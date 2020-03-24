@@ -3,7 +3,7 @@
 
 <h3>How to Build</h3>
 
-<h5>Within the directory that contains nnbar-calo-sim, run </h5>
+<h5>Within the directory that contains nnbar-calo-sim/, run </h5>
   
 $ mkdir nnbar-calo-sim-build <br>
 $ cd nnbar-calo-sim-build  <br>
