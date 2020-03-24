@@ -10,6 +10,16 @@ $ cd nnbar-calo-sim-build  <br>
 $ cmake -DGeant4_DIR=path_to_Geant4_installation/lib[64]/Geant4-10.0.0/ ../nnbar-calo-sim <br>
 $ make <br>              
 
-<h5>You made need to run </h5>
+<h5>If you have shared library problems, you made need to run </h5>
 
 $ source path_to_Geant4_installation/bin/geant4.sh 
+
+<h3>How to Run</h3>
+
+<h5>interactive Mode</h5>
+
+$ ./nnbar-calo-sim
+
+<h5>Macro Mode</h5>
+
+$ ./nnbar-calo-sim -m nnbar-calo-sim.in
