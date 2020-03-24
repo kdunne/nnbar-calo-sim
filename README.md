@@ -7,7 +7,7 @@
   
 $ mkdir nnbar-calo-sim-build <br>
 $ cd nnbar-calo-sim-build  <br>
-$ cmake -DGeant4_DIR=path_to_Geant4_installation/lib[64]/Geant4-10.0.0/ ../nnbar-calo-sim <br>
+$ cmake -DGeant4_DIR=path_to_Geant4_installation/lib/Geant4-10.0.0/ ../nnbar-calo-sim <br>
 $ make <br>              
 
 <h5>If you have shared library problems, you made need to run </h5>
