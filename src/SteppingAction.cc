@@ -78,16 +78,29 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   G4String ParticleName = track->GetDynamicParticle()->
                                  GetParticleDefinition()->GetParticleName();
-
-  if (ParticleName == "opticalphoton") {
-  
-  G4double time = track->GetGlobalTime();
-
-  auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillH1(6, time);
-
-  return;
+  if (track->GetTrackID() > 1) {
+    if (ParticleName != "e-" && ParticleName != "opticalphoton") {
+      G4cout << "Killing particle: " << ParticleName << G4endl;
+      track->SetTrackStatus(fStopAndKill);
+    }
   }
+
+
+  if (ParticleName == "opticalphoton" && track->GetCreatorProcess()->GetProcessName()=="Cerenkov") {
+  
+    
+ // G4double time = track->GetGlobalTime();
+ // G4double loctime = track->GetLocalTime();
+
+ // G4cout << "Local TIme :" << loctime << G4endl;
+ // G4cout << "Globat Time :" << time << G4endl;
+
+ // auto analysisManager = G4AnalysisManager::Instance();
+ // analysisManager->FillH1(6, time);
+  }
+
+//  return;
+  
 
   const std::vector<const G4Track*>* secondaries =
                                             step->GetSecondaryInCurrentStep();
@@ -97,9 +110,16 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         if (secondaries->at(i)->GetParentID()>0) {
            if(secondaries->at(i)->GetDynamicParticle()->GetParticleDefinition()
                == G4OpticalPhoton::OpticalPhotonDefinition()){
-              if (secondaries->at(i)->GetCreatorProcess()->GetProcessName()
-               == "Scintillation")fScintillationCounter++;
-              if (secondaries->at(i)->GetCreatorProcess()->GetProcessName()
+              if (secondaries->at(i)->GetCreatorProcess()->GetProcessName()== "Scintillation"){		
+		fScintillationCounter++;
+  		G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  		G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
+ // 		G4int copyNo = theTouchable->GetReplicaNumber(); 
+//		G4cout << "copyNumber : " << copyNo << G4endl;
+	      }
+
+
+	      if (secondaries->at(i)->GetCreatorProcess()->GetProcessName()
                == "Cerenkov")fCerenkovCounter++;
            }
         }
@@ -109,7 +129,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   else{
     G4int TrackID = track->GetTrackID(); 
     if (TrackID == 1 && track->GetKineticEnergy() == 0) {
-      G4cout << "stopping position" << track->GetPosition()  << G4endl;
+      //G4cout << "stopping position" << track->GetPosition()  << G4endl;
     }
   }
 }

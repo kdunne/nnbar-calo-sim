@@ -145,9 +145,17 @@ void EventAction::EndOfEventAction(const G4Event* event)
   auto analysisManager = G4AnalysisManager::Instance();
 
   // fill histograms
+  if (absoEdep >0 ) {
   analysisManager->FillH1(0, absoEdep);
+  }
+
+  if (gapEdep >0) {
   analysisManager->FillH1(1, gapEdep);
+  }
+  if (absoTrackLength >0) {
   analysisManager->FillH1(2, absoTrackLength);
+  }
+
   if(numcerenkov > 0) {
       analysisManager->FillH1(3, numcerenkov);
   }

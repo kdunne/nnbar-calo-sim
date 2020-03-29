@@ -53,6 +53,7 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 {
 
 
+
   // muon decay products specified here for sanity checking the results
 
   G4ParticleDefinition* pos = G4Positron::PositronDefinition();
@@ -64,15 +65,38 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
   //G4String proc = aTrack->GetCreatorProcess()->G4VProcess::GetProcessName(); 
   G4ParticleDefinition* pid = aTrack->GetDefinition();
+
   if(pid == opticalphoton)
   { // particle is optical photon
-    { // particle is secondary
-      if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation")
-        fScintillationCounter++;
-      if(aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov")
-        fCerenkovCounter++;
-    }
+          if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation")
+              fScintillationCounter++;
+          if(aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
+          
+
+	      // Time Create 
+              G4double time = aTrack->GetGlobalTime();
+              //G4cout << " Time ------ " << time << G4endl;
+	      auto analysisManager = G4AnalysisManager::Instance();
+              analysisManager->FillH1(6, time);
+         
+
+              //G4double time = aTrack->GetGlobalTime();
+              G4double loctime = aTrack->GetLocalTime();
+
+              G4cout << "Local Time : " << loctime/CLHEP::ns << G4endl;
+              G4cout << "Global Time : " << time/CLHEP::ns << G4endl;
+
+	      //G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
+
+	      // Parent Particle
+              //G4Track* pParent = G4Track(aTrack->GetParentID());         
+	      //analysisManager->FillH1(8, position);
+
+
+              fCerenkovCounter++;
+          }
   }
+  
 
 /***  
   if(pid == e){
@@ -100,12 +124,26 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
   //	G4cout << "Other particle: " << pid->GetParticleName() << G4endl;
   //}
 
-	//if(pid != pos && pid != y && pid != antinu_mu && pid != nu_e  && pid != opticalphoton && pid != e){
-  	//G4cout << "PID: " << pid->GetParticleName() << G4endl;
-	//G4cout << "Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
-	//G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
-        //}
 ***/
+
+  else{
+//  if(pid != pos && pid != y && pid != antinu_mu && pid != nu_e  && pid != opticalphoton && pid != e){
+  G4cout << "PID: " << pid->GetParticleName() << G4endl;
+  //G4cout << "Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
+  G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
+  G4cout << "Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
+  // Position
+  G4ThreeVector pos = aTrack->GetPosition();
+  G4double z = pos.getZ();
+
+  // Origin
+  G4ThreeVector vertex = aTrack->GetVertexPosition();
+  G4double origin = vertex.getZ();
+
+  G4double tracklength = z - origin;
+  G4cout << "Position Z : " << tracklength/ CLHEP::mm << " mm" << G4endl;
+  //}
+  }
 
   return fUrgent;
 }
@@ -115,9 +153,21 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 void StackingAction::NewStage()
 {
 
-  //G4cout << "Number of Scintillation photons produced in this event : "
-  //       << fScintillationCounter << G4endl;
-  G4cout << "Number of Cerenkov photons : "<< fCerenkovCounter << G4endl;
+
+  auto analysisManager = G4AnalysisManager::Instance();
+
+  if(fCerenkovCounter>0) {
+  analysisManager->FillH1(3, fCerenkovCounter);
+  }
+
+  //if(fScintillationCounter>0) {
+  //analysisManager->FillH1(8, fScintillationCounter);
+  //}
+
+  G4cout << "Number of Scintillation photons produced in this event : "
+         << fScintillationCounter << G4endl;
+  G4cout << "Number of Cerenkov photons : "
+	 << fCerenkovCounter << G4endl;
 
 /***  
   G4cout << "------> Electrons <--------" << G4endl;

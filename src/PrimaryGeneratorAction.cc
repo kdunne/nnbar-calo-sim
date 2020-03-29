@@ -68,12 +68,14 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
-  G4double worldZHalfLength = 0.;
+  G4double worldZHalfLength = 27.5*cm;
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
   // Set gun position
-  fParticleGun
-    ->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength + 8*cm));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength ));
+
+
+  //    ->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength + 8*cm));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

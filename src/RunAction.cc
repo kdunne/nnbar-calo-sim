@@ -56,14 +56,17 @@ RunAction::RunAction()
   //
   
   // Creating histograms
-  analysisManager->CreateH1("Eabs","Edep in absorber", 100, 0., 800*MeV); // 0
-  analysisManager->CreateH1("Egap","Edep in gap", 100, 0., 800*MeV);	  // 1
-  analysisManager->CreateH1("Labs","trackL in absorber", 100, 0., 500.);  // 2
-  analysisManager->CreateH1("Cerenkov", "Num Cerenkov photons", 40000, 0, 40000); // 3
-  analysisManager->CreateH1("Lscint", "trackL in scint", 10, 0, 300.);        // 4
-  analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  // 5
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Time Dist", 5000, 0, 5000*ns); // 6
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 5000, 0, 5000*ns); //7
+  analysisManager->CreateH1("Eabs","Energy Deposited in Absorber", 500, 0., 500*MeV); //	0
+  analysisManager->CreateH1("Egap","Energy Deposited in Scintillator", 100, 0., 1*MeV);	  // 	1
+  analysisManager->CreateH1("Labs","Track Length in Absorber", 100, 0., 500.);  // 		2
+  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 40000, 0, 40000); //      	3
+  analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        //   4
+  analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  //          	5
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 100, 0, 100*ns); // 	6
+  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 200, 0, 200*ns); //         	7
+  analysisManager->CreateH1("PhotonPos", "Photon Production Vertex Z", 80, 0, 800*mm); //  	8
+  //analysisManager->CreateH2("
+
   // create h2 energy dep time
 
   // Creating ntuple

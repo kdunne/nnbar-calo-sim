@@ -89,15 +89,29 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
  //Run* run 
  // = static_cast<Run*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
    
- //get time
+ // When Primary Particle Decays 
  G4int ID = track->GetTrackID();
  if (ID==1 && track->GetKineticEnergy() == 0) { 
- G4double time = track->GetGlobalTime(); 
- //G4cout << "TIME " << time/ns << "ns" << G4endl;
+     G4double time = track->GetGlobalTime() / ns; 
+     G4cout << "TIME " << time << "ns" << G4endl;
 
- G4AnalysisManager* analysis = G4AnalysisManager::Instance();
- analysis->FillH1(7, time); 
+     // Position
+     G4ThreeVector pos = track->GetPosition();
+     G4double z = pos.getZ();
 
+     // Origin
+     G4ThreeVector vertex = track->GetVertexPosition();
+     G4double origin = vertex.getZ();
+
+     G4double tracklength = z - origin;
+ 
+     G4cout << "Delta z : " << tracklength/mm << " mm" << G4endl;
+
+     //G4cout << "POSITION DECAY " << z/mm << G4endl;
+     G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+
+     analysis->FillH1(7, time); 
+     analysis->FillH1(8, tracklength/mm);
 
  }
 

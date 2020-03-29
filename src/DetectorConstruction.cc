@@ -163,20 +163,29 @@ absMPT->AddProperty("RINDEX", PhotonEnergy, refractiveIndex, nEntries)
 Abs->SetMaterialPropertiesTable(absMPT);
 
 // Print materials
+  G4cout << "Absorber Properties -------" << G4endl;
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
   absMPT->DumpTable();
 
 
 
 //Scintillator Optical Properties
+
 /***
   const G4int nEntries2 = 12;
 
   G4double ScintPhotonEnergy[nEntries2] =
-    {3.44*eV, 3.26*eV, 3.1*eV, 3.02*eV, 2.95*eV,
-     2.92*eV, 2.82*eV, 2.76*eV, 2.7*eV, 2.58*eV,
-     2.38*eV, 2.08*eV     
-    };
+
+  { 2.08*eV, 2.38*eV, 2.58*eV, 2.7*eV, 2.76*eV,
+    2.82*eV, 2.92*eV, 2.95*eV, 3.02*eV, 3.1*eV,
+    3.26*eV, 3.44*eV
+  };
+
+ //   {3.44*eV, 3.26*eV, 3.1*eV, 3.02*eV, 2.95*eV,
+ //    2.92*eV, 2.82*eV, 2.76*eV, 2.7*eV, 2.58*eV,
+ //    2.38*eV, 2.08*eV     
+ //   };
+
 
   G4double rindex_scint[nEntries2] =
     {1.58, 1.58, 1.58, 1.58, 1.58,
@@ -190,24 +199,42 @@ Abs->SetMaterialPropertiesTable(absMPT);
      210*cm, 210*cm
     };
 
-  G4double scintill_scint[nEntries2] =
+  G4double scintilFast[nEntries2] =
     {.04, .07, .20, .49, .84,
      1.0, .83, .55, .40, .17,
      .03, 0
     };
 
-  G4MaterialPropertiesTable *scintMPT = new G4MaterialPropertiesTable();
-  scintMPT->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint, nEntries2);
-  scintMPT->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint, nEntries2);
-  scintMPT->AddProperty("FASTCOMPONENT", ScintPhotonEnergy, scintill_scint, nEntries2);
+ G4double scintilSlow[nEntries2] =
+    {.04, .07, .20, .49, .84,
+     1.0, .83, .55, .40, .17,
+     .03, 0
+    };
 
-  scintMPT->AddConstProperty("SCINTILLATIONYIELD", 500./MeV);
+
+  G4MaterialPropertiesTable *scintMPT = new G4MaterialPropertiesTable();
+  scintMPT->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint, nEntries2)
+	  ->SetSpline(true);
+  scintMPT->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint, nEntries2)
+	  ->SetSpline(true);
+  scintMPT->AddProperty("FASTCOMPONENT", ScintPhotonEnergy, scintilFast, nEntries2)
+	  ->SetSpline(true);
+  scintMPT->AddProperty("SLOWCOMPONENT", ScintPhotonEnergy, scintilSlow, nEntries2)
+	  ->SetSpline(true);
+
+  // 64% of Antracene: 17400
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD", 11136000/keV);
   scintMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
-  scintMPT->AddConstProperty("FASTTIMECONSTANT", 1.*ns);
-  scintMPT->AddConstProperty("SLOWTIMECONSTANT", 1.*ns);
+  scintMPT->AddConstProperty("FASTTIMECONSTANT", .9*ns);
+  scintMPT->AddConstProperty("SLOWTIMECONSTANT", 2.1*ns);
   scintMPT->AddConstProperty("YIELDRATIO", 1.);
 
   Scint->SetMaterialPropertiesTable(scintMPT);
+
+  // Print materials
+  G4cout << "Scintillator Properties -------" << G4endl;
+  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  scintMPT->DumpTable();
 ***/
 }
 //....
@@ -216,13 +243,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 {
   // Geometry parameters
   G4int  nofLayers = 10;
-  G4double  absoThickness = 50.*cm;
+  G4double  absoThickness = 25.*cm;
   G4double  scintThickness =  3.*cm;
   G4double  calorSizeXY  = 1.*m;
 
   auto calorThickness = (nofLayers*scintThickness) + absoThickness;
-  auto worldSizeXY = 1.2 * calorSizeXY;
-  auto worldSizeZ  = 1.2 * calorThickness;
+  auto worldSizeXY = 1 * calorSizeXY;
+  auto worldSizeZ  = 1 * calorThickness;
 
 
   // Get materials
@@ -292,11 +319,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  absorberS,        // its solid
                  absorberMaterial, // its material
                  "AbsoLV");          // its name
-    
+ 
+ 
+
   auto absorberPV  
     = new G4PVPlacement(
                  0,                // no rotation
-		 G4ThreeVector(0., 0., absoThickness/2 - 10*cm ),
+		 G4ThreeVector(0., 0., absoThickness/2. + (calorThickness/2. - absoThickness) ),
                 // G4ThreeVector(0., 0., -scintThickness/2), //  its position
                  absorberLV,       // its logical volume                         
                  "Abso",           // its name
@@ -319,7 +348,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto layerPV
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0., -(scintThickness*nofLayers)/2 - 10*cm ), //  its position
+                 G4ThreeVector(0., 0.,  -(scintThickness*nofLayers/2. ) + (calorThickness/2. - absoThickness) ), //  its position
                  layerLV,            // its logical volume                         
                  "Gap",            // its name
                  calorLV,          // its mother  volume
@@ -426,7 +455,11 @@ void DetectorConstruction::ConstructSDandField()
   primitive->SetFilter(gun_part);
   //primitive ->SetFilter(charged);
   scintDetector->RegisterPrimitive(primitive);  
-  
+
+  primitive = new G4PSPopulation("Population");
+  primitive->SetFilter(photonFilter);
+  scintDetector->RegisterPrimitive(primitive);
+
   SetSensitiveDetector("ScintLV", scintDetector);  
 
 }
