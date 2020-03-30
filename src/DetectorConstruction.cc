@@ -448,9 +448,14 @@ void DetectorConstruction::ConstructSDandField()
   auto scintDetector = new G4MultiFunctionalDetector("Scint");
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
 
-  primitive = new G4PSEnergyDeposit("Edep");
+  primitive = new G4PSEnergyDeposit("Edep_gun");
+  primitive->SetFilter(gun_part);
   scintDetector->RegisterPrimitive(primitive);
   
+  primitive = new G4PSEnergyDeposit("Edep_other");
+  primitive->SetFilter(gun_part);
+  scintDetector->RegisterPrimitive(primitive);
+
   primitive = new G4PSTrackLength("TrackLength");
   primitive->SetFilter(gun_part);
   //primitive ->SetFilter(charged);
