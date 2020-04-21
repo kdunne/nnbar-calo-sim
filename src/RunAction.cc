@@ -62,10 +62,11 @@ RunAction::RunAction()
   analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 40000, 0, 40000); //      	3
   analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        //   4
   analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  //          	5
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 100, 0, 100*ns); // 	6
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 200, 0, 200*ns); //         	7
-  analysisManager->CreateH1("PhotonPos", "Photon Production Vertex Z", 80, 0, 800*mm); //  	8
-  //analysisManager->CreateH2("
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 3*ns); // 	6
+  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); //         	7
+  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); //  	8
+  // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
+  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); // 9 
 
   // create h2 energy dep time
 
@@ -95,7 +96,9 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
   
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
-
+  
+  
+  //fileName = argv[1];
   // Open an output file
   //
   G4String fileName = "calo-sim";

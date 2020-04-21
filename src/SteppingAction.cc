@@ -75,13 +75,76 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   }
 
   G4Track* track = step->GetTrack();
+  G4int ID = track->GetTrackID();
+
+  if (ID==1) {
+
+      G4StepPoint* prePoint = step->GetPreStepPoint();
+      G4StepPoint* postPoint = step->GetPostStepPoint();
+
+
+
+      G4String procName = postPoint->GetProcessDefinedStep()->GetProcessName();
+      G4cout << " Process : " << procName << G4endl;
+
+      G4double kinEnergyPreStep = prePoint->GetKineticEnergy();
+      G4double kinEnergyPostStep = postPoint->GetKineticEnergy();
+
+      G4double engDep = kinEnergyPreStep - kinEnergyPostStep;
+
+
+      //G4double KinEn = track->GetKineticEnergy();
+      //G4cout << " Kinetic energy transfer " << engDep/CLHEP::keV << " keV" << G4endl;
+      //G4cout << " Kinetic energy pre step " << kinEnergyPreStep/CLHEP::keV << " keV" << G4endl;   
+      //G4cout << " Kinetix energy post step " << kinEnergyPostStep/CLHEP::keV << G4endl;
+      //G4cout << " Kinetic energy track " << track->GetKineticEnergy()/CLHEP::keV<< G4endl;
+      //G4cout << "Kinetic Energy primary particle " << KinEn/CLHEP::MeV << " MeV" << G4endl;
+      
+      // Current Z Position
+      G4ThreeVector pos = prePoint->GetPosition();
+      //G4ThreeVector pos = track->GetPosition();
+      G4double z = pos.getZ();
+
+      // Origin Z Position
+      G4ThreeVector vertex = track->GetVertexPosition();
+      G4double origin = vertex.getZ();
+      G4double tracklength = z - origin;
+     
+      //G4cout << "Distance in detector " << tracklength/CLHEP::mm << " mm" << G4endl; 
+      
+      
+      //G4cout << "Filling with " << tracklength << " mm and " << kinEnergyPreStep/CLHEP::MeV << " MeV" << G4endl;
+      
+      
+      G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+      analysis->FillH2(0, tracklength/CLHEP::cm, kinEnergyPreStep/CLHEP::MeV);
+      //analysis->FillH2(0, tracklength, track->GetKineticEnergy());
+      //analysis->FillH2(0,tracklength,engDep);
+
+
+      if (track->GetKineticEnergy() == 0) {
+         G4double time = track->GetGlobalTime() / CLHEP::ns;
+         
+	 G4ThreeVector trackPos = track->GetPosition();
+         //z = trackPos.getZ();
+	 //tracklength = z - origin;
+
+	 //G4cout << "TIME " << time << "ns" << G4endl;
+         //G4cout << "Delta z : " << tracklength/mm << " mm" << G4endl;
+         //G4cout << "POSITION DECAY " << z/mm << G4endl;
+
+         analysis->FillH1(7, time);
+         //analysis->FillH1(8, tracklength/CLHEP::cm); 
+     }
+
+  }
 
   G4String ParticleName = track->GetDynamicParticle()->
                                  GetParticleDefinition()->GetParticleName();
   if (track->GetTrackID() > 1) {
-    if (ParticleName != "e-" && ParticleName != "opticalphoton") {
+    if ( track->GetParentID() > 1 && ParticleName != "opticalphoton") {
       G4cout << "Killing particle: " << ParticleName << G4endl;
-      track->SetTrackStatus(fStopAndKill);
+      track->SetTrackStatus(fKillTrackAndSecondaries);
     }
   }
 

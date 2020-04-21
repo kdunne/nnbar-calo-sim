@@ -81,12 +81,14 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
          
 
               //G4double time = aTrack->GetGlobalTime();
-              G4double loctime = aTrack->GetLocalTime();
+              //G4double loctime = aTrack->GetLocalTime();
 
-              G4cout << "Local Time : " << loctime/CLHEP::ns << G4endl;
+              //G4cout << "Local Time : " << loctime/CLHEP::ns << G4endl;
               G4cout << "Global Time : " << time/CLHEP::ns << G4endl;
-
-	      //G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
+	      if(aTrack->GetParentID() > 1 && time/CLHEP::ns >=3 ) {
+	     
+	      G4cout << "Cerenkov Parent Track ID : " << aTrack->GetParentID() << G4endl; 
+	      }//G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
 
 	      // Parent Particle
               //G4Track* pParent = G4Track(aTrack->GetParentID());         
@@ -128,10 +130,13 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
   else{
 //  if(pid != pos && pid != y && pid != antinu_mu && pid != nu_e  && pid != opticalphoton && pid != e){
-  G4cout << "PID: " << pid->GetParticleName() << G4endl;
-  //G4cout << "Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
-  G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
-  G4cout << "Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
+  if(aTrack->GetTrackID() > 1) {
+  if( (aTrack->GetGlobalTime() / CLHEP::ns) >= 3){ 
+  G4cout << "Track ID: " << aTrack->GetTrackID() << G4endl;
+  G4cout << "--------> PID: " << pid->GetParticleName() << G4endl;
+  //G4cout << "--------> Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
+  //G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
+  G4cout << "--------> Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
   // Position
   G4ThreeVector pos = aTrack->GetPosition();
   G4double z = pos.getZ();
@@ -144,7 +149,8 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
   G4cout << "Position Z : " << tracklength/ CLHEP::mm << " mm" << G4endl;
   //}
   }
-
+  }
+  }
   return fUrgent;
 }
 
