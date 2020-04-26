@@ -26,6 +26,8 @@
 //
 
 #include "DetectorConstruction.hh"
+#include "ScintillatorSD.hh"
+#include "AbsorberSD.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -83,6 +85,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 }
 
 //....
+
 
 void DetectorConstruction::DefineMaterials()
 { 
@@ -171,7 +174,7 @@ Abs->SetMaterialPropertiesTable(absMPT);
 
 //Scintillator Optical Properties
 
-/***
+  /***
   const G4int nEntries2 = 12;
 
   G4double ScintPhotonEnergy[nEntries2] =
@@ -235,7 +238,8 @@ Abs->SetMaterialPropertiesTable(absMPT);
   G4cout << "Scintillator Properties -------" << G4endl;
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
   scintMPT->DumpTable();
-***/
+
+  ***/
 }
 //....
 
@@ -420,6 +424,8 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
   // Scorers
 
+
+/***
   // declare Absorber as a MultiFunctionalDetector scorer
   auto absDetector = new G4MultiFunctionalDetector("Absorber");
   G4SDManager::GetSDMpointer()->AddNewDetector(absDetector);
@@ -443,8 +449,12 @@ void DetectorConstruction::ConstructSDandField()
   primitive->SetFilter(photonFilter);
   absDetector->RegisterPrimitive(primitive);
   SetSensitiveDetector("AbsoLV",absDetector);
-  
+ ***/
+
+
+
   // declare Scintillator as a MultiFunctionalDetector scorer
+  /***
   auto scintDetector = new G4MultiFunctionalDetector("Scint");
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
 
@@ -466,6 +476,23 @@ void DetectorConstruction::ConstructSDandField()
   scintDetector->RegisterPrimitive(primitive);
 
   SetSensitiveDetector("ScintLV", scintDetector);  
+  ***/
+
+
+  // declare Scintillator as SinctillatorSD
+  G4String scintDetectorName = "ScintLV" ;
+  
+  ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
+  SetSensitiveDetector("ScintLV", scintDetector);
+  //scintLV->SetSensitiveDetector(scintDetector);
+
+  // declare absorber as AbsorberSD
+  G4String absorberDetectorName = "AbsoLV" ;
+  
+  AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
+  SetSensitiveDetector("AbsoLV", absorberDetector);
 
 }
 

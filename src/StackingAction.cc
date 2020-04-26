@@ -84,10 +84,10 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
               //G4double loctime = aTrack->GetLocalTime();
 
               //G4cout << "Local Time : " << loctime/CLHEP::ns << G4endl;
-              G4cout << "Global Time : " << time/CLHEP::ns << G4endl;
+              //G4cout << "Global Time : " << time/CLHEP::ns << G4endl;
 	      if(aTrack->GetParentID() > 1 && time/CLHEP::ns >=3 ) {
 	     
-	      G4cout << "Cerenkov Parent Track ID : " << aTrack->GetParentID() << G4endl; 
+	      //G4cout << "Cerenkov Parent Track ID : " << aTrack->GetParentID() << G4endl; 
 	      }//G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
 
 	      // Parent Particle
@@ -132,11 +132,11 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 //  if(pid != pos && pid != y && pid != antinu_mu && pid != nu_e  && pid != opticalphoton && pid != e){
   if(aTrack->GetTrackID() > 1) {
   if( (aTrack->GetGlobalTime() / CLHEP::ns) >= 3){ 
-  G4cout << "Track ID: " << aTrack->GetTrackID() << G4endl;
-  G4cout << "--------> PID: " << pid->GetParticleName() << G4endl;
+  //G4cout << "Track ID: " << aTrack->GetTrackID() << G4endl;
+  //G4cout << "--------> PID: " << pid->GetParticleName() << G4endl;
   //G4cout << "--------> Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
   //G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
-  G4cout << "--------> Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
+  //G4cout << "--------> Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
   // Position
   G4ThreeVector pos = aTrack->GetPosition();
   G4double z = pos.getZ();
@@ -146,7 +146,7 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
   G4double origin = vertex.getZ();
 
   G4double tracklength = z - origin;
-  G4cout << "Position Z : " << tracklength/ CLHEP::mm << " mm" << G4endl;
+  //G4cout << "Position Z : " << tracklength/ CLHEP::mm << " mm" << G4endl;
   //}
   }
   }
@@ -163,17 +163,17 @@ void StackingAction::NewStage()
   auto analysisManager = G4AnalysisManager::Instance();
 
   if(fCerenkovCounter>0) {
-  analysisManager->FillH1(3, fCerenkovCounter);
+  analysisManager->FillH1(13, fCerenkovCounter);
   }
 
   //if(fScintillationCounter>0) {
   //analysisManager->FillH1(8, fScintillationCounter);
   //}
 
-  G4cout << "Number of Scintillation photons produced in this event : "
-         << fScintillationCounter << G4endl;
-  G4cout << "Number of Cerenkov photons : "
-	 << fCerenkovCounter << G4endl;
+//  G4cout << "Number of Scintillation photons produced in this event : "
+//         << fScintillationCounter << G4endl;
+//  G4cout << "Number of Cerenkov photons : "
+//	 << fCerenkovCounter << G4endl;
 
 /***  
   G4cout << "------> Electrons <--------" << G4endl;

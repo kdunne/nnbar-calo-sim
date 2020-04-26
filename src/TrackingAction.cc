@@ -108,7 +108,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
      G4double origin = vertex.getZ();
      G4double tracklength = z - origin;
 
-     //analysis->FillH2(9, KinEn, tracklength/mm);
+     //analysis->FillH2(0, KinEn, tracklength/mm);
 
      if (KinEn == 0) { 
      //    G4double time = track->GetGlobalTime() / ns; 
@@ -119,10 +119,10 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
          //G4cout << "POSITION DECAY " << z/mm << G4endl;
 
      //    analysis->FillH1(7, time); 
-         analysis->FillH1(8, tracklength/cm);
+         analysis->FillH1(18, tracklength/cm);
      }
  }
-
+}
  //  G4int ID = track->GetTrackID();
  // if (ID == 1) run->PrimaryTiming(time);        //time of life of primary ion
  // fTime_end = time;      
@@ -136,6 +136,5 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
  //if ((fTime_birth <= fTimeWindow2)&&(fTime_end > fTimeWindow2)) life2 = true;
  //if ((fTime_end   >  fTimeWindow1)&&(fTime_end < fTimeWindow2)) decay = true;
  //if (life1||life2||decay) run->CountInTimeWindow(name,life1,life2,decay);
-}
 
 //....

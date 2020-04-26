@@ -56,6 +56,8 @@ private:
   G4int  fAbsoTrackLengthHCID;
   G4int  fCerenkovHCID;
   G4int  fScintTrackLengthHCID;
+  G4int  scintHitsCollectionID;
+  G4int  absHitsCollectionID;
   //G4int  fGapTrackLengthHCID;
 };
                      

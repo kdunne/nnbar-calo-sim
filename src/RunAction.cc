@@ -56,28 +56,40 @@ RunAction::RunAction()
   //
   
   // Creating histograms
-  analysisManager->CreateH1("Eabs","Energy Deposited in Absorber", 500, 0., 500*MeV); //	0
-  analysisManager->CreateH1("Egap","Energy Deposited in Scintillator", 100, 0., 1*MeV);	  // 	1
-  analysisManager->CreateH1("Labs","Track Length in Absorber", 100, 0., 500.);  // 		2
-  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 40000, 0, 40000); //      	3
-  analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        //   4
-  analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  //          	5
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 3*ns); // 	6
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); //         	7
-  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); //  	8
-  // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); // 9 
 
-  // create h2 energy dep time
-
-  // Creating ntuple
+  // Scintillator Bin Histos
+  // 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
   //
-  analysisManager->CreateNtuple("calo", "Edep and TrackL");
-  analysisManager->CreateNtupleDColumn("Eabs");
-  analysisManager->CreateNtupleDColumn("Egap");
-  analysisManager->CreateNtupleDColumn("Labs");
-  analysisManager->CreateNtupleDColumn("Ceren");
-  analysisManager->FinishNtuple();
+  //for(int i=0; i<10; i++) {
+  //    G4String h1name = "Scint_Bin_" + i.c_str()
+  analysisManager->CreateH1("Scint_Bin_1", "Num Scint Photons", 60000, 0, 60000); // 0
+  analysisManager->CreateH1("Scint_Bin_2", "Num Scint Photons", 60000, 0, 60000); // 1
+  analysisManager->CreateH1("Scint_Bin_3", "Num Scint Photons", 60000, 0, 60000); // 2
+  analysisManager->CreateH1("Scint_Bin_4", "Num Scint Photons", 60000, 0, 60000); // 3
+  analysisManager->CreateH1("Scint_Bin_5", "Num Scint Photons", 60000, 0, 60000); // 4
+  analysisManager->CreateH1("Scint_Bin_6", "Num Scint Photons", 60000, 0, 60000); // 5
+  analysisManager->CreateH1("Scint_Bin_7", "Num Scint Photons", 60000, 0, 60000); // 6
+  analysisManager->CreateH1("Scint_Bin_8", "Num Scint Photons", 60000, 0, 60000); // 7
+  analysisManager->CreateH1("Scint_Bin_9", "Num Scint Photons", 60000, 0, 60000); // 8
+  analysisManager->CreateH1("Scint_Bin_10", "Num Scint Photons", 60000, 0, 60000); //9
+  //    G4cout << "h1name: " << h1name << G4endl; 
+  //}
+
+  analysisManager->CreateH1("Eabs","Energy Deposited in Absorber", 500, 0., 500*MeV); //	10
+  analysisManager->CreateH1("Egap","Energy Deposited in Scintillator", 100, 0., 1*MeV);	  // 	11
+  analysisManager->CreateH1("Labs","Track Length in Absorber", 100, 0., 500.);  // 		12
+  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 40000, 0, 40000); //      	13
+  analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        //   14
+  analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  //          	15
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 3*ns); // 	16
+  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); //         	17
+  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); //  		18
+  // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
+  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); // 		0 
+
+
+  
+
 }
 
 //....

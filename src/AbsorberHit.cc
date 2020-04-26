@@ -23,50 +23,51 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
+// Hadrontherapy advanced example for Geant4
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "ActionInitialization.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "RunAction.hh"
-#include "EventAction.hh"
-#include "StackingAction.hh"
-//#include "SteppingAction.hh"
-#include "TrackingAction.hh"
+#include "AbsorberHit.hh"
 
-//....
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
-{}
+//**********************MT
+G4ThreadLocal G4Allocator<AbsorberHit>* AbsorberHitAllocator=0;
+//**********************MT
 
-//....
-
-ActionInitialization::~ActionInitialization()
-{;}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void ActionInitialization::BuildForMaster() const
+AbsorberHit::AbsorberHit()
+: G4VHit()
 {
-  SetUserAction(new RunAction);
+ energyDeposit = 0;
+ kinEnergy = 0;
+ posZ = 0;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+AbsorberHit::~AbsorberHit()
+{}
 
-void ActionInitialization::Build() const
+AbsorberHit::AbsorberHit(const AbsorberHit& right)
+  : G4VHit()
 {
-  SetUserAction(new PrimaryGeneratorAction);
-  
-  SetUserAction(new RunAction);
-  
-  EventAction* eventAction = new EventAction();
-  SetUserAction(eventAction);
-  
-  SetUserAction(new StackingAction());
-  
-//  SetUserAction(new SteppingAction());
-  
-  SetUserAction(new TrackingAction());
-}  
+ // xHitID = right.xHitID;
+ //zHitID = right.zHitID;
+ //yHitID = right.yHitID;
+ posZ = right.posZ;
+ energyDeposit = right.energyDeposit;
+ kinEnergy = right.kinEnergy;
+}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+const AbsorberHit& AbsorberHit::operator=(const AbsorberHit& right)
+{
+ //xHitID = right.xHitID;
+ //zHitID = right.zHitID;
+ //yHitID = right.yHitID;
+ posZ = right.posZ;
+ energyDeposit = right.energyDeposit;
+ kinEnergy = right.kinEnergy;
+ return *this;
+}
+
+G4bool AbsorberHit::operator==(const AbsorberHit& right) const
+{
+//return(xHitID==right.xHitID);
+       	//return((xHitID==right.xHitID)&&(zHitID==right.zHitID)&&(yHitID==right.yHitID));
+}

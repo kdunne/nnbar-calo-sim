@@ -23,50 +23,36 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "ActionInitialization.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "RunAction.hh"
-#include "EventAction.hh"
-#include "StackingAction.hh"
-//#include "SteppingAction.hh"
-#include "TrackingAction.hh"
+#ifndef ScintillatorSD_h
+#define ScintillatorSD_h 1
 
-//....
+#include "G4VSensitiveDetector.hh"
+#include "ScintillatorHit.hh"
+#include "globals.hh"
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
-{}
-
-//....
-
-ActionInitialization::~ActionInitialization()
-{;}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void ActionInitialization::BuildForMaster() const
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class ScintillatorSD : public G4VSensitiveDetector
 {
-  SetUserAction(new RunAction);
-}
+public:
+    ScintillatorSD(G4String name);
+    ~ScintillatorSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
+private:
+    ScintillatorHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
+};
+#endif
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void ActionInitialization::Build() const
-{
-  SetUserAction(new PrimaryGeneratorAction);
-  
-  SetUserAction(new RunAction);
-  
-  EventAction* eventAction = new EventAction();
-  SetUserAction(eventAction);
-  
-  SetUserAction(new StackingAction());
-  
-//  SetUserAction(new SteppingAction());
-  
-  SetUserAction(new TrackingAction());
-}  
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

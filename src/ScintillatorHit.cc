@@ -23,50 +23,51 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
+// Hadrontherapy advanced example for Geant4
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "ActionInitialization.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "RunAction.hh"
-#include "EventAction.hh"
-#include "StackingAction.hh"
-//#include "SteppingAction.hh"
-#include "TrackingAction.hh"
+#include "ScintillatorHit.hh"
 
-//....
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
-{}
+//**********************MT
+G4ThreadLocal G4Allocator<ScintillatorHit>* ScintillatorHitAllocator=0;
+//**********************MT
 
-//....
-
-ActionInitialization::~ActionInitialization()
-{;}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void ActionInitialization::BuildForMaster() const
+ScintillatorHit::ScintillatorHit()
+: G4VHit()
 {
-  SetUserAction(new RunAction);
+ energyDeposit = 0;
+ kinEnergy = 0;
+ posZ = 0;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+ScintillatorHit::~ScintillatorHit()
+{}
 
-void ActionInitialization::Build() const
+ScintillatorHit::ScintillatorHit(const ScintillatorHit& right)
+  : G4VHit()
 {
-  SetUserAction(new PrimaryGeneratorAction);
-  
-  SetUserAction(new RunAction);
-  
-  EventAction* eventAction = new EventAction();
-  SetUserAction(eventAction);
-  
-  SetUserAction(new StackingAction());
-  
-//  SetUserAction(new SteppingAction());
-  
-  SetUserAction(new TrackingAction());
-}  
+ xHitID = right.xHitID;
+ //zHitID = right.zHitID;
+ //yHitID = right.yHitID;
+ posZ = right.posZ;
+ energyDeposit = right.energyDeposit;
+ kinEnergy = right.kinEnergy;
+}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+const ScintillatorHit& ScintillatorHit::operator=(const ScintillatorHit& right)
+{
+ xHitID = right.xHitID;
+ //zHitID = right.zHitID;
+ //yHitID = right.yHitID;
+ posZ = right.posZ;
+ energyDeposit = right.energyDeposit;
+ kinEnergy = right.kinEnergy;
+ return *this;
+}
+
+G4bool ScintillatorHit::operator==(const ScintillatorHit& right) const
+{
+return(xHitID==right.xHitID);
+       	//return((xHitID==right.xHitID)&&(zHitID==right.zHitID)&&(yHitID==right.yHitID));
+}
