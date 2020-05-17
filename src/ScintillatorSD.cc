@@ -27,7 +27,7 @@
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
 #include "ScintillatorSD.hh"
-#include "ScintillatorHit.hh"
+//#include "ScintillatorHit.hh"
 
 //#include "HadrontherapyMatrix.hh"
 //#include "HadrontherapyLet.hh"
@@ -62,7 +62,7 @@ ScintillatorSD::ScintillatorSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="ScintillatorHitsCollection");
+    collectionName.insert(HCname="ScintillatorHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
@@ -76,7 +76,7 @@ ScintillatorSD::~ScintillatorSD()
 void ScintillatorSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new ScintillatorHitsCollection(sensitiveDetectorName,
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
                                                              collectionName[0]);
 }
 
@@ -88,14 +88,14 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
     
     
-    // Get kinetic energy
+    // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
    
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
-
-    G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
+    
     //Get particle name
+    G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
     
     // Get particle PDG code
@@ -104,6 +104,8 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get unique track_id (in an event)
     G4int trackID = theTrack -> GetTrackID();
     
+   
+    // Get Energy deposited
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
     
     G4double DX = aStep -> GetStepLength();
@@ -139,14 +141,17 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
         // Get the step average kinetic energy
         G4double eKinMean = (eKinPre + eKinPost) * 0.5;
-        
 
-
-        ScintillatorHit* detectorHit = new ScintillatorHit();
+        NNbarHit* detectorHit = new NNbarHit();
 
         // Make this kinetic energy and position
-        detectorHit -> SetKinEnAndPosition(k, tracklength, energyDeposit, eKinMean);
-        HitsCollection -> insert(detectorHit);
+        detectorHit -> SetTrackID(trackID);
+        detectorHit -> SetXID(k);
+        detectorHit -> SetPosZ(tracklength);
+        detectorHit -> SetEDep(energyDeposit);
+        detectorHit -> SetKinEn(eKinMean);
+
+	HitsCollection -> insert(detectorHit);
 
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;

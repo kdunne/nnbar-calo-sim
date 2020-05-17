@@ -51,33 +51,33 @@ StackingAction::~StackingAction()
 G4ClassificationOfNewTrack
 StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 {
-
-
-
   // muon decay products specified here for sanity checking the results
 
-  G4ParticleDefinition* pos = G4Positron::PositronDefinition();
   G4ParticleDefinition* y = G4Gamma::GammaDefinition();
-  G4ParticleDefinition* antinu_mu = G4AntiNeutrinoMu::AntiNeutrinoMuDefinition();
-  G4ParticleDefinition* nu_e = G4NeutrinoE::NeutrinoEDefinition(); 
   G4ParticleDefinition* opticalphoton = G4OpticalPhoton::OpticalPhotonDefinition();	
   G4ParticleDefinition* e = G4Electron::ElectronDefinition();
 
   //G4String proc = aTrack->GetCreatorProcess()->G4VProcess::GetProcessName(); 
   G4ParticleDefinition* pid = aTrack->GetDefinition();
 
-  if(pid == opticalphoton)
-  { // particle is optical photon
-          if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation")
-              fScintillationCounter++;
-          if(aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
+  auto analysisManager = G4AnalysisManager::Instance();
+
+  
+  if(pid == opticalphoton) { // particle is optical photon
+      if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation"){
+          G4int bin = aTrack->GetTouchable()->GetReplicaNumber(0); 
+	  fScintillationCounter++;
+	  //analysisManager->FillH1(0, bin, 1);
+      }
+ 
+      if(aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
           
 
 	      // Time Create 
               G4double time = aTrack->GetGlobalTime();
               //G4cout << " Time ------ " << time << G4endl;
 	      auto analysisManager = G4AnalysisManager::Instance();
-              analysisManager->FillH1(6, time);
+              analysisManager->FillH1(10, time);
          
 
               //G4double time = aTrack->GetGlobalTime();
@@ -85,10 +85,10 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
               //G4cout << "Local Time : " << loctime/CLHEP::ns << G4endl;
               //G4cout << "Global Time : " << time/CLHEP::ns << G4endl;
-	      if(aTrack->GetParentID() > 1 && time/CLHEP::ns >=3 ) {
+	      //if(aTrack->GetParentID() > 1 && time/CLHEP::ns >=3 ) {
 	     
 	      //G4cout << "Cerenkov Parent Track ID : " << aTrack->GetParentID() << G4endl; 
-	      }//G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
+	      //}//G4cout << "Volume : " << aTrack->GetVolume() << G4endl;
 
 	      // Parent Particle
               //G4Track* pParent = G4Track(aTrack->GetParentID());         
@@ -96,48 +96,16 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
 
 
               fCerenkovCounter++;
-          }
+      }
   }
   
 
-/***  
-  if(pid == e){
-      felectroncounter++;
-      //felectronmom += aTrack->GetDynamicParticle()->GetTotalMomentum();
-  }
-  
-  if(pid == pos){
-      fposcounter++;
-      //felectronmom += aTrack->GetDynamicParticle()->GetTotalMomentum();
-  }
-  if(pid == y){
-      fgammacounter++;
-      //fgammamom += aTrack->GetDynamicParticle()->GetTotalMomentum();
-  }
-  if(pid == antinu_mu){
-     fnumucounter++;
-     //fnumumom += aTrack->GetDynamicParticle()->GetTotalMomentum();
-  }
-  if(pid == nu_e){
-     fantinuecounter++;
-     //fantinuemom += aTrack->GetDynamicParticle()->GetTotalMomentum();
-  }
-  //else{
-  //	G4cout << "Other particle: " << pid->GetParticleName() << G4endl;
-  //}
-
-***/
-
+/***
   else{
 //  if(pid != pos && pid != y && pid != antinu_mu && pid != nu_e  && pid != opticalphoton && pid != e){
   if(aTrack->GetTrackID() > 1) {
   if( (aTrack->GetGlobalTime() / CLHEP::ns) >= 3){ 
-  //G4cout << "Track ID: " << aTrack->GetTrackID() << G4endl;
-  //G4cout << "--------> PID: " << pid->GetParticleName() << G4endl;
-  //G4cout << "--------> Process: " << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
-  //G4cout << "Momentum: " << aTrack->GetDynamicParticle()->GetTotalMomentum()  << "MeV" << G4endl;
-  //G4cout << "--------> Global Time: " << aTrack->GetGlobalTime() / CLHEP::ns << " ns" << G4endl;
-  // Position
+ // Position
   G4ThreeVector pos = aTrack->GetPosition();
   G4double z = pos.getZ();
 
@@ -151,7 +119,9 @@ StackingAction::ClassifyNewTrack(const G4Track * aTrack)
   }
   }
   }
+***/
   return fUrgent;
+
 }
 
 //....
@@ -163,7 +133,7 @@ void StackingAction::NewStage()
   auto analysisManager = G4AnalysisManager::Instance();
 
   if(fCerenkovCounter>0) {
-  analysisManager->FillH1(13, fCerenkovCounter);
+  analysisManager->FillH1(9, fCerenkovCounter);
   }
 
   //if(fScintillationCounter>0) {

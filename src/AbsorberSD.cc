@@ -27,7 +27,7 @@
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
 #include "AbsorberSD.hh"
-#include "AbsorberHit.hh"
+#include "NNbarHit.hh"
 
 //#include "HadrontherapyMatrix.hh"
 //#include "HadrontherapyLet.hh"
@@ -62,7 +62,7 @@ AbsorberSD::AbsorberSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="AbsorberHitsCollection");
+    collectionName.insert(HCname="AbsorberHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
@@ -76,7 +76,7 @@ AbsorberSD::~AbsorberSD()
 void AbsorberSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new AbsorberHitsCollection(sensitiveDetectorName,
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
                                                              collectionName[0]);
 }
 
@@ -88,11 +88,14 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
     
     
-    // Get kinetic energy
+    // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
+    G4ThreeVector stepDelta = aStep->GetDeltaPosition();
+    G4double direction = stepDelta.getZ();
     
-    G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
+    
     //Get particle name
+    G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
     
     // Get particle PDG code
@@ -101,6 +104,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get unique track_id (in an event)
     G4int trackID = theTrack -> GetTrackID();
     
+    // Get Energy deposited
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
     
     G4double DX = aStep -> GetStepLength();
@@ -127,7 +131,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4String namePre = volumePre->GetName();
     
     
-    if( energyDeposit>0. && DX>0. && trackID==1 ) {
+    if(DX>0. && trackID==1 ) {
     		    
         //G4cout << "Energy deposited greater than 0" << G4endl;
 
@@ -139,12 +143,16 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         G4double eKinMean = (eKinPre + eKinPost) * 0.5;
         
 
+        NNbarHit* detectorHit = new NNbarHit();
+        //AbsorberHit* detectorHit = new AbsorberHit();
 
-        AbsorberHit* detectorHit = new AbsorberHit();
+	detectorHit -> SetTrackID(trackID);
+        detectorHit -> SetXID(k);
+        detectorHit -> SetPosZ(tracklength);
+        detectorHit -> SetEDep(energyDeposit);
+        detectorHit -> SetKinEn(eKinMean);
 
-        // Make this kinetic energy and position
-        detectorHit -> SetKinEnAndPosition(tracklength, energyDeposit, eKinMean);
-        HitsCollection -> insert(detectorHit);
+	HitsCollection -> insert(detectorHit);
 
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;

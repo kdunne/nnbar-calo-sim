@@ -28,8 +28,11 @@
 #ifndef AbsorberSD_h
 #define AbsorberSD_h 1
 
+#include "NNbarHit.hh"
+//#include "AbsorberHit.hh"
+
+
 #include "G4VSensitiveDetector.hh"
-#include "AbsorberHit.hh"
 #include "globals.hh"
 
 class G4Step;
@@ -50,7 +53,7 @@ public:
     void EndOfEvent(G4HCofThisEvent*HCE);
     
 private:
-    AbsorberHitsCollection *HitsCollection;
+    NNbarHitsCollection *HitsCollection;
     G4String sensitiveDetectorName;
 };
 #endif

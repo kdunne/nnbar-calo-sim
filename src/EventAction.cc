@@ -28,10 +28,11 @@
 
 #include "EventAction.hh"
 #include "Analysis.hh"
-#include "ScintillatorHit.hh"
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
-#include "AbsorberHit.hh"
+#include "NNbarHit.hh"
+//#include "AbsorberHit.hh"
+//#include "ScintillatorHit.hh"
 
 
 #include "G4VHitsCollection.hh"
@@ -129,8 +130,8 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 {
     G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
     if(scintHitsCollectionID == -1) {
-       scintHitsCollectionID = pSDManager->GetCollectionID("ScintillatorHitsCollection");
-       absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitsCollection");
+       scintHitsCollectionID = pSDManager->GetCollectionID("ScintillatorHitCollection");
+       absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
     }
 
 
@@ -153,68 +154,119 @@ void EventAction::EndOfEventAction(const G4Event* event)
     //fScintTrackLengthHCID
     //  = G4SDManager::GetSDMpointer()->GetCollectionID("Scint/TrackLength");
 
+
     if(scintHitsCollectionID  < 0) {
         return;
     }
 
+    int CHCID = -1;
+    if (CHCID<0) {
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");
+    }
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
-    ScintillatorHitsCollection* sCHC = NULL;
-    AbsorberHitsCollection* aCHC = NULL;
+
+
+    int CHCID2 = -1;
+    if (CHCID2<0) {
+        CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");
+    }
+
+    NNbarHitsCollection* ScintHits = 0;
+    NNbarHitsCollection* AbsHits = 0;
 
     if (HCE) {
        //G4cout << "In HCE loop: " << G4endl;
 
-        ScintillatorHitsCollection* sCHC = (ScintillatorHitsCollection*)(HCE->GetHC(scintHitsCollectionID));
-        AbsorberHitsCollection* aCHC =(AbsorberHitsCollection*)(HCE->GetHC(absHitsCollectionID));
+	ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
+        //ScintillatorHitsCollection* sCHC = (ScintillatorHitsCollection*)(HCE->GetHC(scintHitsCollectionID));
+        //AbsorberHitsCollection* aCHC =(AbsorberHitsCollection*)(HCE->GetHC(absHitsCollectionID));
 
-	if (sCHC) {
-	    G4int hitCount = sCHC->entries();
+	G4double totEdep[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
 
+        if (ScintHits) {
+	//if (sCHC) {
+	    G4int hitCount = ScintHits->entries();
             G4AnalysisManager* analysis = G4AnalysisManager::Instance();
 	    
+
+            G4int trID   = 0;
+	    G4int i         = 0;
+	    G4double kinEn  = 0.;
+	    G4double eDep   = 0.;
+            G4double trackl = 0.;	
+            
+
 	    for (G4int h=0; h<hitCount; h++) {
-	    
-	    G4int i         = ((*sCHC)[h]) -> GetXID();
-	    G4double kinEn  = ((*sCHC)[h]) -> GetKinEn();
-	    G4double eDep   = ((*sCHC)[h]) -> GetEdep();
-            G4double trackl = ((*sCHC)[h]) -> GetPosZ();	
+	        // In future can instead define aHit and assign like track.member[i]
+	        G4int trID   = ((*ScintHits)[h]) -> GetTrackID();
+		G4int i         = ((*ScintHits)[h]) -> GetXID();
+	        G4double kinEn  = ((*ScintHits)[h]) -> GetKinEn();
+	        G4double eDep   = ((*ScintHits)[h]) -> GetEdep();
+                G4double trackl = ((*ScintHits)[h]) -> GetPosZ();	
+                
+	        totEdep[i] += eDep;	
+                   G4cout << "Scint Replica Number: " << i << G4endl;
+	           G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
+	           G4cout << "Scint Energy Deposited: " << eDep << G4endl;
+	           G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
 
-         //   G4cout << "Replica Number: " << i << G4endl;
-	 //   G4cout << "Kinetic Energy: " << kinEn << G4endl;
-	 //   G4cout << "Energy Deposited: " << eDep << G4endl;
-	 //   G4cout << "Position: " << trackl << G4endl;
-
-            analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-
-
+                
+		if (trID == 1) {
+		    analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+                    if (kinEn == 0) {
+		        analysis->FillH1(13, trackl/CLHEP::cm);
+	            }
+		}
 	    }
-        }
 
-	if(aCHC) {
+
+	    // Fill scint bins with Energy Dep
+
+            for (G4int i=0; i<10; i++) {
+                if (totEdep[i]) {
+		    G4cout << "totEdep in Scint " << i <<  " : " << totEdep[i]/CLHEP::MeV << G4endl;  
+		    analysis->FillH1(i, totEdep[i]/CLHEP::keV);
+                }
+	    }
+          }
 	
-	    G4int hitCount = aCHC->entries();
+
+	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+
+	if(AbsHits) {
+	
+	    G4int hitCount = AbsHits->entries();
 
             G4AnalysisManager* analysis = G4AnalysisManager::Instance();
 	    
 	    for (G4int h=0; h<hitCount; h++) {
+	        G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
+		G4int i         = -99;
+	        G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
+	        G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
+                G4double trackl = ((*AbsHits)[h]) -> GetPosZ();	
+
+	        G4cout << "Absorber Kinetic Energy: " << kinEn << G4endl;
+	        G4cout << "Absorber Energy Deposited: " << eDep << G4endl;
+	        G4cout << "Absorber Position: " << trackl/CLHEP::cm << " cm" << G4endl;
+                
+
+	        if (trID ==1){
+                    analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+	            if (kinEn == 0) {
+		        analysis->FillH1(13, trackl/CLHEP::cm);
+		    }
+	        }
 	    
-	    G4double kinEn  = ((*aCHC)[h]) -> GetKinEn();
-	    G4double eDep   = ((*aCHC)[h]) -> GetEdep();
-            G4double trackl = ((*aCHC)[h]) -> GetPosZ();	
-
-	    //G4cout << "Absorber Kinetic Energy: " << kinEn << G4endl;
-	    //G4cout << "Absorber Energy Deposited: " << eDep << G4endl;
-	    //G4cout << "Absorber Position: " << trackl << G4endl;
-
-            analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	    }
 	}  
         else {
-	    G4cout << "No CHC" << G4endl;
+	    G4cout << "No Hits" << G4endl;
 	}
     } else {
         G4cout << "No HCE" << G4endl;
     }
+
 
      
   //}
@@ -231,10 +283,16 @@ auto absoEdep = GetSum(GetHitsCollection(fAbsoEdepHCID, event));
 ***/
 
   // get analysis manager
-  auto analysisManager = G4AnalysisManager::Instance();
+  //auto analysisManager = G4AnalysisManager::Instance();
 
-  /***
+ 
   // fill histograms
+  
+
+
+
+/***
+
   if (absoEdep >0 ) {
   analysisManager->FillH1(0, absoEdep);
   }

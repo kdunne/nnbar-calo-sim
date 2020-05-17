@@ -79,18 +79,18 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   if (ID==1) {
 
-      G4StepPoint* prePoint = step->GetPreStepPoint();
-      G4StepPoint* postPoint = step->GetPostStepPoint();
+      //G4StepPoint* prePoint = step->GetPreStepPoint();
+      //G4StepPoint* postPoint = step->GetPostStepPoint();
 
 
 
-      G4String procName = postPoint->GetProcessDefinedStep()->GetProcessName();
-      G4cout << " Process : " << procName << G4endl;
+      //G4String procName = postPoint->GetProcessDefinedStep()->GetProcessName();
+      //G4cout << " Process : " << procName << G4endl;
 
-      G4double kinEnergyPreStep = prePoint->GetKineticEnergy();
-      G4double kinEnergyPostStep = postPoint->GetKineticEnergy();
+      //G4double kinEnergyPreStep = prePoint->GetKineticEnergy();
+      //G4double kinEnergyPostStep = postPoint->GetKineticEnergy();
 
-      G4double engDep = kinEnergyPreStep - kinEnergyPostStep;
+      //G4double engDep = kinEnergyPreStep - kinEnergyPostStep;
 
 
       //G4double KinEn = track->GetKineticEnergy();
@@ -101,14 +101,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       //G4cout << "Kinetic Energy primary particle " << KinEn/CLHEP::MeV << " MeV" << G4endl;
       
       // Current Z Position
-      G4ThreeVector pos = prePoint->GetPosition();
+      //G4ThreeVector pos = prePoint->GetPosition();
       //G4ThreeVector pos = track->GetPosition();
-      G4double z = pos.getZ();
+      //G4double z = pos.getZ();
 
       // Origin Z Position
-      G4ThreeVector vertex = track->GetVertexPosition();
-      G4double origin = vertex.getZ();
-      G4double tracklength = z - origin;
+      //G4ThreeVector vertex = track->GetVertexPosition();
+      //G4double origin = vertex.getZ();
+      //G4double tracklength = z - origin;
      
       //G4cout << "Distance in detector " << tracklength/CLHEP::mm << " mm" << G4endl; 
       
@@ -117,7 +117,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       
       
       G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-      analysis->FillH2(0, tracklength/CLHEP::cm, kinEnergyPreStep/CLHEP::MeV);
+//      analysis->FillH2(0, tracklength/CLHEP::cm, kinEnergyPreStep/CLHEP::MeV);
       //analysis->FillH2(0, tracklength, track->GetKineticEnergy());
       //analysis->FillH2(0,tracklength,engDep);
 
@@ -133,7 +133,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
          //G4cout << "Delta z : " << tracklength/mm << " mm" << G4endl;
          //G4cout << "POSITION DECAY " << z/mm << G4endl;
 
-         analysis->FillH1(7, time);
+         analysis->FillH1(11, time);
          //analysis->FillH1(8, tracklength/CLHEP::cm); 
      }
 
@@ -143,28 +143,32 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                                  GetParticleDefinition()->GetParticleName();
   if (track->GetTrackID() > 1) {
     if ( track->GetParentID() > 1 && ParticleName != "opticalphoton") {
-      G4cout << "Killing particle: " << ParticleName << G4endl;
+      //G4cout << "Killing particle: " << ParticleName << G4endl;
       track->SetTrackStatus(fKillTrackAndSecondaries);
     }
   }
 
 
+  /***
   if (ParticleName == "opticalphoton" && track->GetCreatorProcess()->GetProcessName()=="Cerenkov") {
   
     
- // G4double time = track->GetGlobalTime();
- // G4double loctime = track->GetLocalTime();
+      G4double time = track->GetGlobalTime();
+      G4double loctime = track->GetLocalTime();
 
- // G4cout << "Local TIme :" << loctime << G4endl;
- // G4cout << "Globat Time :" << time << G4endl;
+      //G4cout << "Local Time :" << loctime << G4endl;
+      G4cout << "Global Time :" << time << G4endl;
 
- // auto analysisManager = G4AnalysisManager::Instance();
- // analysisManager->FillH1(6, time);
+      
+      auto analysisManager = G4AnalysisManager::Instance();
+      analysisManager->FillH1(16, time);
   }
+***/
 
-//  return;
+  return;
   
 
+  /****
   const std::vector<const G4Track*>* secondaries =
                                             step->GetSecondaryInCurrentStep();
 
@@ -188,13 +192,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         }
      }
   }
+***/
 
-  else{
-    G4int TrackID = track->GetTrackID(); 
-    if (TrackID == 1 && track->GetKineticEnergy() == 0) {
+  //else{
+  //  G4int TrackID = track->GetTrackID(); 
+  //  if (TrackID == 1 && track->GetKineticEnergy() == 0) {
       //G4cout << "stopping position" << track->GetPosition()  << G4endl;
-    }
-  }
+  //  }
+  //}
 }
 
 //....

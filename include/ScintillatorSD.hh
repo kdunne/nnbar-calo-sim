@@ -29,8 +29,10 @@
 #define ScintillatorSD_h 1
 
 #include "G4VSensitiveDetector.hh"
-#include "ScintillatorHit.hh"
 #include "globals.hh"
+
+#include "NNbarHit.hh"
+//#include "ScintillatorHit.hh"
 
 class G4Step;
 class G4HCofThisEvent;
@@ -50,7 +52,7 @@ public:
     void EndOfEvent(G4HCofThisEvent*HCE);
     
 private:
-    ScintillatorHitsCollection *HitsCollection;
+    NNbarHitsCollection *HitsCollection;
     G4String sensitiveDetectorName;
 };
 #endif

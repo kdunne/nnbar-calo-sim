@@ -30,7 +30,7 @@
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "StackingAction.hh"
-//#include "SteppingAction.hh"
+#include "SteppingAction.hh"
 #include "TrackingAction.hh"
 
 //....
@@ -64,7 +64,7 @@ void ActionInitialization::Build() const
   
   SetUserAction(new StackingAction());
   
-//  SetUserAction(new SteppingAction());
+  SetUserAction(new SteppingAction());
   
   SetUserAction(new TrackingAction());
 }  
