@@ -31,12 +31,8 @@
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
 #include "NNbarHit.hh"
-//#include "AbsorberHit.hh"
-//#include "ScintillatorHit.hh"
-
 
 #include "G4VHitsCollection.hh"
-//#include "G4VEventManager.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
 #include "G4SDManager.hh"
@@ -98,34 +94,6 @@ G4double EventAction::GetSum(G4THitsMap<G4double>* hitsMap) const
 
 //.....
 
-/***void EventAction::PrintEventStatistics(
-                            G4double absoEdep, G4double absoTrackLength,
-                            G4double gapEdep, G4double scintTrackLength) const //, G4double numCerenkov) const
-{
-  // Print event statistics
-  //
-  //
-  
-  G4cout
-     << "----->Absorber<-----" << G4endl  << "total energy: " 
-     << std::setw(7) << G4BestUnit(absoEdep, "Energy")
-     << "       Total track length: " 
-     << std::setw(7) << G4BestUnit(absoTrackLength, "Length")
-     << G4endl;
-  
-  G4cout 
-     << "------>Scint<-------" << G4endl << "total energy: " 
-     << std::setw(7) << G4BestUnit(gapEdep, "Energy")
-     << "       Total track length: " 
-     << std::setw(7) << G4BestUnit(scintTrackLength, "Length")
-     << G4endl;i
-
-    
-}
-***/
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 {
     G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
@@ -137,24 +105,11 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....
 
 void EventAction::EndOfEventAction(const G4Event* event)
 {  
-   // Get hist collections IDs
-  //if ( fAbsoEdepHCID == -1 ) {
-    //fAbsoEdepHCID 
-    //  = G4SDManager::GetSDMpointer()->GetCollectionID("Absorber/Edep");
-    //fGapEdepHCID 
-    //  = G4SDManager::GetSDMpointer()->GetCollectionID("Scint/Edep");
-   // fAbsoTrackLengthHCID 
-    //  = G4SDManager::GetSDMpointer()->GetCollectionID("Absorber/TrackLength");
-    //fCerenkovHCID
-    //  = G4SDManager::GetSDMpointer()->GetCollectionID("Absorber/Population");
-    //fScintTrackLengthHCID
-    //  = G4SDManager::GetSDMpointer()->GetCollectionID("Scint/TrackLength");
-
-
+  
     if(scintHitsCollectionID  < 0) {
         return;
     }
@@ -175,16 +130,12 @@ void EventAction::EndOfEventAction(const G4Event* event)
     NNbarHitsCollection* AbsHits = 0;
 
     if (HCE) {
-       //G4cout << "In HCE loop: " << G4endl;
 
 	ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
-        //ScintillatorHitsCollection* sCHC = (ScintillatorHitsCollection*)(HCE->GetHC(scintHitsCollectionID));
-        //AbsorberHitsCollection* aCHC =(AbsorberHitsCollection*)(HCE->GetHC(absHitsCollectionID));
 
 	G4double totEdep[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
 
         if (ScintHits) {
-	//if (sCHC) {
 	    G4int hitCount = ScintHits->entries();
             G4AnalysisManager* analysis = G4AnalysisManager::Instance();
 	    G4int ltime     = 0.;
@@ -221,25 +172,19 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		       analysis->FillH1(12, time/CLHEP::ns);
 		   }
 	       } 
-	       
-	       //else if (name == "opticalphoton"){
-               //    analysis->FillH1(11,time);
-	       //}
-
-	                        
-                    //		    G4cout << "Scint Time: " << time << G4endl;
-//                    G4cout << "Scint Replica Number: " << i << G4endl;
-//	            G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
-//	            G4cout << "Scint Energy Deposited: " << eDep << G4endl;
-//	            G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
+	    	                        
+//	       G4cout << "Scint Time: " << time << G4endl;
+//             G4cout << "Scint Replica Number: " << i << G4endl;
+//	       G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
+//	       G4cout << "Scint Energy Deposited: " << eDep << G4endl;
+//	       G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
    
 
 	    }
-	    // Fill scint bins with Energy Dep
 
+	    // Fill scint bins with Energy Dep
             for (G4int i=0; i<10; i++) {
                 if (totEdep[i]) {
-		    //G4cout << "totEdep in Scint " << i <<  " : " << totEdep[i]/CLHEP::MeV << G4endl;  
 		    analysis->FillH1(i, totEdep[i]/CLHEP::MeV);
                 }
 	    }
@@ -308,9 +253,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	
     	
 }
-
-     
-  //}
 
   //print per event (modulo n)
   auto eventID = event->GetEventID();

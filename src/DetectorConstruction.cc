@@ -57,11 +57,6 @@
 
 //....
 
-//G4ThreadLocal 
-//G4GlobalMagFieldMessenger* DetectorConstruction::fMagFieldMessenger = 0; 
-
-//.....
-
 DetectorConstruction::DetectorConstruction()
  : G4VUserDetectorConstruction(),
    fCheckOverlaps(true)
@@ -374,17 +369,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  scintMaterial,      // its material
                  "ScintLV");      // its name
                                    
- /***  new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(0., 0., absoThickness/2), //  its position
-                 scintLV,            // its logical volume                         
-                 "Gap",            // its name
-                 layerLV,          // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-  ***/
-
    auto scintPV
     = new G4PVReplica(
                  "Layer",          // its name
@@ -413,9 +397,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   simpleBoxVisAtt->SetVisibility(true);
   calorLV->SetVisAttributes(simpleBoxVisAtt);
 
-  //
-  // Always return the physical World
-  //
   return worldPV;
 }
 
@@ -424,78 +405,16 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 void DetectorConstruction::ConstructSDandField()
 {
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
-  // Scorers
-
-
-
-  // declare Absorber as a MultiFunctionalDetector scorer
-//  auto absDetector = new G4MultiFunctionalDetector("Absorber");
-//  G4SDManager::GetSDMpointer()->AddNewDetector(absDetector);
-/***
-  G4VPrimitiveScorer* primitive;
-  primitive = new G4PSEnergyDeposit("Edep");
-  absDetector->RegisterPrimitive(primitive);
-
-
-  // Hardcoded here for particle filter, must be changed for different particle
-  primitive = new G4PSTrackLength("TrackLength");
-  auto gun_part = new G4SDParticleFilter("gun_particle");
-  gun_part->add("pi+");
-  //gun_part->add("mu+");
-  primitive->SetFilter(gun_part);
-  absDetector->RegisterPrimitive(primitive);  
-
-  primitive = new G4PSPopulation("Population");
-  auto photonFilter = new G4SDParticleFilter("photonFilter");
-  photonFilter->add("opticalphoton");
-  primitive->SetFilter(photonFilter);
-  absDetector->RegisterPrimitive(primitive);
-  SetSensitiveDetector("AbsoLV",absDetector);
- ***/
-
-
-
-  // declare Scintillator as a MultiFunctionalDetector scorer
- /***
-  auto scintDetector = new G4MultiFunctionalDetector("Scint");
-  G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-
-  primitive = new G4PSEnergyDeposit("Edep");
-  primitive->SetFilter(gun_part);
-  scintDetector->RegisterPrimitive(primitive);
-  
-  //primitive = new G4PSEnergyDeposit("Edep_other");
-  //primitive->SetFilter(gun_part);
-  //scintDetector->RegisterPrimitive(primitive);
-
-  primitive = new G4PSTrackLength("TrackLength");
-  primitive->SetFilter(gun_part);
-  //primitive ->SetFilter(charged);
-  scintDetector->RegisterPrimitive(primitive);  
-
-  primitive = new G4PSPopulation("Population");
-  primitive->SetFilter(photonFilter);
-  scintDetector->RegisterPrimitive(primitive);
-
-  SetSensitiveDetector("ScintLV", scintDetector);  
-  ***/
-
 
   // declare Scintillator as SinctillatorSD
   G4String scintDetectorName = "ScintLV" ;
-  
- 
   ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName);
- // ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName, "ScintillatorHitCollection")
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
   SetSensitiveDetector("ScintLV", scintDetector);
-  //scintLV->SetSensitiveDetector(scintDetector);
 
   // declare absorber as AbsorberSD
   G4String absorberDetectorName = "AbsoLV" ;
-
   AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
-  //AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName,"AbsorberHitCollection");
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
 

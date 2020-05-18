@@ -42,14 +42,14 @@ ActionInitialization::ActionInitialization()
 ActionInitialization::~ActionInitialization()
 {;}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....
 
 void ActionInitialization::BuildForMaster() const
 {
   SetUserAction(new RunAction);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....
 
 void ActionInitialization::Build() const
 {
@@ -64,4 +64,4 @@ void ActionInitialization::Build() const
   
 }  
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....

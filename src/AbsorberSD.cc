@@ -23,16 +23,9 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// Hadrontherapy advanced example for Geant4
-// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
 #include "AbsorberSD.hh"
 #include "NNbarHit.hh"
-
-//#include "HadrontherapyMatrix.hh"
-//#include "HadrontherapyLet.hh"
-//#include "HadrontherapyRunAction.hh"
-//#include "HadrontherapySteppingAction.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -57,7 +50,7 @@
 #include "G4SystemOfUnits.hh"
 
 
-/////////////////////////////////////////////////////////////////////////////
+//......
 AbsorberSD::AbsorberSD(G4String name):
 G4VSensitiveDetector(name)
 {
@@ -68,11 +61,11 @@ G4VSensitiveDetector(name)
     
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//......
 AbsorberSD::~AbsorberSD()
 {}
 
-/////////////////////////////////////////////////////////////////////////////
+//......
 void AbsorberSD::Initialize(G4HCofThisEvent*)
 {
     
@@ -80,10 +73,9 @@ void AbsorberSD::Initialize(G4HCofThisEvent*)
                                                              collectionName[0]);
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//.....
 G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-    //G4cout << "Physical Volume: " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
     
@@ -106,13 +98,12 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Get Energy deposited
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-    
+   
+    // Get Step Length 
     G4double DX = aStep -> GetStepLength();
-    //G4int Z = particleDef-> GetAtomicNumber();
-    //G4int A = particleDef-> GetAtomicMass();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
     
-    // Position
+    // Get Position
     G4ThreeVector pos = PreStep->GetPosition();
     G4double z = pos.getZ();
 
@@ -133,6 +124,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Process
     G4int parentID = 0;
     G4String proc = "";
+    // Getting Process ond parentID of primary causes seg fault
     if (trackID > 1){
 	parentID = theTrack->GetParentID();
         proc = theTrack->GetCreatorProcess()->GetProcessName();
@@ -147,48 +139,39 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
-
     // Get Name
     G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
-
-//    if(DX>0. && trackID==1 ) {
-    		    
-        //G4cout << "Energy deposited greater than 0" << G4endl;
-
-        // Get the pre-step kinetic energy
-        G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
-        // Get the post-step kinetic energy
-        G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
-        // Get the step average kinetic energy
-        G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+	    
+    // Get the pre-step kinetic energy
+    G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
+    // Get the post-step kinetic energy
+    G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
+    // Get the step average kinetic energy
+    G4double eKinMean = (eKinPre + eKinPost) * 0.5;
         
+    NNbarHit* detectorHit = new NNbarHit();
+    detectorHit -> SetLocalTime(localTime);
+    detectorHit -> SetParentID(parentID);
+    detectorHit -> SetProcess(proc);
+    detectorHit -> SetTime(time);
+    detectorHit -> SetName(name);
+    detectorHit -> SetTrackID(trackID);
+    detectorHit -> SetXID(k);
+    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetKinEn(eKinMean);
 
-        NNbarHit* detectorHit = new NNbarHit();
-	detectorHit -> SetLocalTime(localTime);
-        detectorHit -> SetParentID(parentID);
-	detectorHit -> SetProcess(proc);
-        detectorHit -> SetTime(time);
-        detectorHit -> SetName(name);
-	detectorHit -> SetTrackID(trackID);
-        detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
-        detectorHit -> SetEDep(energyDeposit);
-        detectorHit -> SetKinEn(eKinMean);
-
-	HitsCollection -> insert(detectorHit);
+    HitsCollection -> insert(detectorHit);
 
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
 //	G4cout << "eKinMean: "      << eKinMean << G4endl;
-
-
-  //  }
     
     return true;
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//......
 void AbsorberSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     

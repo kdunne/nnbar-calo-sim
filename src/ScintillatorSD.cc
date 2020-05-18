@@ -27,12 +27,6 @@
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
 #include "ScintillatorSD.hh"
-//#include "ScintillatorHit.hh"
-
-//#include "HadrontherapyMatrix.hh"
-//#include "HadrontherapyLet.hh"
-//#include "HadrontherapyRunAction.hh"
-//#include "HadrontherapySteppingAction.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -57,7 +51,7 @@
 #include "G4SystemOfUnits.hh"
 
 
-/////////////////////////////////////////////////////////////////////////////
+//.....
 ScintillatorSD::ScintillatorSD(G4String name):
 G4VSensitiveDetector(name)
 {
@@ -68,11 +62,11 @@ G4VSensitiveDetector(name)
     
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//.....
 ScintillatorSD::~ScintillatorSD()
 {}
 
-/////////////////////////////////////////////////////////////////////////////
+//.....
 void ScintillatorSD::Initialize(G4HCofThisEvent*)
 {
     
@@ -80,22 +74,17 @@ void ScintillatorSD::Initialize(G4HCofThisEvent*)
                                                              collectionName[0]);
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//.....
 G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-   // G4cout << "Physical Volume: " << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName() << G4endl;
 
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
-    
     
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
    
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
-
-    // Get Parent ID
-    //G4int parentID = theTrack->GetParentID();
 
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
@@ -106,11 +95,11 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Get unique track_id (in an event)
     G4int trackID = theTrack -> GetTrackID();
-    
    
     // Get Energy deposited
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-    
+  
+    // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
     
@@ -130,7 +119,6 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
 
     // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
@@ -191,7 +179,7 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     return true;
 }
 
-/////////////////////////////////////////////////////////////////////////////
+//......
 void ScintillatorSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     

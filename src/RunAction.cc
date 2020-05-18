@@ -50,18 +50,8 @@ RunAction::RunAction()
   //analysisManager->SetNtupleDirectoryName("ntuple");
   analysisManager->SetVerboseLevel(1);
   analysisManager->SetNtupleMerging(true);
-    // Note: merging ntuples is available only with Root output
 
-  // Book histograms, ntuple
-  //
-  
-  // Creating histograms
-
-  // Scintillator Bin Histos
-  // 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-  //
-  //for(int i=0; i<10; i++) {
-  //    G4String h1name = "Scint_Bin_" + i.c_str()
+  // Book histograms
 
 /***
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 1000*keV); // 0
@@ -90,17 +80,12 @@ RunAction::RunAction()
   analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 100*MeV); //9
 
 
-  //analysisManager->CreateH1("Eabs","Energy Deposited in Absorber", 500, 0., 500*MeV); 	//	10
-  //analysisManager->CreateH1("Egap","Energy Deposited in Scintillator", 100, 0., 1*MeV);	// 	11
-  //analysisManager->CreateH1("Labs","Track Length in Absorber", 100, 0., 500.);  		//      12
   analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 2500, 0, 25000); 		//   	13 -> 10
-  //analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        	//      14
-  //analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  		//     	15
   analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	16 -> 11
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	17 -> 12 
   analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	18 -> 13
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	4 
+  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
 
 
   
@@ -126,8 +111,6 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
   
   
   //fileName = argv[1];
-  // Open an output file
-  //
   G4String fileName = "calo-sim";
   analysisManager->OpenFile(fileName);
 }
