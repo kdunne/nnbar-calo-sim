@@ -63,6 +63,7 @@ RunAction::RunAction()
   //for(int i=0; i<10; i++) {
   //    G4String h1name = "Scint_Bin_" + i.c_str()
 
+/***
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 1000*keV); // 0
   analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 1000*keV); // 1
   analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 1000*keV); // 2
@@ -73,8 +74,10 @@ RunAction::RunAction()
   analysisManager->CreateH1("Scint_Bin_8", "", 100, 0, 1000*keV); // 7
   analysisManager->CreateH1("Scint_Bin_9", "", 100, 0, 1000*keV); // 8
   analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 1000*keV); //9
+***/
 
-/***
+
+
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 100*MeV); // 0
   analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 100*MeV); // 1
   analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 100*MeV); // 2
@@ -85,17 +88,15 @@ RunAction::RunAction()
   analysisManager->CreateH1("Scint_Bin_8", "", 100, 0, 100*MeV); // 7
   analysisManager->CreateH1("Scint_Bin_9", "", 100, 0, 100*MeV); // 8
   analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 100*MeV); //9
-  //    G4cout << "h1name: " << h1name << G4endl; 
-  //}
-***/
+
 
   //analysisManager->CreateH1("Eabs","Energy Deposited in Absorber", 500, 0., 500*MeV); 	//	10
   //analysisManager->CreateH1("Egap","Energy Deposited in Scintillator", 100, 0., 1*MeV);	// 	11
   //analysisManager->CreateH1("Labs","Track Length in Absorber", 100, 0., 500.);  		//      12
-  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 40000, 0, 40000); 		//   	13 -> 10
+  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 2500, 0, 25000); 		//   	13 -> 10
   //analysisManager->CreateH1("Lscint", "Track Length in Scintillator", 10, 0, 300.);        	//      14
   //analysisManager->CreateH1("TrackLength", "Total Track Length", 8000, 0, 800);  		//     	15
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 3*ns); 		// 	16 -> 11
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	16 -> 11
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	17 -> 12 
   analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	18 -> 13
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax

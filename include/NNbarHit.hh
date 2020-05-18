@@ -53,6 +53,11 @@ inline void operator delete(void*);
 //******************************MT
 
 private:
+    G4double localTime;
+    G4int parentID;
+    G4String process;
+    G4String name;
+    G4double time;
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
     G4double posZ;
@@ -62,9 +67,21 @@ private:
     G4double kinEnergy;
 
 public:
-    // Methods to get the information - energy deposit and associated
-    // position in the phantom - of the hits stored in the hits collection  
- 
+    inline G4double GetLocalTime()
+    {return localTime;}
+
+    inline G4int GetParentID()
+    {return parentID;}
+
+    inline G4String GetProcess()
+    {return process;}
+
+    inline G4String GetName()
+    {return name;}
+
+    inline G4double GetTime()
+    {return time;}
+
     inline G4int GetTrackID()
     {return trackID;}
 
@@ -80,15 +97,12 @@ public:
     inline G4double GetPosZ()
     {return posZ;}
 
-
     inline G4double GetEdep() // Get energy deposit
     {return energyDeposit;}
  
     inline G4double GetKinEn()
     {return kinEnergy;}
 
-    // Methods to store the information of the hit ( energy deposit, position in the phantom )
-    // in the hits collection
 
 /***    inline void SetKinEnAndPosition(G4int xx, G4double zz, G4double eDep, G4double kinEn)
     {
@@ -99,6 +113,29 @@ public:
         energyDeposit = eDep;
         kinEnergy = kinEn;
   }***/
+    inline void SetLocalTime(G4int ltime){
+        localTime = ltime;
+    }
+ 
+
+    inline void SetParentID(G4int parent){
+        parentID = parent;
+    }
+    
+    inline void SetProcess(G4String p){
+        process = p;
+    }
+
+
+    inline void SetName(G4String n){
+        name = n;
+    }
+
+
+    inline void SetTime(G4double t){
+        time = t;
+    }
+
 
     inline void SetTrackID(G4int track){
         trackID = track;

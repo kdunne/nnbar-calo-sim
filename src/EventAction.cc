@@ -187,9 +187,12 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	//if (sCHC) {
 	    G4int hitCount = ScintHits->entries();
             G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-	    
-
-            G4int trID   = 0;
+	    G4int ltime     = 0.;
+    	    G4int parentID  = 0;
+	    G4String proc   = "";
+	    G4String name   = "";
+            G4double time   = 0.;
+            G4int trID      = 0;
 	    G4int i         = 0;
 	    G4double kinEn  = 0.;
 	    G4double eDep   = 0.;
@@ -198,40 +201,53 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 	    for (G4int h=0; h<hitCount; h++) {
 	        // In future can instead define aHit and assign like track.member[i]
-	        G4int trID   = ((*ScintHits)[h]) -> GetTrackID();
-		G4int i         = ((*ScintHits)[h]) -> GetXID();
-	        G4double kinEn  = ((*ScintHits)[h]) -> GetKinEn();
-	        G4double eDep   = ((*ScintHits)[h]) -> GetEdep();
-                G4double trackl = ((*ScintHits)[h]) -> GetPosZ();	
-                
-	        totEdep[i] += eDep;	
-                   G4cout << "Scint Replica Number: " << i << G4endl;
-	           G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
-	           G4cout << "Scint Energy Deposited: " << eDep << G4endl;
-	           G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
+	        ltime    = ((*ScintHits)[h]) -> GetLocalTime();
+	        parentID = ((*ScintHits)[h]) -> GetParentID();
+    		proc     = ((*ScintHits)[h]) -> GetProcess();
+       	        name     = ((*ScintHits)[h]) -> GetName();
+       	        time     = ((*ScintHits)[h]) -> GetTime(); 
+	        trID     = ((*ScintHits)[h]) -> GetTrackID();
+		i        = ((*ScintHits)[h]) -> GetXID();
+	        kinEn    = ((*ScintHits)[h]) -> GetKinEn();
+	        eDep     = ((*ScintHits)[h]) -> GetEdep();
+                trackl   = ((*ScintHits)[h]) -> GetPosZ();	
+               
 
-                
-		if (trID == 1) {
-		    analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-                    if (kinEn == 0) {
-		        analysis->FillH1(13, trackl/CLHEP::cm);
-	            }
-		}
+               if (trID ==1){
+                   totEdep[i] += eDep;	
+		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+	           if (kinEn == 0) {
+		       analysis->FillH1(13, trackl/CLHEP::cm);
+		       analysis->FillH1(12, time/CLHEP::ns);
+		   }
+	       } 
+	       
+	       //else if (name == "opticalphoton"){
+               //    analysis->FillH1(11,time);
+	       //}
+
+	                        
+                    //		    G4cout << "Scint Time: " << time << G4endl;
+//                    G4cout << "Scint Replica Number: " << i << G4endl;
+//	            G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
+//	            G4cout << "Scint Energy Deposited: " << eDep << G4endl;
+//	            G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
+   
+
 	    }
-
-
 	    // Fill scint bins with Energy Dep
 
             for (G4int i=0; i<10; i++) {
                 if (totEdep[i]) {
-		    G4cout << "totEdep in Scint " << i <<  " : " << totEdep[i]/CLHEP::MeV << G4endl;  
-		    analysis->FillH1(i, totEdep[i]/CLHEP::keV);
+		    //G4cout << "totEdep in Scint " << i <<  " : " << totEdep[i]/CLHEP::MeV << G4endl;  
+		    analysis->FillH1(i, totEdep[i]/CLHEP::MeV);
                 }
 	    }
-          }
 	
 
 	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+
+       
 
 	if(AbsHits) {
 	
@@ -239,25 +255,48 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
             G4AnalysisManager* analysis = G4AnalysisManager::Instance();
 	    
+            G4int cerenkovCounter = 0;
+
 	    for (G4int h=0; h<hitCount; h++) {
-	        G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
+		ltime           = ((*AbsHits)[h]) -> GetLocalTime();
+		parentID	= ((*AbsHits)[h]) -> GetParentID();
+     	        proc            = ((*AbsHits)[h]) -> GetProcess();
+	        G4String name   = ((*AbsHits)[h]) -> GetName();
+	    	G4double time   = ((*AbsHits)[h]) -> GetTime(); 
+		G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
 		G4int i         = -99;
 	        G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
 	        G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
                 G4double trackl = ((*AbsHits)[h]) -> GetPosZ();	
 
-	        G4cout << "Absorber Kinetic Energy: " << kinEn << G4endl;
-	        G4cout << "Absorber Energy Deposited: " << eDep << G4endl;
-	        G4cout << "Absorber Position: " << trackl/CLHEP::cm << " cm" << G4endl;
-                
+		//G4cout << "Absorber Time: " << time/CLHEP::ns << " ns" << G4endl;
+	        //G4cout << "Absorber Kinetic Energy: " << kinEn << G4endl;
+	        //G4cout << "Absorber Energy Deposited: " << eDep << G4endl;
+	        //G4cout << "Absorber Position: " << trackl/CLHEP::cm << " cm" << G4endl;
+                //G4cout << "Process: " << proc << G4endl;
+		//G4cout << "Particle: " << name << G4endl;
 
-	        if (trID ==1){
+                if (parentID > 1 and name != "opticalphoton") {
+		    continue;
+		}
+
+	        if (trID == 1){
                     analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
 		        analysis->FillH1(13, trackl/CLHEP::cm);
+		        analysis->FillH1(12, time/CLHEP::ns);
 		    }
-	        }
+	        } else if (ltime==0 && name == "opticalphoton" && proc == "Cerenkov"){
+                    //G4cout << "photon local time: " << ltime << G4endl;
+		    analysis->FillH1(11,time);
+		    cerenkovCounter++;
+		}
 	    
+	    }
+	
+	    G4cout << "Cernkov count: " << cerenkovCounter << G4endl;
+            if (cerenkovCounter>0){
+	        analysis->FillH1(10,cerenkovCounter);
 	    }
 	}  
         else {
@@ -266,52 +305,12 @@ void EventAction::EndOfEventAction(const G4Event* event)
     } else {
         G4cout << "No HCE" << G4endl;
     }
-
+	
+    	
+}
 
      
   //}
-  
-  // Get sum values from hits collections
-/***
-auto absoEdep = GetSum(GetHitsCollection(fAbsoEdepHCID, event));
-  auto gapEdep = GetSum(GetHitsCollection(fGapEdepHCID, event));
-  auto absoTrackLength 
-    = GetSum(GetHitsCollection(fAbsoTrackLengthHCID, event));
-  auto numcerenkov = GetSum(GetHitsCollection(fCerenkovHCID, event));
-  auto scintTrackLength = GetSum(GetHitsCollection(fScintTrackLengthHCID, event));
-  auto totTrackLength = scintTrackLength + absoTrackLength;
-***/
-
-  // get analysis manager
-  //auto analysisManager = G4AnalysisManager::Instance();
-
- 
-  // fill histograms
-  
-
-
-
-/***
-
-  if (absoEdep >0 ) {
-  analysisManager->FillH1(0, absoEdep);
-  }
-
-  if (gapEdep >0) {
-  analysisManager->FillH1(1, gapEdep);
-  }
-  if (absoTrackLength >0) {
-  analysisManager->FillH1(2, absoTrackLength);
-  }
-  if(numcerenkov > 0) {
-      analysisManager->FillH1(3, numcerenkov);
-  }
-  ***/
-
-  //analysisManager->FillH1(4, scintTrackLength);
-  //analysisManager->FillH1(5, totTrackLength);
- 
-
 
   //print per event (modulo n)
   auto eventID = event->GetEventID();

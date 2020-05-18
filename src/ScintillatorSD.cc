@@ -93,7 +93,10 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
    
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
-    
+
+    // Get Parent ID
+    //G4int parentID = theTrack->GetParentID();
+
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
@@ -109,8 +112,6 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
     
     G4double DX = aStep -> GetStepLength();
-    //G4int Z = particleDef-> GetAtomicNumber();
-    //G4int A = particleDef-> GetAtomicMass();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
     
     // Position
@@ -126,13 +127,33 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int k  = touchable->GetReplicaNumber(0);
     //G4int i  = touchable->GetReplicaNumber(2);
     //G4int j  = touchable->GetReplicaNumber(1);
-    
+  
+    // Get Time
+    G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
+
+
+    // Get Local Time
+    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
+
+    // Get Name
+    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
+
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-    
-    
-    if( direction>0 && DX>0 && trackID==1 ) {
+   
+    G4int parentID = 0;
+    G4String proc = ""; 
+    // Get Process
+    if (trackID > 1){
+        parentID = theTrack->GetParentID();
+        proc = theTrack->GetCreatorProcess()->GetProcessName();
+    } else {
+        proc = "primary";
+	parentID = 0;
+    }
+
+//    if( direction>0 && DX>0 && trackID==1 ) {
     		    
                   
         // Get the pre-step kinetic energy
@@ -145,7 +166,13 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         NNbarHit* detectorHit = new NNbarHit();
 
         // Make this kinetic energy and position
-        detectorHit -> SetTrackID(trackID);
+	detectorHit -> SetLocalTime(localTime);
+	detectorHit -> SetParentID(parentID);
+	detectorHit -> SetProcess(proc);
+       	detectorHit -> SetTime(time);
+	detectorHit -> SetName(name);
+
+	detectorHit -> SetTrackID(trackID);
         detectorHit -> SetXID(k);
         detectorHit -> SetPosZ(tracklength);
         detectorHit -> SetEDep(energyDeposit);
@@ -159,7 +186,7 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "eKinMean: "      << eKinMean << G4endl;
 
 
-    }
+//    }
     
     return true;
 }

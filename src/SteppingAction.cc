@@ -133,7 +133,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
          //G4cout << "Delta z : " << tracklength/mm << " mm" << G4endl;
          //G4cout << "POSITION DECAY " << z/mm << G4endl;
 
-         analysis->FillH1(11, time);
+         //analysis->FillH1(11, time);
          //analysis->FillH1(8, tracklength/CLHEP::cm); 
      }
 

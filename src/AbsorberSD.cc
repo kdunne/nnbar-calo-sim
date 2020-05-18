@@ -130,8 +130,28 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
     
-    
-    if(DX>0. && trackID==1 ) {
+    // Get Process
+    G4int parentID = 0;
+    G4String proc = "";
+    if (trackID > 1){
+	parentID = theTrack->GetParentID();
+        proc = theTrack->GetCreatorProcess()->GetProcessName();
+    } else {
+        proc = "primary";
+	parentID = 0;
+    }
+
+    // Get Time 
+    G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
+
+    // Get Local Time
+    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
+
+
+    // Get Name
+    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
+
+//    if(DX>0. && trackID==1 ) {
     		    
         //G4cout << "Energy deposited greater than 0" << G4endl;
 
@@ -144,8 +164,11 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         
 
         NNbarHit* detectorHit = new NNbarHit();
-        //AbsorberHit* detectorHit = new AbsorberHit();
-
+	detectorHit -> SetLocalTime(localTime);
+        detectorHit -> SetParentID(parentID);
+	detectorHit -> SetProcess(proc);
+        detectorHit -> SetTime(time);
+        detectorHit -> SetName(name);
 	detectorHit -> SetTrackID(trackID);
         detectorHit -> SetXID(k);
         detectorHit -> SetPosZ(tracklength);
@@ -160,7 +183,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "eKinMean: "      << eKinMean << G4endl;
 
 
-    }
+  //  }
     
     return true;
 }
