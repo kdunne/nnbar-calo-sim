@@ -207,7 +207,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	
 	    hitCount = AbsHits->entries();
             G4int cerenkovCounter = 0;
-
+            totEdep = 0.;
 	    for (G4int h=0; h<hitCount; h++) {
 		ltime           = ((*AbsHits)[h]) -> GetLocalTime();
 		parentID	= ((*AbsHits)[h]) -> GetParentID();
@@ -232,6 +232,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		}
 
 	        if (trID == 1){
+                    totEdep += eDep; 
                     analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
 		        analysis->FillH1(13, trackl/CLHEP::cm);
@@ -243,9 +244,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		    cerenkovCounter++;
 		}
 	    
-	      }
+	    }
 	
-	    G4cout << "Cernkov count: " << cerenkovCounter << G4endl;
+            analysis->FillH1(15, totEdep/CLHEP::MeV);
+            G4cout << "Total Edep in lead-glass: " << totEdep/CLHEP::MeV << G4endl;
+	    G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
             if (cerenkovCounter>0){
 	        analysis->FillH1(10,cerenkovCounter);
 	    }

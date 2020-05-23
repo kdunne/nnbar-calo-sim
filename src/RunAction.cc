@@ -87,6 +87,7 @@ RunAction::RunAction()
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
   analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
   analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 100, 0, 400*MeV); //      14
+  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass",100, 0, 400*MeV);       //      15
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
