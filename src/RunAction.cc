@@ -53,6 +53,8 @@ RunAction::RunAction()
 
   // Book histograms
 
+
+// Scintillator Histograms Edeposited in individual sheets for low energy gamma backgrounds keV
 /***
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 1000*keV); // 0
   analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 1000*keV); // 1
@@ -67,7 +69,7 @@ RunAction::RunAction()
 ***/
 
 
-
+// Scintillator Histograms Edeposited in individual sheets for Primary Particles
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 100*MeV); // 0
   analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 100*MeV); // 1
   analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 100*MeV); // 2
@@ -79,16 +81,17 @@ RunAction::RunAction()
   analysisManager->CreateH1("Scint_Bin_9", "", 100, 0, 100*MeV); // 8
   analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 100*MeV); //9
 
+  // 1-D Histos
+  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 2500, 0, 25000); 		//   	10
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	11
+  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
+  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
+  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 100, 0, 400*MeV); //      14
 
-  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 2500, 0, 25000); 		//   	13 -> 10
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	16 -> 11
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	17 -> 12 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	18 -> 13
+  // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
 
-
-  
 
 }
 

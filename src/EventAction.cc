@@ -109,7 +109,7 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 
 void EventAction::EndOfEventAction(const G4Event* event)
 {  
-  
+ 
     if(scintHitsCollectionID  < 0) {
         return;
     }
@@ -130,25 +130,28 @@ void EventAction::EndOfEventAction(const G4Event* event)
     NNbarHitsCollection* AbsHits = 0;
 
     if (HCE) {
+        G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+	G4int ltime     = 0.;
+    	G4int parentID  = 0;
+	G4String proc   = "";
+	G4String name   = "";
+        G4double time   = 0.;
+        G4int trID      = 0;
+	G4int i         = 0;
+	G4double kinEn  = 0.;
+	G4double eDep   = 0.;
+        G4double trackl = 0.;	
+        G4int hitCount  = 0;
 
 	ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
 
-	G4double totEdep[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
+        // Book vector to keep track of Edep in each Scintillator Sheet
+	G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
+        G4double totEdep = 0.;     
 
         if (ScintHits) {
-	    G4int hitCount = ScintHits->entries();
-            G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-	    G4int ltime     = 0.;
-    	    G4int parentID  = 0;
-	    G4String proc   = "";
-	    G4String name   = "";
-            G4double time   = 0.;
-            G4int trID      = 0;
-	    G4int i         = 0;
-	    G4double kinEn  = 0.;
-	    G4double eDep   = 0.;
-            G4double trackl = 0.;	
-            
+	    hitCount = ScintHits->entries();
+                        
 
 	    for (G4int h=0; h<hitCount; h++) {
 	        // In future can instead define aHit and assign like track.member[i]
@@ -162,10 +165,13 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	        kinEn    = ((*ScintHits)[h]) -> GetKinEn();
 	        eDep     = ((*ScintHits)[h]) -> GetEdep();
                 trackl   = ((*ScintHits)[h]) -> GetPosZ();	
-               
 
                if (trID ==1){
-                   totEdep[i] += eDep;	
+                   // Sum totEdep
+                   totEdep += eDep;  
+                   // Sum eDep for each scintillator sheet
+                   EdepPerSheet[i] += eDep;
+	
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	           if (kinEn == 0) {
 		       analysis->FillH1(13, trackl/CLHEP::cm);
@@ -184,22 +190,22 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 	    // Fill scint bins with Energy Dep
             for (G4int i=0; i<10; i++) {
-                if (totEdep[i]) {
-		    analysis->FillH1(i, totEdep[i]/CLHEP::MeV);
+                if (EdepPerSheet[i]) {
+		    analysis->FillH1(i, EdepPerSheet[i]/CLHEP::MeV);
                 }
 	    }
-	
-
+   
+            // Fill total Edep in Scintillator
+            analysis->FillH1(14, totEdep/CLHEP::MeV);	
+            G4cout << "Total Edep in scint: " << totEdep/CLHEP::MeV << G4endl;         
+        }
+ 
 	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-
        
 
 	if(AbsHits) {
 	
-	    G4int hitCount = AbsHits->entries();
-
-            G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-	    
+	    hitCount = AbsHits->entries();
             G4int cerenkovCounter = 0;
 
 	    for (G4int h=0; h<hitCount; h++) {
@@ -237,7 +243,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		    cerenkovCounter++;
 		}
 	    
-	    }
+	      }
 	
 	    G4cout << "Cernkov count: " << cerenkovCounter << G4endl;
             if (cerenkovCounter>0){
@@ -250,9 +256,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
     } else {
         G4cout << "No HCE" << G4endl;
     }
-	
-    	
-}
 
   //print per event (modulo n)
   auto eventID = event->GetEventID();
