@@ -116,6 +116,17 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int k  = touchable->GetReplicaNumber(0);
     //G4int i  = touchable->GetReplicaNumber(2);
     //G4int j  = touchable->GetReplicaNumber(1);
+
+
+
+    // Get Time 
+    G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
+
+    // Get Local Time
+    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
+
+    // Get Name
+    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
     
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
@@ -133,14 +144,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	parentID = 0;
     }
 
-    // Get Time 
-    G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
-    // Get Local Time
-    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
-
-    // Get Name
-    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
+    if (DX>0) {
 	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -167,7 +171,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
 //	G4cout << "eKinMean: "      << eKinMean << G4endl;
-    
+    }
+
     return true;
 }
 

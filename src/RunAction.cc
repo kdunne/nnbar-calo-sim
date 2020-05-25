@@ -33,6 +33,8 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+#include <iostream>
+#include <fstream>
 //....
 
 RunAction::RunAction()
@@ -53,7 +55,7 @@ RunAction::RunAction()
 
   // Book histograms
 
-
+  G4cout << "Booking histograms " << G4endl;
 // Scintillator Histograms Edeposited in individual sheets for low energy gamma backgrounds keV
 /***
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 1000*keV); // 0
@@ -85,15 +87,17 @@ RunAction::RunAction()
   analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 2500, 0, 25000); 		//   	10
   analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	11
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
-  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 100, 0, 400*MeV); //      14
-  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass",100, 0, 400*MeV);       //      15
+  analysisManager->CreateH1("Range", "Primary Particle Range", 55, 0, 55); 			//	13
+  //analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
+  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV); //      14
+  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
-
-
+  analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
+  //analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 1000, 0, 20000, );     //      2
+ 
 }
 
 //....
@@ -105,7 +109,7 @@ RunAction::~RunAction()
 
 //.....
 
-void RunAction::BeginOfRunAction(const G4Run* /*run*/)
+void RunAction::BeginOfRunAction(const G4Run*)
 { 
   //inform the runManager to save random number seed
   //G4RunManager::GetRunManager()->SetRandomNumberStore(true);
@@ -113,15 +117,18 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
   
-  
-  //fileName = argv[1];
-  G4String fileName = "calo-sim";
+   G4String fileName = "calo-sim.root";
+  //G4String Dir = "../output/";
+  //G4String fileName = Dir + "scint-calo-sim.root";
+  //G4String fileName = Dir + "abs-calo-sim.root";
+  //G4cout << "Printing to " << fileName << G4endl;
+
   analysisManager->OpenFile(fileName);
 }
 
 //....
 
-void RunAction::EndOfRunAction(const G4Run* /*run*/)
+void RunAction::EndOfRunAction(const G4Run*)
 {
   
   auto analysisManager = G4AnalysisManager::Instance();

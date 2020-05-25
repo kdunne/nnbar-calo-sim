@@ -166,25 +166,39 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	        eDep     = ((*ScintHits)[h]) -> GetEdep();
                 trackl   = ((*ScintHits)[h]) -> GetPosZ();	
 
-               if (trID ==1){
-                   // Sum totEdep
-                   totEdep += eDep;  
-                   // Sum eDep for each scintillator sheet
+               // Sum totEdep
+               totEdep += eDep;  
+ 
+               if (trID ==1) {
+                  // Sum eDep for each scintillator sheet
                    EdepPerSheet[i] += eDep;
 	
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	           if (kinEn == 0) {
-		       analysis->FillH1(13, trackl/CLHEP::cm);
-		       analysis->FillH1(12, time/CLHEP::ns);
+                       if(h==0){
+                           G4cout << "Filling with pos " << trackl << G4endl;
+                           analysis->FillH1(13, trackl/CLHEP::cm);
+		           analysis->FillH1(12, time/CLHEP::ns);
+                           continue;
+                       }
+		       
+                       //G4cout << "hit number: " << h << G4endl;
+                       G4double prevKin = ((*ScintHits)[h-1])->GetKinEn();
+                       //G4cout << "Position: " << trackl << G4endl;
+	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
+		       //G4cout << "Local Time: " << ltime << G4endl;
+		       
+                       // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
+                       if (prevKin == 0) {
+                           G4cout << "continuing to next hit "<< G4endl;
+                           continue;
+                       } else {
+                           //G4cout << "Filling with pos " << trackl << G4endl;
+                           analysis->FillH1(13, trackl/CLHEP::cm);
+		           analysis->FillH1(12, time/CLHEP::ns);
+                       }
 		   }
 	       } 
-	    	                        
-//	       G4cout << "Scint Time: " << time << G4endl;
-//             G4cout << "Scint Replica Number: " << i << G4endl;
-//	       G4cout << "Scint Kinetic Energy: " << kinEn << G4endl;
-//	       G4cout << "Scint Energy Deposited: " << eDep << G4endl;
-//	       G4cout << "Scint Position: " << trackl/CLHEP::cm << " cm" << G4endl;
-   
 
 	    }
 
@@ -219,24 +233,33 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	        G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
 	        G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
                 G4double trackl = ((*AbsHits)[h]) -> GetPosZ();	
+                
+ 
+                //if(trID>1 && eDep>0){
+                    //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
+                //}
+                if (proc == "Decay") {
+                    continue;
+                }
+                	   
+                totEdep += eDep;
 
-		//G4cout << "Absorber Time: " << time/CLHEP::ns << " ns" << G4endl;
-	        //G4cout << "Absorber Kinetic Energy: " << kinEn << G4endl;
-	        //G4cout << "Absorber Energy Deposited: " << eDep << G4endl;
-	        //G4cout << "Absorber Position: " << trackl/CLHEP::cm << " cm" << G4endl;
-                //G4cout << "Process: " << proc << G4endl;
-		//G4cout << "Particle: " << name << G4endl;
-
-                if (parentID > 1 and name != "opticalphoton") {
-		    continue;
-		}
-
-	        if (trID == 1){
-                    totEdep += eDep; 
+                if (trID == 1){
                     analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
-		        analysis->FillH1(13, trackl/CLHEP::cm);
-		        analysis->FillH1(12, time/CLHEP::ns);
+                        if(h==0){
+                            analysis->FillH1(13, trackl/CLHEP::cm);
+		            analysis->FillH1(12, time/CLHEP::ns);
+                            continue;
+                        }
+                        G4double prevKin = ((*AbsHits)[h-1])->GetKinEn();
+                        if (prevKin==0){
+                            //G4cout << "continuing to next hit" << G4endl;
+                            continue;
+                        } else {
+                            analysis->FillH1(13, trackl/CLHEP::cm);
+		            analysis->FillH1(12, time/CLHEP::ns);
+                        }
 		    }
 	        } else if (ltime==0 && name == "opticalphoton" && proc == "Cerenkov"){
                     //G4cout << "photon local time: " << ltime << G4endl;
@@ -245,8 +268,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		}
 	    
 	    }
-	
-            analysis->FillH1(15, totEdep/CLHEP::MeV);
+	    
+            if (totEdep>0){
+                analysis->FillH1(15, totEdep/CLHEP::MeV);
+            }
             G4cout << "Total Edep in lead-glass: " << totEdep/CLHEP::MeV << G4endl;
 	    G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
             if (cerenkovCounter>0){

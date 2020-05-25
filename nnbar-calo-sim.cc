@@ -43,7 +43,6 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
-#include "G4TScoreNtupleWriter.hh"
 
 //.........
 

@@ -141,8 +141,8 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	parentID = 0;
     }
 
-//    if( direction>0 && DX>0 && trackID==1 ) {
-    		    
+    //if( direction>0 && DX>0) { //&& trackID==1 ) {
+    if(DX>0) { 		    
                   
         // Get the pre-step kinetic energy
         G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -164,7 +164,9 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         detectorHit -> SetXID(k);
         detectorHit -> SetPosZ(tracklength);
         detectorHit -> SetEDep(energyDeposit);
-        detectorHit -> SetKinEn(eKinMean);
+        //detectorHit -> SetKinEn(eKinMean);
+        //detectorHit -> SetKinEn(eKinPre);
+        detectorHit -> SetKinEn(eKinPost);
 
 	HitsCollection -> insert(detectorHit);
 
@@ -173,8 +175,7 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
 //	G4cout << "eKinMean: "      << eKinMean << G4endl;
 
-
-//    }
+    }
     
     return true;
 }
