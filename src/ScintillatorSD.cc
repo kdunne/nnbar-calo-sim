@@ -141,8 +141,13 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	parentID = 0;
     }
 
+    if (proc=="Decay"){
+        G4cout << "Killing particle " << name << G4endl;
+        theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+    }
+
     //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX>0) { 		    
+    if(DX) { 		    
                   
         // Get the pre-step kinetic energy
         G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();

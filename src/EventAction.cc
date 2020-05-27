@@ -148,10 +148,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
         // Book vector to keep track of Edep in each Scintillator Sheet
 	G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
         G4double totEdep = 0.;     
-
+        G4double eDepScint = 0.;
+        G4double eDepAbs = 0.;
+ 
         if (ScintHits) {
 	    hitCount = ScintHits->entries();
-                        
 
 	    for (G4int h=0; h<hitCount; h++) {
 	        // In future can instead define aHit and assign like track.member[i]
@@ -167,8 +168,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 trackl   = ((*ScintHits)[h]) -> GetPosZ();	
 
                // Sum totEdep
-               totEdep += eDep;  
- 
+               eDepScint += eDep;  
+               totEdep += eDep;
                if (trID ==1) {
                   // Sum eDep for each scintillator sheet
                    EdepPerSheet[i] += eDep;
@@ -196,6 +197,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                            //G4cout << "Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
+                           analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
                        }
 		   }
 	       } 
@@ -210,8 +212,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	    }
    
             // Fill total Edep in Scintillator
-            analysis->FillH1(14, totEdep/CLHEP::MeV);	
-            G4cout << "Total Edep in scint: " << totEdep/CLHEP::MeV << G4endl;         
+            analysis->FillH1(14, eDepScint/CLHEP::MeV);	
+            G4cout << "Total Edep in scint: " << eDepScint/CLHEP::MeV << G4endl;         
         }
  
 	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
@@ -221,7 +223,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	
 	    hitCount = AbsHits->entries();
             G4int cerenkovCounter = 0;
-            totEdep = 0.;
 	    for (G4int h=0; h<hitCount; h++) {
 		ltime           = ((*AbsHits)[h]) -> GetLocalTime();
 		parentID	= ((*AbsHits)[h]) -> GetParentID();
@@ -242,8 +243,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     continue;
                 }
                 	   
+                eDepAbs += eDep;
                 totEdep += eDep;
-
                 if (trID == 1){
                     analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
@@ -259,9 +260,12 @@ void EventAction::EndOfEventAction(const G4Event* event)
                         } else {
                             analysis->FillH1(13, trackl/CLHEP::cm);
 		            analysis->FillH1(12, time/CLHEP::ns);
-                        }
+                            analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
+                       }
 		    }
-	        } else if (ltime==0 && name == "opticalphoton" && proc == "Cerenkov"){
+	        }
+                // ltime == 0 ?
+                if (name == "opticalphoton" && proc == "Cerenkov"){
                     //G4cout << "photon local time: " << ltime << G4endl;
 		    analysis->FillH1(11,time);
 		    cerenkovCounter++;
@@ -269,18 +273,23 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	    
 	    }
 	    
-            if (totEdep>0){
-                analysis->FillH1(15, totEdep/CLHEP::MeV);
+            if (eDepAbs>0){
+                analysis->FillH1(15, eDepAbs/CLHEP::MeV);
+                //analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);  
+                  
+                if(cerenkovCounter>0){
+                    G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
+                    analysis->FillH2(2, cerenkovCounter, eDepAbs/CLHEP::MeV);       
+                }
             }
-            G4cout << "Total Edep in lead-glass: " << totEdep/CLHEP::MeV << G4endl;
+
+            G4cout << "Total Edep in lead-glass: " << eDepAbs/CLHEP::MeV << G4endl;
 	    G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
             if (cerenkovCounter>0){
 	        analysis->FillH1(10,cerenkovCounter);
 	    }
 	}  
-        else {
-	    G4cout << "No Hits" << G4endl;
-	}
+      
     } else {
         G4cout << "No HCE" << G4endl;
     }
