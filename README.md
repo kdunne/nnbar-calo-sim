@@ -16,7 +16,7 @@ $ source path_to_Geant4_installation/bin/geant4.sh
 
 <h3>How to Run</h3>
 
-<h5>interactive Mode</h5>
+<h5>Interactive Mode</h5>
 
 $ ./nnbar-calo-sim
 
