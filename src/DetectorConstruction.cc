@@ -96,6 +96,11 @@ void DetectorConstruction::DefineMaterials()
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
 
+  // Aluminum
+  density = 2.7*g/cm3;
+  a = 26.98*g/mole;
+  G4Material* Aluminum = new G4Material("Aluminum", z=13., a, density);
+
   // BC-408 taken from datasheet
   G4Element* elH = nistManager->FindOrBuildElement("H");
   G4Element* elC = nistManager->FindOrBuildElement("C");
@@ -257,7 +262,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
-  
+  auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
+ 
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial ) {
     G4ExceptionDescription msg;
     msg << "Cannot retrieve materials already defined."; 
