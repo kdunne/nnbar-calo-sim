@@ -89,15 +89,15 @@ RunAction::RunAction()
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
   analysisManager->CreateH1("Range", "Primary Particle Range", 55, 0, 55); 			//	13
   //analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
-  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV); //      14
+  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV);  //      14
   analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
+  analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 250*MeV);     //      16
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
   analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
   analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 10000, 50, 0, 250*MeV);     //      2
- 
 }
 
 //....
