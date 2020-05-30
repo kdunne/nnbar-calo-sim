@@ -28,6 +28,7 @@
 #include "DetectorConstruction.hh"
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
+#include "TubeSD.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -396,7 +397,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     = new G4LogicalVolume(
                  tubeS,           // its solid
                  tubeMaterial,  // its material
-                 "tubeLV");         // its name
+                 "TubeLV");         // its name
 
   auto tubePV
     = new G4PVPlacement(
@@ -428,7 +429,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
  
     
   // Visualization attributes
-  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
+  //worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
@@ -454,6 +455,13 @@ void DetectorConstruction::ConstructSDandField()
   AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
+
+  // declare vacuum as TubeSD
+  G4String tubeDetectorName = "TubeLV" ;
+  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
+  SetSensitiveDetector("TubeLV", tubeDetector);
+
 
 }
 

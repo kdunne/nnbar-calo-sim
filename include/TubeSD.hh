@@ -23,46 +23,36 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
 
-#ifndef EventAction_h
-#define EventAction_h 1
+#ifndef TubeSD_h
+#define TubeSD_h 1
 
-#include "G4UserEventAction.hh"
-
-#include "G4THitsMap.hh"
+#include "G4VSensitiveDetector.hh"
 #include "globals.hh"
 
-class EventAction : public G4UserEventAction
+#include "NNbarHit.hh"
+
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class TubeSD : public G4VSensitiveDetector
 {
 public:
-  EventAction();
-  virtual ~EventAction();
-
-  virtual void  BeginOfEventAction(const G4Event* event);
-  virtual void    EndOfEventAction(const G4Event* event);
+    TubeSD(G4String name);
+    ~TubeSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
     
 private:
-  // methods
-  G4THitsMap<G4double>* GetHitsCollection(G4int hcID,
-                                          const G4Event* event) const;
-  G4double GetSum(G4THitsMap<G4double>* hitsMap) const;
-  void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
-                            G4double gapEdep, G4double scintTrackLength) const; //, G4double gapTrackLength) const;
-  
-  // data members                   
-  G4int  fAbsoEdepHCID;
-  G4int  fGapEdepHCID;
-  G4int  fAbsoTrackLengthHCID;
-  G4int  fCerenkovHCID;
-  G4int  fScintTrackLengthHCID;
-  G4int  scintHitsCollectionID;
-  G4int  absHitsCollectionID;
-  G4int  tubeHitsCollectionID;
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
 };
-                     
-//....
-
 #endif
 
-    
+
