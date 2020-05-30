@@ -96,7 +96,8 @@ void DetectorConstruction::DefineMaterials()
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
 
- // new G4Material("Aluminum", a=26.98*g/mole, z=13., density=2.7*g/cm3);
+  // Tube
+  G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
 
   // BC-408 taken from datasheet
   G4Element* elH = nistManager->FindOrBuildElement("H");
@@ -259,7 +260,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
- // auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
+  auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
@@ -394,7 +395,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto tubeLV
     = new G4LogicalVolume(
                  tubeS,           // its solid
-                 defaultMaterial,  // its material
+                 tubeMaterial,  // its material
                  "tubeLV");         // its name
 
   auto tubePV
