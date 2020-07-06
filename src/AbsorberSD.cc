@@ -25,8 +25,6 @@
 //
 
 #include "AbsorberSD.hh"
-#include "TubeSD.hh"
-
 #include "NNbarHit.hh"
 
 #include "G4Step.hh"
@@ -79,6 +77,7 @@ void AbsorberSD::Initialize(G4HCofThisEvent*)
 G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
 
+    
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
     
     
@@ -99,7 +98,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
     
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    //G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    G4double energyDeposit = aStep->GetPreStepPoint()->GetKineticEnergy() - aStep->GetPostStepPoint()->GetKineticEnergy();
    
     // Get Step Length 
     G4double DX = aStep -> GetStepLength();
@@ -108,9 +108,9 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Position
     G4ThreeVector pos = PreStep->GetPosition();
     G4double z = pos.getZ();
-
     G4ThreeVector vertex = theTrack->GetVertexPosition();
-    G4double origin = vertex.getZ();
+    G4double origin = -28.5*CLHEP::cm;
+    //G4double origin = vertex.getZ();
     G4double tracklength = z - origin;
 
     // Read voxel indexes: i is the x index, k is the z index
@@ -119,13 +119,13 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     //G4int i  = touchable->GetReplicaNumber(2);
     //G4int j  = touchable->GetReplicaNumber(1);
 
-
-
     // Get Time 
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
 
     // Get Local Time
-    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
+
+    G4double localTime = aStep->GetPreStepPoint()->GetLocalTime() / CLHEP::ns;
+//    G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
     // Get Name
     G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
@@ -147,12 +147,12 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
 
     if (proc=="Decay") {
-        G4cout << "Killing particle " << name << G4endl;
+   //     G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
 
 
-    if (DX) {
+//    if (DX) {
 	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -160,7 +160,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
     // Get the step average kinetic energy
     G4double eKinMean = (eKinPre + eKinPost) * 0.5;
-        
+    G4double deltaKE = eKinPre - eKinPost;    
+    
     NNbarHit* detectorHit = new NNbarHit();
     detectorHit -> SetLocalTime(localTime);
     detectorHit -> SetParentID(parentID);
@@ -171,15 +172,20 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetXID(k);
     detectorHit -> SetPosZ(tracklength);
     detectorHit -> SetEDep(energyDeposit);
-    detectorHit -> SetKinEn(eKinMean);
+    detectorHit -> SetKinEn(deltaKE);
 
     HitsCollection -> insert(detectorHit);
-
-//	G4cout << "Replica: "       << k << G4endl;
-//	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinMean: "      << eKinMean << G4endl;
-    }
+/***
+    G4cout << "ABSORBER HIT: " << G4endl;
+    G4cout << "Particle: " << name << G4endl;
+    G4cout << "TrackID: " << trackID << G4endl;
+    G4cout << "Process: " << proc << G4endl;
+    G4cout << "energyDeposit: " << energyDeposit/CLHEP::MeV << G4endl;
+    G4cout << "Position: " << tracklength/CLHEP::cm << G4endl;
+    G4cout << "Global time: " << time << G4endl;
+    G4cout << "Local time: " << localTime << G4endl << G4endl;
+***/
+  //  }
 
     return true;
 }

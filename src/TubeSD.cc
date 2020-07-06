@@ -97,7 +97,8 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    G4double energyDeposit = aStep->GetPreStepPoint()->GetKineticEnergy() - aStep->GetPostStepPoint()->GetKineticEnergy();
+    //G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
   
     // Get step length  
     G4double DX = aStep -> GetStepLength();
@@ -147,7 +148,7 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
 
     //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
+    if(direction>0) { 		    
                   
         // Get the pre-step kinetic energy
         G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -155,6 +156,8 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
         // Get the step average kinetic energy
         G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+
+        G4double deltaKE = eKinPre - eKinPost;
 
         NNbarHit* detectorHit = new NNbarHit();
 
@@ -177,10 +180,17 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinMean: "      << eKinMean << G4endl;
-
-    }
+/***
+        G4cout << "TUBE HIT: " << G4endl;
+        G4cout << "Particle: " << name << G4endl;
+        G4cout << "TrackID: " << trackID << G4endl;
+        G4cout << "Process: " << proc << G4endl;
+        G4cout << "energyDeposit: " << energyDeposit/CLHEP::MeV << G4endl;
+        G4cout << "Position: " << tracklength/CLHEP::cm << G4endl;
+        G4cout << "Global time: " << time << G4endl << G4endl;
+        G4cout << "Kinetic Energy PostStep: " << eKinPost/CLHEP::MeV << G4endl;
+***/
+   }
     
     return true;
 }

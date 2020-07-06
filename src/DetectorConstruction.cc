@@ -326,11 +326,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  absorberS,        // its solid
                  absorberMaterial, // its material
                  "AbsoLV");          // its name
- 
-  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  absorberVisAtt->SetVisibility(true);
-  absorberLV->SetVisAttributes(absorberVisAtt);
- 
 
   auto absorberPV  
     = new G4PVPlacement(
@@ -345,6 +340,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
   // Layer
+
   auto layerS 
     = new G4Box("Layer",           // its name
                  calorSizeXY/2, calorSizeXY/2, (scintThickness * nofLayers)/2); // its size
@@ -388,6 +384,34 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  nofLayers,        // number of replica
                  scintThickness);  // width of replica
 
+
+
+/***
+ // Scint one Block
+  auto scintS 
+    = new G4Box("Layer",           // its name
+                 calorSizeXY/2, calorSizeXY/2, (scintThickness * nofLayers)/2); // its size
+                         
+  auto scintLV
+    = new G4LogicalVolume(
+                 scintS,           // its solid
+                 scintMaterial,  // its material
+                 "ScintLV");         // its name
+
+  auto scintPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., -11.5*cm),
+                 //G4ThreeVector(0., 0.,  -(scintThickness*nofLayers/2. ) + (calorThickness/2. - absoThickness) ), //  its position
+                 scintLV,            // its logical volume                         
+                 "Scint",            // its name
+                 calorLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+***/
+
+
   // Vacuum Tube
   auto tubeS 
     = new G4Box("Tube",           // its name
@@ -410,11 +434,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
-  G4VisAttributes* tubeVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
-  tubeVisAtt->SetVisibility(true);
-  tubeLV->SetVisAttributes(tubeVisAtt);
- 
-
+  
 
   // print parameters
   G4cout
@@ -429,11 +449,27 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
  
     
   // Visualization attributes
-  //worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
+  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
-  layerLV->SetVisAttributes(simpleBoxVisAtt);
+  //simpleBoxVisAtt->SetForceSolid(true);
+  scintLV->SetVisAttributes(simpleBoxVisAtt);
+  
+
+
+  G4VisAttributes* tubeVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
+  tubeVisAtt->SetVisibility(true);
+  tubeVisAtt->SetForceSolid(true);
+  tubeLV->SetVisAttributes(tubeVisAtt);
+ 
+ 
+  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  absorberVisAtt->SetVisibility(true);
+  absorberLV->SetVisAttributes(absorberVisAtt);
+ 
+
+
 
   return worldPV;
 }
@@ -443,6 +479,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 void DetectorConstruction::ConstructSDandField()
 {
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
+
+
+  // declare vacuum as TubeSD
+  G4String tubeDetectorName = "TubeLV" ;
+  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
+  SetSensitiveDetector("TubeLV", tubeDetector);
 
   // declare Scintillator as SinctillatorSD
   G4String scintDetectorName = "ScintLV" ;
@@ -455,12 +498,6 @@ void DetectorConstruction::ConstructSDandField()
   AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
-
-  // declare vacuum as TubeSD
-  G4String tubeDetectorName = "TubeLV" ;
-  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
-  SetSensitiveDetector("TubeLV", tubeDetector);
 
 
 }

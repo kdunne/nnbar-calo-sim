@@ -72,6 +72,7 @@ RunAction::RunAction()
 
 
 // Scintillator Histograms Edeposited in individual sheets for Primary Particles
+//
   analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 100*MeV); // 0
   analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 100*MeV); // 1
   analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 100*MeV); // 2
@@ -85,19 +86,37 @@ RunAction::RunAction()
 
   // 1-D Histos
   analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 80, 0, 10000); 		//   	10
+  //analysisManager->CreateH1("NumCerenkov","NC", 80, 0, 500);
   analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	11
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 55, 0, 55); 			//	13
+  analysisManager->CreateH1("Range", "Primary Particle Range", 57, 0, 57); 			//	13
   //analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
-  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV);  //      14
-  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
-  analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 250*MeV);     //      16
+  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 500*MeV);  //      14
+  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 500*MeV);       //      15
+  analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 500*MeV);     //      16
+  analysisManager->CreateH1("EdepElectron", "Energy Deposited by Electron", 50, 0, 10*MeV);      //      17
+  analysisManager->CreateH1("RangeElectron", "Range of electron", 57, 0, 57);                   //      18
 
   // 2-D Histos
+  // Two sets of histos
+  // 500 MeV limit for signal
+  // 4,10MeV limit for low energy background
+
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
-  analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
-  analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 10000, 50, 0, 250*MeV);     //      2
+
+  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			             //	0 
+  //analysisManager->CreateH2("KinE","Kinetic Energy", 57, 0, 57, 50, 0, 4*MeV); 		             // 0
+
+  analysisManager->CreateH2("eDepvRange", "Energy Deposited", 57, 0, 57, 50, 0, 500*MeV );                   // 1
+  //analysisManager->CreateH2("eDepvRange", "eDepvRange", 57, 0, 57, 50, 0, 10*MeV);                         // 1
+
+  analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 10000, 50, 0, 500*MeV);   // 2
+  //analysisManager->CreateH2("eDepvCerenkov", "eDepvCerenkov", 80, 0, 500, 50, 0, 3.5*MeV);                 // 2
+
+  analysisManager->CreateH2("eDepvRangeElectron", "EDevRangeElectron", 57, 0, 57, 50, 0, 10*MeV);             // 3
+  analysisManager->CreateH2("KinEelectron", "KinEelectron", 57, 0, 57, 50, 0, 10*MeV);                        // 4
+
+  analysisManager->CreateH2("RangevCerenkov", "", 80, 0, 10000, 57, 0, 57); //5
 }
 
 //....

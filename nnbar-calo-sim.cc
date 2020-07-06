@@ -117,6 +117,13 @@ int main(int argc,char** argv)
 
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
+
+  // MCPL file
+  //runManager->SetUserAction(new G4MCPLGenerator("cross_photon_eng_RAD_BIN_1cm_shift.mcpl"));
+  //runManager->Initialize();
+  //runManager->BeamOn(std::numeric_limits<G4int>::max());  // crash  
+  //  runManager->BeamOn(5700); 
+
   
   // Initialize visualization
   auto visManager = new G4VisExecutive;

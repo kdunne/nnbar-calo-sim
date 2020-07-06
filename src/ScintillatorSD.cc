@@ -78,11 +78,12 @@ void ScintillatorSD::Initialize(G4HCofThisEvent*)
 G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
 
+    //if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint") return false;
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
-    
+  
+
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
-   
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
@@ -97,14 +98,17 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-  
+    //G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    G4double energyDeposit = aStep->GetPreStepPoint()->GetKineticEnergy() - aStep->GetPostStepPoint()->GetKineticEnergy();
+ 
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    
-    // Position
-    G4ThreeVector pos = PreStep->GetPosition();
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();    
+
+    // Position z=0 at center of detector
+    G4ThreeVector pos = PostStep->GetPosition();
+    //G4ThreeVector pos = PreStep->GetPosition();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
@@ -139,49 +143,61 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     } else {
         proc = "primary";
 	parentID = 0;
+        if (aStep->GetPreStepPoint()->GetKineticEnergy() == 0){
+            theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+        }
     }
 
     if (proc=="Decay"){
-        G4cout << "Killing particle " << name << G4endl;
+   //     G4cout << "Particle: " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+        return false; 
     }
 
-    //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
-                  
-        // Get the pre-step kinetic energy
-        G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
-        // Get the post-step kinetic energy
-        G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
-        // Get the step average kinetic energy
-        G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+                 
+    // Get the pre-step kinetic energy
+    G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
+    // Get the post-step kinetic energy
+    G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
 
-        NNbarHit* detectorHit = new NNbarHit();
+//        if(aStep->GetPreStepPoint()->GetStepStatus()==fGeomBoundary) {
+//            G4cout << "Step starts on boundary" << G4endl;
+//        }else if (aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary) {
+//            G4cout << "Step stops on boundary" << G4endl;
+//        }
 
-        // Make this kinetic energy and position
-	detectorHit -> SetLocalTime(localTime);
-	detectorHit -> SetParentID(parentID);
-	detectorHit -> SetProcess(proc);
-       	detectorHit -> SetTime(time);
-	detectorHit -> SetName(name);
+    NNbarHit* detectorHit = new NNbarHit();
 
-	detectorHit -> SetTrackID(trackID);
-        detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
-        detectorHit -> SetEDep(energyDeposit);
-        //detectorHit -> SetKinEn(eKinMean);
-        //detectorHit -> SetKinEn(eKinPre);
-        detectorHit -> SetKinEn(eKinPost);
 
-	HitsCollection -> insert(detectorHit);
 
-//	G4cout << "Replica: "       << k << G4endl;
-//	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinMean: "      << eKinMean << G4endl;
+    // Make this kinetic energy and position
+    detectorHit -> SetLocalTime(localTime);
+    detectorHit -> SetParentID(parentID);
+    detectorHit -> SetProcess(proc);
+    detectorHit -> SetTime(time);
+    detectorHit -> SetName(name);
 
-    }
-    
+    detectorHit -> SetTrackID(trackID);
+    detectorHit -> SetXID(k);
+    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetKinEn(eKinPost);
+    HitsCollection -> insert(detectorHit);
+
+/***
+if (tracklength > 4/CLHEP::cm && tracklength < 5/CLHEP::cm) {
+        G4cout << "SCINTILLATOR HIT: " << G4endl;
+        G4cout << "Particle: " << name << G4endl;
+        G4cout << "TrackID: " << trackID << G4endl;
+        G4cout << "Process: " << proc << G4endl;
+	G4cout << "energyDeposit: " << energyDeposit/CLHEP::MeV << G4endl;
+        G4cout << "Position: " << tracklength/CLHEP::cm << G4endl;
+        G4cout << "Global time: " << time << G4endl << G4endl;
+	G4cout << "Kinetic Energy PostStep: " << eKinPost/CLHEP::MeV << G4endl;
+}
+***/
+
+//}    
     return true;
 }
 

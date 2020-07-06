@@ -64,11 +64,11 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
      fScintillationCounter = 0;
      fCerenkovCounter = 0;
   }
-
+/***
   G4Track* track = step->GetTrack();
   G4int ID = track->GetTrackID();
   G4int ltime = track->GetLocalTime();
-
+***/
 
 } 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
