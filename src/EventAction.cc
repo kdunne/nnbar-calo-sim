@@ -105,7 +105,7 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
        scintHitsCollectionID = pSDManager->GetCollectionID("ScintillatorHitCollection");
        absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
        tubeHitsCollectionID = pSDManager->GetCollectionID("TubeHitCollection");  	
-       trackerHitsCollectionID = pSDManager->GetCollectionID("TrackerHitsCollection"); 
+       trackerHitsCollectionID = pSDManager->GetCollectionID("TrackerHitCollection"); 
  }
 
 
@@ -139,7 +139,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
     int CHCID4 = -1;
     if (CHCID4<0) {
-	CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TrackerHitsCollection");
+	CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TrackerHitCollection");
     }
 
     NNbarHitsCollection* ScintHits = 0;
@@ -313,60 +313,65 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	}  
        
         TrackerHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
- 
+
+//	G4cout << TrackerHits->entries()<< G4endl;
+		
         if (TrackerHits) {
 	    hitCount = TrackerHits->entries();
+	    // Print hitcount
+	    G4cout <<hitCount<< G4endl;
+
             G4cout << " in trackerhits loops " << G4endl;
 	    for (G4int h=0; h<hitCount; h++) {
-//	        // In future can instead define aHit and assign like track.member[i]
+	        // In future can instead define aHit and assign like track.member[i]
 	        ltime    = ((*TrackerHits)[h]) -> GetLocalTime();
-//	        parentID = ((*TrackerHits)[h]) -> GetParentID();
-//	        proc     = ((*TrackerHits)[h]) -> GetProcess();
-//              name     = ((*TrackerHits)[h]) -> GetName();
-//              time     = ((*TrackerHits)[h]) -> GetTime(); 
-//	        trID     = ((*TrackerHits)[h]) -> GetTrackID();
-//		i        = ((*TrackerHits)[h]) -> GetXID();
-//	        kinEn    = ((*TrackerHits)[h]) -> GetKinEn();
-//	        eDep     = ((*TrackerHits)[h]) -> GetEdep();
-//              trackl   = ((*TrackerHits)[h]) -> GetPosZ();	
+	        parentID = ((*TrackerHits)[h]) -> GetParentID();
+	        proc     = ((*TrackerHits)[h]) -> GetProcess();
+                name     = ((*TrackerHits)[h]) -> GetName();
+                time     = ((*TrackerHits)[h]) -> GetTime(); 
+	        trID     = ((*TrackerHits)[h]) -> GetTrackID();
+		i        = ((*TrackerHits)[h]) -> GetXID();
+	        kinEn    = ((*TrackerHits)[h]) -> GetKinEn();
+ 	        eDep     = ((*TrackerHits)[h]) -> GetEdep();
+                trackl   = ((*TrackerHits)[h]) -> GetPosZ();	
  
                // Sum totEdep
-//               eDepTracker += eDep;  
-//               totEdep += eDep;
-//               if (trID ==1) {
-//		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-//	           if (kinEn == 0) {
-//                       if(h==0){
-//                           G4cout << "Filling with pos " << trackl << G4endl;
-//                           analysis->FillH1(13, trackl/CLHEP::cm);
-//		           analysis->FillH1(12, time/CLHEP::ns);
-//                           continue;
-//                       }
+               eDepTracker += eDep;  
+               totEdep += eDep;
+               if (trID ==1) {
+		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+	           if (kinEn == 0) {
+                       if(h==0){
+                           G4cout << "Filling with pos " << trackl << G4endl;
+                           analysis->FillH1(13, trackl/CLHEP::cm);
+		           analysis->FillH1(12, time/CLHEP::ns);
+                           continue;
+                       }
 		       
-//                       //G4cout << "hit number: " << h << G4endl;
-//                       G4double prevKin = ((*TrackerHits)[h-1])->GetKinEn();
-//                       //G4cout << "Position: " << trackl << G4endl;
-//	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
-//		       //G4cout << "Local Time: " << ltime << G4endl;
+                       //G4cout << "hit number: " << h << G4endl;
+                       G4double prevKin = ((*TrackerHits)[h-1])->GetKinEn();
+                       //G4cout << "Position: " << trackl << G4endl;
+	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
+		       //G4cout << "Local Time: " << ltime << G4endl;
 		       
-//                       // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
-//                       if (prevKin == 0) {
-//                           G4cout << "continuing to next hit "<< G4endl;
-//                           continue;
-//                       } else {
-//                           //G4cout << "Filling with pos " << trackl << G4endl;
-//                           analysis->FillH1(13, trackl/CLHEP::cm);
-//		           analysis->FillH1(12, time/CLHEP::ns);
-//                           //analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
-//                       }
-//		   }
-//	       } 
-//
+                       // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
+                       if (prevKin == 0) {
+                           G4cout << "continuing to next hit "<< G4endl;
+                           continue;
+                       } else {
+                           //G4cout << "Filling with pos " << trackl << G4endl;
+                           analysis->FillH1(13, trackl/CLHEP::cm);
+		           analysis->FillH1(12, time/CLHEP::ns);
+                           //analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
+                       }
+		   }
+	       } 
+
 	    }
    
-//            // Fill total Edep in Trackere
-//            analysis->FillH1(16, eDepTracker/CLHEP::MeV);	
-//            G4cout << "Total Edep in tracker: " << eDepTracker/CLHEP::MeV << G4endl;         
+            // Fill total Edep in Trackere
+            analysis->FillH1(16, eDepTracker/CLHEP::MeV);	
+            G4cout << "Total Edep in tracker: " << eDepTracker/CLHEP::MeV << G4endl;         
         }
 
         TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
