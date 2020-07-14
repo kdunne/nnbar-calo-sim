@@ -319,7 +319,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
             G4cout << " in trackerhits loops " << G4endl;
 	    for (G4int h=0; h<hitCount; h++) {
 //	        // In future can instead define aHit and assign like track.member[i]
-//	        ltime    = ((*TrackerHits)[h]) -> GetLocalTime();
+	        ltime    = ((*TrackerHits)[h]) -> GetLocalTime();
 //	        parentID = ((*TrackerHits)[h]) -> GetParentID();
 //	        proc     = ((*TrackerHits)[h]) -> GetProcess();
 //              name     = ((*TrackerHits)[h]) -> GetName();

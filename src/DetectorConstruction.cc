@@ -488,8 +488,12 @@ void DetectorConstruction::ConstructSDandField()
   TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
   SetSensitiveDetector("TubeLV", tubeDetector);
-
-
+ 
+   // declare racker as TrackerSD
+   G4String trackerDetectorName = "Tracker" ;
+   TrackerSD* trackerDetector = new TrackerSD(trackerDetectorName);
+   G4SDManager::GetSDMpointer()->AddNewDetector(trackerDetector);
+   SetSensitiveDetector("Tracker", trackerDetector);
 }
 
 //....

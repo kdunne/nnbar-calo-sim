@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 
-#ifndef TubeSD_h
-#define TubeSD_h 1
+#ifndef TrackerSD_h
+#define TrackerSD_h 1
 
 #include "G4VSensitiveDetector.hh"
 #include "globals.hh"
