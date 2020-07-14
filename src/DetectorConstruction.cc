@@ -125,6 +125,9 @@ void DetectorConstruction::DefineMaterials()
   Abs->AddElement(elAs, .002651);
   Abs->AddElement(elPb, 0.751938);
 
+  // Silicon Tracker Material
+  nistManager->FindOrBuildMaterial("G4_Si");
+
 //
 // ----------------- Generate and Add Material Properties Table ----------------
 //
@@ -250,9 +253,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double  scintThickness =  3.*cm;
   G4double  calorSizeXY    =  1.*m;
   G4double  tubeThickness  =  2.*cm;
-
+  
+  // Tracker geometry
+  G4double trackerSizeX = calorSizeXY;
+  G4double trackerSizeY = calorSizeXY;
+  G4double trackerThickness = 300.*micrometer;
+  
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
-  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
+  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness + trackerThickness;
   auto worldSizeXY = 1 * calorSizeXY;
   auto worldSizeZ  = 1 * calorThickness;
 
@@ -262,7 +270,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
   auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
- 
+  auto trackerMaterial = G4Material::GetMaterial("G4_Si");
+
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
     msg << "Cannot retrieve materials already defined."; 
@@ -414,7 +423,24 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   tubeVisAtt->SetVisibility(true);
   tubeLV->SetVisAttributes(tubeVisAtt);
  
+  // Silicon Detector
+  
+  auto trackerS
+	= new G4Box("Tracker", trackerSizeX/2, trackerSizeY/2, trackerThickness/2); // its size
 
+  auto trackerLV
+	= new G4LogicalVolume(trackerS, trackerMaterial, "Tracker");
+
+  auto trackerPV
+	= new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., -calorThickness/2-trackerThickness/2), //  its position
+                 trackerLV,            // its logical volume                         
+                 "Tracker",            // its name
+                 calorLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
 
   // print parameters
   G4cout

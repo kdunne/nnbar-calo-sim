@@ -1,0 +1,698 @@
+The system is: Linux - 3.10.0-1062.4.1.el7.x86_64 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/nevis/el7/gcc-6.4.0/bin/gcc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/3.16.4/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/nevis/el7/gcc-6.4.0/bin/g++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/3.16.4/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_e27c4/fast && /usr/bin/gmake -f CMakeFiles/cmTC_e27c4.dir/build.make CMakeFiles/cmTC_e27c4.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e27c4.dir/testCCompiler.c.o
+/usr/nevis/el7/gcc-6.4.0/bin/gcc    -o CMakeFiles/cmTC_e27c4.dir/testCCompiler.c.o   -c /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_e27c4
+/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e27c4.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/gcc      -rdynamic CMakeFiles/cmTC_e27c4.dir/testCCompiler.c.o  -o cmTC_e27c4 
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_7a07f/fast && /usr/bin/gmake -f CMakeFiles/cmTC_7a07f.dir/build.make CMakeFiles/cmTC_7a07f.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o
+/usr/nevis/el7/gcc-6.4.0/bin/gcc   -v -o CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o   -c /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCCompilerABI.c
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/cc1 -quiet -v -iprefix /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/ /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccoeaZyf.s
+GNU C11 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 6.4.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed"
+ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed
+ /usr/local/include
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include
+ /usr/include
+End of search list.
+GNU C11 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 6.4.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: b77dfa5e9650e6f644e01093d71ceda2
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o /tmp/ccoeaZyf.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-43.base.el7_8.1
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+Linking C executable cmTC_7a07f
+/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a07f.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/gcc     -v -rdynamic CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o  -o cmTC_7a07f 
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc
+COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_7a07f' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccTkHPYh.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_7a07f /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_7a07f' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+    add: [/usr/local/include]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/include]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed;/usr/local/include;/nevis/library/usr/nevis/el7/gcc-6.4.0/include;/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake cmTC_7a07f/fast && /usr/bin/gmake -f CMakeFiles/cmTC_7a07f.dir/build.make CMakeFiles/cmTC_7a07f.dir/build]
+  ignore line: [gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/gcc   -v -o CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o   -c /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCCompilerABI.c]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/cc1 -quiet -v -iprefix /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/ /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccoeaZyf.s]
+  ignore line: [GNU C11 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 6.4.0  GMP version 4.3.2  MPFR version 2.4.2  MPC version 0.8.1  isl version 0.15]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed"]
+  ignore line: [ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C11 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 6.4.0  GMP version 4.3.2  MPFR version 2.4.2  MPC version 0.8.1  isl version 0.15]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: b77dfa5e9650e6f644e01093d71ceda2]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o /tmp/ccoeaZyf.s]
+  ignore line: [GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-43.base.el7_8.1]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking C executable cmTC_7a07f]
+  ignore line: [/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a07f.dir/link.txt --verbose=1]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/gcc     -v -rdynamic CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o  -o cmTC_7a07f ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_7a07f' '-mtune=generic' '-march=x86-64']
+  link line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccTkHPYh.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_7a07f /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccTkHPYh.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_7a07f] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> ignore
+    arg [/lib/../lib64/crti.o] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o] ==> ignore
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..]
+    arg [CMakeFiles/cmTC_7a07f.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o] ==> ignore
+    arg [/lib/../lib64/crtn.o] ==> ignore
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64;/lib64;/usr/lib64;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_9bfb0/fast && /usr/bin/gmake -f CMakeFiles/cmTC_9bfb0.dir/build.make CMakeFiles/cmTC_9bfb0.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9bfb0.dir/testCXXCompiler.cxx.o
+/usr/nevis/el7/gcc-6.4.0/bin/g++     -o CMakeFiles/cmTC_9bfb0.dir/testCXXCompiler.cxx.o -c /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_9bfb0
+/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9bfb0.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/g++       -rdynamic CMakeFiles/cmTC_9bfb0.dir/testCXXCompiler.cxx.o  -o cmTC_9bfb0 
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake cmTC_9e90e/fast && /usr/bin/gmake -f CMakeFiles/cmTC_9e90e.dir/build.make CMakeFiles/cmTC_9e90e.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o
+/usr/nevis/el7/gcc-6.4.0/bin/g++    -v -o CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -c /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/cc1plus -quiet -v -iprefix /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/ -D_GNU_SOURCE /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/cc7NZ3mB.s
+GNU C++14 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 6.4.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include"
+ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed"
+ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed
+ /usr/local/include
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include
+ /usr/include
+End of search list.
+GNU C++14 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 6.4.0, GMP version 4.3.2, MPFR version 2.4.2, MPC version 0.8.1, isl version 0.15
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: fa2f121845a1e32027130d088ea0f765
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc7NZ3mB.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-43.base.el7_8.1
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+Linking CXX executable cmTC_9e90e
+/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9e90e.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/g++      -v -rdynamic CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_9e90e 
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++
+COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_9e90e' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccc4LEeE.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_9e90e /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_9e90e' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+    add: [/usr/local/include]
+    add: [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0/x86_64-pc-linux-gnu]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0/backward]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/include]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0;/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0/x86_64-pc-linux-gnu;/nevis/library/usr/nevis/el7/gcc-6.4.0/include/c++/6.4.0/backward;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed;/usr/local/include;/nevis/library/usr/nevis/el7/gcc-6.4.0/include;/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake cmTC_9e90e/fast && /usr/bin/gmake -f CMakeFiles/cmTC_9e90e.dir/build.make CMakeFiles/cmTC_9e90e.dir/build]
+  ignore line: [gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/g++    -v -o CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -c /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/cc1plus -quiet -v -iprefix /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/ -D_GNU_SOURCE /nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/cc7NZ3mB.s]
+  ignore line: [GNU C++14 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 6.4.0  GMP version 4.3.2  MPFR version 2.4.2  MPC version 0.8.1  isl version 0.15]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include"]
+  ignore line: [ignoring duplicate directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed"]
+  ignore line: [ignoring nonexistent directory "/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/x86_64-pc-linux-gnu]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../include/c++/6.4.0/backward]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/include-fixed]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/../../include]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C++14 (GCC) version 6.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 6.4.0  GMP version 4.3.2  MPFR version 2.4.2  MPC version 0.8.1  isl version 0.15]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: fa2f121845a1e32027130d088ea0f765]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc7NZ3mB.s]
+  ignore line: [GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-43.base.el7_8.1]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking CXX executable cmTC_9e90e]
+  ignore line: [/nevis/library/usr/nevis/cmake-3.16.4-Linux-x86_64/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9e90e.dir/link.txt --verbose=1]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/g++      -v -rdynamic CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_9e90e ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_9e90e' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccc4LEeE.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_9e90e /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccc4LEeE.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_9e90e] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> ignore
+    arg [/lib/../lib64/crti.o] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o] ==> ignore
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..]
+    arg [CMakeFiles/cmTC_9e90e.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o] ==> ignore
+    arg [/lib/../lib64/crtn.o] ==> ignore
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64;/lib64;/usr/lib64;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit fwks: []
+
+
+The system is: Linux - 3.10.0-1062.4.1.el7.x86_64 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/nevis/el7/gcc-6.4.0/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/2.8.12.2/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/nevis/el7/gcc-6.4.0/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/2.8.12.2/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec3913855791/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3913855791.dir/build.make CMakeFiles/cmTryCompileExec3913855791.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3913855791.dir/testCCompiler.c.o
+/usr/nevis/el7/gcc-6.4.0/bin/gcc    -o CMakeFiles/cmTryCompileExec3913855791.dir/testCCompiler.c.o   -c /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec3913855791
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3913855791.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/gcc       CMakeFiles/cmTryCompileExec3913855791.dir/testCCompiler.c.o  -o cmTryCompileExec3913855791 -rdynamic 
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec2728919222/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec2728919222.dir/build.make CMakeFiles/cmTryCompileExec2728919222.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o
+/usr/nevis/el7/gcc-6.4.0/bin/gcc    -o CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec2728919222
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2728919222.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/gcc     -v CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec2728919222 -rdynamic  
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc
+COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2728919222' '-rdynamic' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccSk6fms.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec2728919222 /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2728919222' '-rdynamic' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec2728919222/fast"]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec2728919222.dir/build.make CMakeFiles/cmTryCompileExec2728919222.dir/build]
+  ignore line: [gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/gcc    -o CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec2728919222]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2728919222.dir/link.txt --verbose=1]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/gcc     -v CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec2728919222 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec2728919222' '-rdynamic' '-mtune=generic' '-march=x86-64']
+  link line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccSk6fms.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec2728919222 /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccSk6fms.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec2728919222] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> ignore
+    arg [/lib/../lib64/crti.o] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o] ==> ignore
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..]
+    arg [CMakeFiles/cmTryCompileExec2728919222.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o] ==> ignore
+    arg [/lib/../lib64/crtn.o] ==> ignore
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit libs: [c]
+  implicit dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64;/lib64;/usr/lib64;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec831669145/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec831669145.dir/build.make CMakeFiles/cmTryCompileExec831669145.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec831669145.dir/testCXXCompiler.cxx.o
+/usr/nevis/el7/gcc-6.4.0/bin/g++     -o CMakeFiles/cmTryCompileExec831669145.dir/testCXXCompiler.cxx.o -c /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec831669145
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec831669145.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/g++        CMakeFiles/cmTryCompileExec831669145.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec831669145 -rdynamic 
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec3664485815/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3664485815.dir/build.make CMakeFiles/cmTryCompileExec3664485815.dir/build
+gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o
+/usr/nevis/el7/gcc-6.4.0/bin/g++     -o CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec3664485815
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3664485815.dir/link.txt --verbose=1
+/usr/nevis/el7/gcc-6.4.0/bin/g++      -v CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3664485815 -rdynamic  
+Using built-in specs.
+COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++
+COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib
+Thread model: posix
+gcc version 6.4.0 (GCC) 
+COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/
+LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3664485815' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccemk2XS.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec3664485815 /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3664485815' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec3664485815/fast"]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3664485815.dir/build.make CMakeFiles/cmTryCompileExec3664485815.dir/build]
+  ignore line: [gmake[1]: Entering directory `/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/g++     -o CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec3664485815]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3664485815.dir/link.txt --verbose=1]
+  ignore line: [/usr/nevis/el7/gcc-6.4.0/bin/g++      -v CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3664485815 -rdynamic  ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/nevis/el7/gcc-6.4.0/bin/g++]
+  ignore line: [COLLECT_LTO_WRAPPER=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: /usr/nevis/src/gcc-6.4.0/configure --prefix=/usr/nevis/el7/gcc-6.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 6.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/]
+  ignore line: [LIBRARY_PATH=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3664485815' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2 -plugin /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so -plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccemk2XS.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec3664485815 /lib/../lib64/crt1.o /lib/../lib64/crti.o /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../.. CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../libexec/gcc/x86_64-pc-linux-gnu/6.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccemk2XS.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec3664485815] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> ignore
+    arg [/lib/../lib64/crti.o] ==> ignore
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtbegin.o] ==> ignore
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..]
+    arg [CMakeFiles/cmTryCompileExec3664485815.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/crtend.o] ==> ignore
+    arg [/lib/../lib64/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../../../lib64] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/nevis/library/usr/nevis/el7/gcc-6.4.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.4.0/../../..] ==> [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit libs: [stdc++;m;c]
+  implicit dirs: [/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc/x86_64-pc-linux-gnu/6.4.0;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib/gcc;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib64;/lib64;/usr/lib64;/nevis/library/usr/nevis/el7/gcc-6.4.0/lib]
+  implicit fwks: []
+
+

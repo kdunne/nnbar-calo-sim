@@ -32,6 +32,7 @@
 #include "AbsorberSD.hh"
 #include "TubeSD.hh"
 #include "NNbarHit.hh"
+#include "TrackerSD.hh"
 
 #include "G4VHitsCollection.hh"
 #include "G4RunManager.hh"
@@ -54,7 +55,8 @@ EventAction::EventAction():
     fScintTrackLengthHCID(-1),
     scintHitsCollectionID(-1),
     absHitsCollectionID(-1),
-    tubeHitsCollectionID(-1)
+    tubeHitsCollectionID(-1),
+    trackerHitsCollectionID(-1)
 {}
 
 //....
@@ -102,8 +104,9 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
     if(scintHitsCollectionID == -1) {
        scintHitsCollectionID = pSDManager->GetCollectionID("ScintillatorHitCollection");
        absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
-       tubeHitsCollectionID = pSDManager->GetCollectionID("TubeHitCollection");  
-  }
+       tubeHitsCollectionID = pSDManager->GetCollectionID("TubeHitCollection");  	
+       trackerHitsCollectionID = pSDManager->GetCollectionID("TrackerHitsCollection"); 
+ }
 
 
 }
@@ -134,9 +137,15 @@ void EventAction::EndOfEventAction(const G4Event* event)
         CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");
     }
 
+    int CHCID4 = -1;
+    if (CHCID4<0) {
+	CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TrackerHitsCollection");
+    }
+
     NNbarHitsCollection* ScintHits = 0;
     NNbarHitsCollection* AbsHits   = 0;
     NNbarHitsCollection* TubeHits  = 0;
+    NNbarHitsCollection* TrackerHits = 0;
 
     if (HCE) {
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
@@ -160,6 +169,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4double eDepScint = 0.;
         G4double eDepAbs   = 0.;
         G4double eDepTube  = 0.; 
+	G4double eDepTracker = 0.;
 
         if (ScintHits) {
 	    hitCount = ScintHits->entries();
@@ -203,7 +213,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
                        if (prevKin == 0) {
                            G4cout << "continuing to next hit "<< G4endl;
                            continue;
-                       } else {
+                       }
+ 
+			else {
                            //G4cout << "Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
@@ -300,13 +312,69 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	    }
 	}  
        
+        TrackerHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
+ 
+        if (TrackerHits) {
+	    hitCount = TrackerHits->entries();
+            G4cout << " in trackerhits loops " << G4endl;
+	    for (G4int h=0; h<hitCount; h++) {
+//	        // In future can instead define aHit and assign like track.member[i]
+//	        ltime    = ((*TrackerHits)[h]) -> GetLocalTime();
+//	        parentID = ((*TrackerHits)[h]) -> GetParentID();
+//	        proc     = ((*TrackerHits)[h]) -> GetProcess();
+//              name     = ((*TrackerHits)[h]) -> GetName();
+//              time     = ((*TrackerHits)[h]) -> GetTime(); 
+//	        trID     = ((*TrackerHits)[h]) -> GetTrackID();
+//		i        = ((*TrackerHits)[h]) -> GetXID();
+//	        kinEn    = ((*TrackerHits)[h]) -> GetKinEn();
+//	        eDep     = ((*TrackerHits)[h]) -> GetEdep();
+//              trackl   = ((*TrackerHits)[h]) -> GetPosZ();	
+ 
+               // Sum totEdep
+//               eDepTracker += eDep;  
+//               totEdep += eDep;
+//               if (trID ==1) {
+//		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+//	           if (kinEn == 0) {
+//                       if(h==0){
+//                           G4cout << "Filling with pos " << trackl << G4endl;
+//                           analysis->FillH1(13, trackl/CLHEP::cm);
+//		           analysis->FillH1(12, time/CLHEP::ns);
+//                           continue;
+//                       }
+		       
+//                       //G4cout << "hit number: " << h << G4endl;
+//                       G4double prevKin = ((*TrackerHits)[h-1])->GetKinEn();
+//                       //G4cout << "Position: " << trackl << G4endl;
+//	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
+//		       //G4cout << "Local Time: " << ltime << G4endl;
+		       
+//                       // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
+//                       if (prevKin == 0) {
+//                           G4cout << "continuing to next hit "<< G4endl;
+//                           continue;
+//                       } else {
+//                           //G4cout << "Filling with pos " << trackl << G4endl;
+//                           analysis->FillH1(13, trackl/CLHEP::cm);
+//		           analysis->FillH1(12, time/CLHEP::ns);
+//                           //analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
+//                       }
+//		   }
+//	       } 
+//
+	    }
+   
+//            // Fill total Edep in Trackere
+//            analysis->FillH1(16, eDepTracker/CLHEP::MeV);	
+//            G4cout << "Total Edep in tracker: " << eDepTracker/CLHEP::MeV << G4endl;         
+        }
+
         TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
  
         if (TubeHits) {
 	    hitCount = TubeHits->entries();
             G4cout << " in tubehits loops " << G4endl;
 	    for (G4int h=0; h<hitCount; h++) {
-	        // In future can instead define aHit and assign like track.member[i]
 	        ltime    = ((*TubeHits)[h]) -> GetLocalTime();
 	        parentID = ((*TubeHits)[h]) -> GetParentID();
     		proc     = ((*TubeHits)[h]) -> GetProcess();
@@ -316,10 +384,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		i        = ((*TubeHits)[h]) -> GetXID();
 	        kinEn    = ((*TubeHits)[h]) -> GetKinEn();
 	        eDep     = ((*TubeHits)[h]) -> GetEdep();
-                trackl   = ((*TubeHits)[h]) -> GetPosZ();	
+                trackl   = ((*TubeHits)[h]) -> GetPosZ();
 
-               // Sum totEdep
-               eDepTube += eDep;  
+	        eDepTube += eDep;  
                totEdep += eDep;
                if (trID ==1) {
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
@@ -330,32 +397,27 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		           analysis->FillH1(12, time/CLHEP::ns);
                            continue;
                        }
-		       
-                       //G4cout << "hit number: " << h << G4endl;
                        G4double prevKin = ((*TubeHits)[h-1])->GetKinEn();
-                       //G4cout << "Position: " << trackl << G4endl;
-	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
-		       //G4cout << "Local Time: " << ltime << G4endl;
-		       
-                       // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
+
                        if (prevKin == 0) {
                            G4cout << "continuing to next hit "<< G4endl;
                            continue;
                        } else {
-                           //G4cout << "Filling with pos " << trackl << G4endl;
+
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
-                           //analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
                        }
 		   }
 	       } 
 
 	    }
    
-            // Fill total Edep in Vacuum Tube
             analysis->FillH1(16, eDepTube/CLHEP::MeV);	
             G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << G4endl;         
         }
+
+
+
 
     } else {
         G4cout << "No HCE" << G4endl;
