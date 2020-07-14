@@ -364,6 +364,7 @@ CMakeFiles/nnbar-calo-sim.dir/DetectorConstruction.cc.o
  ../include/DetectorConstruction.hh
  ../include/NNbarHit.hh
  ../include/ScintillatorSD.hh
+ ../include/TrackerSD.hh
  ../include/TubeSD.hh
  /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/DetectorConstruction.cc
  /usr/nevis/el7/geant4.10.05/include/Geant4/CLHEP/Geometry/BasicVector3D.h

@@ -185,6 +185,8 @@ AbsorberSD.hh
 /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/AbsorberSD.hh
 TubeSD.hh
 /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/TubeSD.hh
+TrackerSD.hh
+/nevis/milne/files/jamakkinje/nnbar-calo-sim/src/TrackerSD.hh
 G4Material.hh
 /nevis/milne/files/jamakkinje/nnbar-calo-sim/src/G4Material.hh
 G4Element.hh

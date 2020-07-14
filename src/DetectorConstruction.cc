@@ -29,6 +29,7 @@
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
 #include "TubeSD.hh"
+#include "TrackerSD.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
