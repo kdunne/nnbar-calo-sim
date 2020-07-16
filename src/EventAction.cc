@@ -342,17 +342,17 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	           if (kinEn == 0) {
                        if(h==0){
-                           G4cout << "Filling with pos " << trackl << G4endl;
+                           G4cout << "Tracker Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
                            continue;
                        }
 		       
-                       //G4cout << "hit number: " << h << G4endl;
+                       G4cout << "Tracker hit number: " << h << G4endl;
                        G4double prevKin = ((*TrackerHits)[h-1])->GetKinEn();
-                       //G4cout << "Position: " << trackl << G4endl;
-	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
-		       //G4cout << "Local Time: " << ltime << G4endl;
+                       G4cout << "Tracker Position: " << trackl << G4endl;
+	               G4cout << "Tracker Previous KinEn: " << prevKin << G4endl;
+		       G4cout << "Tracker Local Time: " << ltime << G4endl;
 		       
                        // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
                        if (prevKin == 0) {
@@ -362,15 +362,15 @@ void EventAction::EndOfEventAction(const G4Event* event)
                            //G4cout << "Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
-                           //analysis->FillH2(1, trackl/CLHEP::cm, eDepScint/CLHEP::MeV);
+                           analysis->FillH2(1, trackl/CLHEP::cm, eDepTracker/CLHEP::MeV);
                        }
 		   }
 	       } 
 
 	    }
    
-            // Fill total Edep in Trackere
-            analysis->FillH1(16, eDepTracker/CLHEP::MeV);	
+            // Fill total Edep in Tracker
+            analysis->FillH1(17, eDepTracker/CLHEP::MeV);	
             G4cout << "Total Edep in tracker: " << eDepTracker/CLHEP::MeV << G4endl;         
         }
 
