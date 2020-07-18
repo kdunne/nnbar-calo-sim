@@ -197,7 +197,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	           if (kinEn == 0) {
                        if(h==0){
-                           G4cout << "Filling with pos " << trackl << G4endl;
+//                           G4cout << "Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
                            continue;
@@ -211,7 +211,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		       
                        // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
                        if (prevKin == 0) {
-                           G4cout << "continuing to next hit "<< G4endl;
+//                           G4cout << "continuing to next hit "<< G4endl;
                            continue;
                        }
  
@@ -300,18 +300,18 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 //analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);  
                   
                 if(cerenkovCounter>0){
-                    G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
+//                    G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
                     analysis->FillH2(2, cerenkovCounter, eDepAbs/CLHEP::MeV);       
                 }
             }
 
-            G4cout << "Total Edep in lead-glass: " << eDepAbs/CLHEP::MeV << G4endl;
-	    G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
+//            G4cout << "Total Edep in lead-glass: " << eDepAbs/CLHEP::MeV << G4endl;
+//	    G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
             if (cerenkovCounter>0){
 	        analysis->FillH1(10,cerenkovCounter);
 	    }
 	}  
-       
+     
         TrackerHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
 
 //	G4cout << TrackerHits->entries()<< G4endl;
@@ -342,7 +342,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	           if (kinEn == 0) {
                        if(h==0){
-                           G4cout << "Tracker Filling with pos " << trackl << G4endl;
+  //                         G4cout << "Tracker Filling with pos " << trackl << G4endl;
                            analysis->FillH1(13, trackl/CLHEP::cm);
 		           analysis->FillH1(12, time/CLHEP::ns);
                            continue;
@@ -356,7 +356,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		       
                        // For some reason, kinEn can be 0 two hits in a row-> double counting one primary particle
                        if (prevKin == 0) {
-                           G4cout << "continuing to next hit "<< G4endl;
+//                           G4cout << "continuing to next hit "<< G4endl;
                            continue;
                        } else {
                            //G4cout << "Filling with pos " << trackl << G4endl;
@@ -405,7 +405,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                        G4double prevKin = ((*TubeHits)[h-1])->GetKinEn();
 
                        if (prevKin == 0) {
-                           G4cout << "continuing to next hit "<< G4endl;
+//                           G4cout << "continuing to next hit "<< G4endl;
                            continue;
                        } else {
 
@@ -418,7 +418,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	    }
    
             analysis->FillH1(16, eDepTube/CLHEP::MeV);	
-            G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << G4endl;         
+//            G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << G4endl;         
         }
 
 

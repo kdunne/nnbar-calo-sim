@@ -259,11 +259,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double trackerSizeX = calorSizeXY;
   G4double trackerSizeY = calorSizeXY;
   G4double trackerThickness = 300.*micrometer;
+  G4double noftrackerLayers = 2; 
   
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
-  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness + trackerThickness;
-  auto worldSizeXY = 1 * calorSizeXY;
-  auto worldSizeZ  = 1 * calorThickness;
+  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness + noftrackerLayers* trackerThickness;
+  auto worldSizeXY = 1.2 * calorSizeXY;
+  auto worldSizeZ  = 1.2 * calorThickness;
 
 
   // Get materials
@@ -425,7 +426,19 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   tubeLV->SetVisAttributes(tubeVisAtt);
  
   // Silicon Detector
+  // Layer
+
+  auto trackerLayerS
+	= new G4Box("TrackerLayer", calorSizeXY/2, calorSizeXY/2, (noftrackerLayers*trackerThickness)/2);
   
+  auto trackerLayerLV
+	= new G4LogicalVolume(trackerLayerS, defaultMaterial, "TrackerLayerLV");
+ 
+  auto trackerLayerPV 
+	= new G4PVPlacement(0, G4ThreeVector(0., 0., -calorThickness/2-trackerThickness/2), trackerLayerLV, "TrackerLayer", calorLV, false, 0, fCheckOverlaps);  
+
+
+  // Silicon Tracker
   auto trackerS
 	= new G4Box("Tracker", trackerSizeX/2, trackerSizeY/2, trackerThickness/2); // its size
 
@@ -433,15 +446,18 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	= new G4LogicalVolume(trackerS, trackerMaterial, "Tracker");
 
   auto trackerPV
-	= new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(0., 0., -calorThickness/2-trackerThickness/2), //  its position
-                 trackerLV,            // its logical volume                         
-                 "Tracker",            // its name
-                 calorLV,          // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
+	= new G4PVReplica("TrackerLayer", trackerLV, trackerLayerLV, kZAxis, noftrackerLayers, trackerThickness);
+
+//  auto trackerPV
+//	= new G4PVPlacement(
+//                 0,                // no rotation
+//                 G4ThreeVector(0., 0., -calorThickness/2-trackerThickness/2), //  its position
+//                 trackerLV,            // its logical volume                         
+//                 "Tracker",            // its name
+//                 calorLV,          // its mother  volume
+//                 false,            // no boolean operation
+//                 0,                // copy number
+//                 fCheckOverlaps);  // checking overlaps 
 
   // print parameters
   G4cout
@@ -456,7 +472,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
  
     
   // Visualization attributes
-  //worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
+  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);

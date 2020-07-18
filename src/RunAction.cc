@@ -92,7 +92,7 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV);  //      14
   analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
   analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 250*MeV);     //      16
-  analysisManager->CreateH1("EdepTracker", "Energy Deposited in Tracker", 50, 0, 400*MeV);      //      17
+  analysisManager->CreateH1("EdepTracker", "Energy Deposited in Tracker", 500, 0, 5*MeV);      //      17
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 

@@ -50,4 +50,38 @@ e OGL
 /gui/addButton viewer "Flush viewer (= refresh + update)" "/vis/viewer/flush"
 /gui/addButton viewer "Update scene" "/vis/scene/notifyHandlers"
 /run/printProgress 100
-/run/beamOn 50
+/vis/set/touchable World 0 Calorimeter 0 Tube 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 1
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 2
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 3
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 4
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 5
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 6
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 7
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 8
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 9
+/vis/set/touchable World 0 Calorimeter 0 Abso 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 1
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 1
+/vis/set/touchable World 0 Calorimeter 0
+/vis/set/touchable World 0 Calorimeter 0 Abso 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 0
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 1
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 2
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 3
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 4
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 5
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 6
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 7
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 8
+/vis/set/touchable World 0 Calorimeter 0 Gap 0 Layer 9
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 1
+/vis/set/touchable World 0 Calorimeter 0 Tube 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 0
+/vis/set/touchable World 0 Calorimeter 0 TrackerLayer 0 TrackerLayer 1
