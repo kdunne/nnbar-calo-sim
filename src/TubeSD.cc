@@ -178,7 +178,7 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinMean: "      << eKinMean << G4endl;
+//	G4cout << "eKinPost: "      << eKinPost << G4endl;
 
     }
     

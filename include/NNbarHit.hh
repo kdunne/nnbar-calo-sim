@@ -113,7 +113,7 @@ public:
         energyDeposit = eDep;
         kinEnergy = kinEn;
   }***/
-    inline void SetLocalTime(G4int ltime){
+    inline void SetLocalTime(G4double ltime){
         localTime = ltime;
     }
  
@@ -147,16 +147,16 @@ public:
     }
 
 
-     inline void SetPosZ(G4int z){
+     inline void SetPosZ(G4double z){
         posZ = z;
     }
 
 
-    inline void SetEDep(G4int eDep){
+    inline void SetEDep(G4double eDep){
         energyDeposit = eDep;
     }
 
-    inline void SetKinEn(G4int kinEn){
+    inline void SetKinEn(G4double kinEn){
         kinEnergy = kinEn;
     }
 

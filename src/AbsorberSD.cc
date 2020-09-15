@@ -171,14 +171,14 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetXID(k);
     detectorHit -> SetPosZ(tracklength);
     detectorHit -> SetEDep(energyDeposit);
-    detectorHit -> SetKinEn(eKinMean);
+    detectorHit -> SetKinEn(eKinPost);
 
     HitsCollection -> insert(detectorHit);
 
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinMean: "      << eKinMean << G4endl;
+//	G4cout << "eKinPost: "      << eKinPost << G4endl;
     }
 
     return true;
