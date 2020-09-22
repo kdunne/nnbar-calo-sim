@@ -60,6 +60,7 @@ private:
     G4double time;
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
+	G4int origin_rp; // my new quantity 
     G4double posZ;
     //G4int zHitID; // Hit z voxel
     //G4int yHitID; // Hit y voxel 
@@ -88,12 +89,6 @@ public:
     inline G4int GetXID() // Get x index of the voxel 
     {return xHitID;}
 
-    //inline G4int GetZID() // Get y index of the voxel   
-    //{return zHitID;}
-
-    //inline G4int GetYID() // Get z index of the voxel  
-    //{return yHitID;}
-
     inline G4double GetPosZ()
     {return posZ;}
 
@@ -103,6 +98,9 @@ public:
     inline G4double GetKinEn()
     {return kinEnergy;}
 
+	// get which layer this hit is from ( only for photon ) 
+	inline G4double GetOrigin()
+	{return origin_rp;}
 
 /***    inline void SetKinEnAndPosition(G4int xx, G4double zz, G4double eDep, G4double kinEn)
     {
@@ -160,6 +158,9 @@ public:
         kinEnergy = kinEn;
     }
 
+	inline void SetOrigin(G4int origin) {
+		origin_rp = origin;
+	}
 
 };
 

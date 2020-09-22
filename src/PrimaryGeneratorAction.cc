@@ -26,7 +26,7 @@
 // 
 
 #include "PrimaryGeneratorAction.hh"
-
+#include <iomanip>
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -39,45 +39,140 @@
 #include "Randomize.hh"
 
 //.....
+using namespace std;
 
 PrimaryGeneratorAction::PrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(),
-   fParticleGun(nullptr)
+ :fParticleGun(nullptr),event_number(0)
 {
-  G4int nofParticles = 1;
-  fParticleGun = new G4ParticleGun(nofParticles);
+  const char* inputfile = "setup.file";
+  fParticleGun = new G4ParticleGun();
 
-  // default particle kinematic
-  // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
-  //auto particleDefinition 
-  //  = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
-  //fParticleGun->SetParticleDefinition(particleDefinition);
-  //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  //fParticleGun->SetParticleMomentum(50.*MeV);
+  std::ifstream inputFile;
+  inputFile.open(inputfile, std::ios::in);
+  
+  char buffer[1000];
+
+  if (inputFile.fail()) {
+	  if (*inputfile != 0)  //....only complain if a filename was given
+		  std::cerr << "PrimaryGeneratorAction: Failed to open CRY input file= " << inputfile << std::endl;
+	  InputState = -1;
+  }
+  else {
+	  std::string setupString("");
+	  while (!inputFile.getline(buffer, 1000).eof()) {
+		  setupString.append(buffer);
+		  setupString.append(" ");
+	  }
+
+	CRYSetup* setup = new CRYSetup(setupString, "/mnt/e/cry_v1.7/data");
+
+	gen = new CRYGenerator(setup);
+
+	// set random number generator
+	RNGWrapper<CLHEP::HepRandomEngine>::set(CLHEP::HepRandom::getTheEngine(), &CLHEP::HepRandomEngine::flat);
+	setup->setRandomFunction(RNGWrapper<CLHEP::HepRandomEngine>::rng);
+	InputState = 0;
+
+  }
+  // create a vector to store the CRY particle properties
+  vect = new std::vector<CRYParticle*>;
+  particleTable = G4ParticleTable::GetParticleTable();
+  gunMessenger = new PrimaryGeneratorMessenger(this);
+  std::cerr << "Input state: " << InputState << std::endl;
+  std::cerr << "particle table: " << particleTable << std::endl;
 }
 
 //....
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
 {
-  delete fParticleGun;
 }
 
 //....
 
+void PrimaryGeneratorAction::InputCRY()
+{
+	InputState = 1;
+}
+
+//----------------------------------------------------------------------------//
+void PrimaryGeneratorAction::UpdateCRY(std::string* MessInput)
+{
+	CRYSetup* setup = new CRYSetup(*MessInput, "/mnt/e/cry_v1.7/data");
+
+	gen = new CRYGenerator(setup);
+
+	// set random number generator
+	RNGWrapper<CLHEP::HepRandomEngine>::set(CLHEP::HepRandom::getTheEngine(), &CLHEP::HepRandomEngine::flat);
+	setup->setRandomFunction(RNGWrapper<CLHEP::HepRandomEngine>::rng);
+	InputState = 0;
+
+}
+
+void PrimaryGeneratorAction::CRYFromFile(G4String newValue)
+{
+	// Read the cry input file
+	std::ifstream inputFile;
+	inputFile.open(newValue, std::ios::in);
+	char buffer[1000];
+
+	if (inputFile.fail()) {
+		std::cerr << "Failed to open input file " << newValue << std::endl;
+		std::cerr << "Make sure to define the cry library on the command line" << std::endl;
+		InputState = -1;
+	}
+	else {
+		
+		std::string setupString("");
+		while (!inputFile.getline(buffer, 1000).eof()) {
+			setupString.append(buffer);
+			setupString.append(" ");
+		}
+
+		CRYSetup* setup = new CRYSetup(setupString, "/mnt/e/cry_v1.7/data");
+
+		gen = new CRYGenerator(setup);
+
+		// set random number generator
+		RNGWrapper<CLHEP::HepRandomEngine>::set(CLHEP::HepRandom::getTheEngine(), &CLHEP::HepRandomEngine::flat);
+		setup->setRandomFunction(RNGWrapper<CLHEP::HepRandomEngine>::rng);
+		InputState = 0;
+	}
+
+	std::cerr << "Input state after CRYFromFile: " << InputState << std::endl;
+
+}
+
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+	G4String particleName;
+	particleName = "mu-";
+	G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+	G4ParticleDefinition* particle = particleTable->FindParticle(particleName = "mu-");
 
-  G4double worldZHalfLength = 57.*cm / 2.;
-  G4cout << "Gun at position " << -(worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
-  //G4double worldZHalfLength = 27.5*cm;
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
+	fParticleGun->SetParticleDefinition(particle);
+	fParticleGun->SetParticleEnergy(500 * MeV);
+	fParticleGun->SetParticlePosition(G4ThreeVector(0.* m, 0.* m, 2.0* m));
+	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.*m, 0. * m, -1.0*m)); //(*vect)[j]->w())
+	fParticleGun->SetParticleTime(1.*s);
+	fParticleGun->GeneratePrimaryVertex(anEvent);
 
-  // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength ));
 
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+	event_ID.push_back(event_number);
+	particle_ID.push_back(3); 
+	particle_KE.push_back(50);
+	particle_x.push_back(0.);
+	particle_y.push_back(0.);
+	particle_z.push_back(2.0);
+	particle_momentum_x.push_back(0.);
+	particle_momentum_y.push_back(0.);
+	particle_momentum_z.push_back(1.0);
+	particle_time.push_back(1.*s);
+	
+	event_number++;
+
 }
+	
 
 //....
 

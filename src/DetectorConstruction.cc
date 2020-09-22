@@ -168,53 +168,43 @@ Abs->SetMaterialPropertiesTable(absMPT);
   G4cout << "Absorber Properties -------" << G4endl;
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
   absMPT->DumpTable();
-
-
-
-//Scintillator Optical Properties
-
-  /***
+  
+  //Scintillator Optical Properties
   const G4int nEntries2 = 12;
 
   G4double ScintPhotonEnergy[nEntries2] =
 
-  { 2.08*eV, 2.38*eV, 2.58*eV, 2.7*eV, 2.76*eV,
-    2.82*eV, 2.92*eV, 2.95*eV, 3.02*eV, 3.1*eV,
-    3.26*eV, 3.44*eV
+  { 2.08 * eV, 2.38 * eV, 2.58 * eV, 2.7 * eV, 2.76 * eV,
+	2.82 * eV, 2.92 * eV, 2.95 * eV, 3.02 * eV, 3.1 * eV,
+	3.26 * eV, 3.44 * eV
   };
 
- //   {3.44*eV, 3.26*eV, 3.1*eV, 3.02*eV, 2.95*eV,
- //    2.92*eV, 2.82*eV, 2.76*eV, 2.7*eV, 2.58*eV,
- //    2.38*eV, 2.08*eV     
- //   };
-
-
   G4double rindex_scint[nEntries2] =
-    {1.58, 1.58, 1.58, 1.58, 1.58,
-     1.58, 1.58, 1.58, 1.58, 1.58,
-     1.58, 1.58
-    };
+  { 1.58, 1.58, 1.58, 1.58, 1.58,
+   1.58, 1.58, 1.58, 1.58, 1.58,
+   1.58, 1.58
+  };
 
   G4double atten_scint[nEntries2] =
-    {210*cm, 210*cm, 210*cm, 210*cm, 210*cm,
-     210*cm, 210*cm, 210*cm, 210*cm, 210*cm,
-     210*cm, 210*cm
-    };
+  { 210 * cm, 210 * cm, 210 * cm, 210 * cm, 210 * cm,
+   210 * cm, 210 * cm, 210 * cm, 210 * cm, 210 * cm,
+   210 * cm, 210 * cm
+  };
 
   G4double scintilFast[nEntries2] =
-    {.04, .07, .20, .49, .84,
-     1.0, .83, .55, .40, .17,
-     .03, 0
-    };
+  { .04, .07, .20, .49, .84,
+   1.0, .83, .55, .40, .17,
+   .03, 0
+  };
 
- G4double scintilSlow[nEntries2] =
-    {.04, .07, .20, .49, .84,
-     1.0, .83, .55, .40, .17,
-     .03, 0
-    };
+  G4double scintilSlow[nEntries2] =
+  { .04, .07, .20, .49, .84,
+   1.0, .83, .55, .40, .17,
+   .03, 0
+  };
 
 
-  G4MaterialPropertiesTable *scintMPT = new G4MaterialPropertiesTable();
+  G4MaterialPropertiesTable* scintMPT = new G4MaterialPropertiesTable();
   scintMPT->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint, nEntries2)
 	  ->SetSpline(true);
   scintMPT->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint, nEntries2)
@@ -225,20 +215,15 @@ Abs->SetMaterialPropertiesTable(absMPT);
 	  ->SetSpline(true);
 
   // 64% of Antracene: 17400
-  scintMPT->AddConstProperty("SCINTILLATIONYIELD", 11136000/keV);
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD", 500. / MeV); //original 11136000.
   scintMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
-  scintMPT->AddConstProperty("FASTTIMECONSTANT", .9*ns);
-  scintMPT->AddConstProperty("SLOWTIMECONSTANT", 2.1*ns);
+  scintMPT->AddConstProperty("FASTTIMECONSTANT", 1. * ns); // org: 0.9
+  scintMPT->AddConstProperty("SLOWTIMECONSTANT", 1. * ns); // org: 2.1
   scintMPT->AddConstProperty("YIELDRATIO", 1.);
 
   Scint->SetMaterialPropertiesTable(scintMPT);
-
-  // Print materials
-  G4cout << "Scintillator Properties -------" << G4endl;
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
   scintMPT->DumpTable();
-***/
-  
+
 }
 //....
 
@@ -253,8 +238,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
-  auto worldSizeXY = 1 * calorSizeXY;
-  auto worldSizeZ  = 1 * calorThickness;
+  auto worldSizeXY = 5. * m; //10.0* calorSizeXY;
+  auto worldSizeZ  = 5. * m; //10.0 * calorThickness;
 
 
   // Get materials
@@ -302,7 +287,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     = new G4LogicalVolume(
                  calorimeterS,    // its solid
                  defaultMaterial, // its material
-                 "Calorimeter");  // its name
+                 "CalorimeterLV");  // its name
   
   auto calorPV  
     = new G4PVPlacement(
@@ -326,11 +311,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  absorberS,        // its solid
                  absorberMaterial, // its material
                  "AbsoLV");          // its name
- 
-  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  absorberVisAtt->SetVisibility(true);
-  absorberLV->SetVisAttributes(absorberVisAtt);
- 
 
   auto absorberPV  
     = new G4PVPlacement(
@@ -338,13 +318,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 		 G4ThreeVector(0., 0., 16.*cm),
                  //G4ThreeVector(0., 0., absoThickness/2. + (calorThickness/2. - absoThickness) ),
                  absorberLV,       // its logical volume                         
-                 "Abso",           // its name
+                 "AbsoPV",           // its name
                  calorLV,	   // its mother volume
 		 //layerLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
   // Layer
+
   auto layerS 
     = new G4Box("Layer",           // its name
                  calorSizeXY/2, calorSizeXY/2, (scintThickness * nofLayers)/2); // its size
@@ -388,6 +369,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  nofLayers,        // number of replica
                  scintThickness);  // width of replica
 
+
+
+
   // Vacuum Tube
   auto tubeS 
     = new G4Box("Tube",           // its name
@@ -410,11 +394,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
-  G4VisAttributes* tubeVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
-  tubeVisAtt->SetVisibility(true);
-  tubeLV->SetVisAttributes(tubeVisAtt);
- 
-
+  
 
   // print parameters
   G4cout
@@ -429,11 +409,27 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
  
     
   // Visualization attributes
-  //worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
+  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
-  layerLV->SetVisAttributes(simpleBoxVisAtt);
+  //simpleBoxVisAtt->SetForceSolid(true);
+  scintLV->SetVisAttributes(simpleBoxVisAtt);
+  
+
+
+  G4VisAttributes* tubeVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
+  tubeVisAtt->SetVisibility(true);
+  tubeVisAtt->SetForceSolid(true);
+  tubeLV->SetVisAttributes(tubeVisAtt);
+ 
+ 
+  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  absorberVisAtt->SetVisibility(true);
+  absorberLV->SetVisAttributes(absorberVisAtt);
+ 
+
+
 
   return worldPV;
 }
@@ -443,6 +439,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 void DetectorConstruction::ConstructSDandField()
 {
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
+
+  // declare vacuum as TubeSD
+  G4String tubeDetectorName = "TubeLV" ;
+  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
+  SetSensitiveDetector("TubeLV", tubeDetector);
 
   // declare Scintillator as SinctillatorSD
   G4String scintDetectorName = "ScintLV" ;
@@ -455,12 +457,6 @@ void DetectorConstruction::ConstructSDandField()
   AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
-
-  // declare vacuum as TubeSD
-  G4String tubeDetectorName = "TubeLV" ;
-  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
-  SetSensitiveDetector("TubeLV", tubeDetector);
 
 
 }

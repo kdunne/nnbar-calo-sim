@@ -37,15 +37,16 @@ NNbarHit::NNbarHit()
 : G4VHit()
 {
     localTime = 0.;
-    parentID = 0;
+    parentID = 0.;
     process = "";
     name = "";
     time = 0.;
-    trackID = 0;
-    xHitID = 0;
+    trackID = 0.;
+    xHitID = 0.;
     energyDeposit = 0.;
     kinEnergy = 0.;
     posZ = 0.;
+	origin_rp = 99; 
 }
 
 NNbarHit::~NNbarHit()
@@ -61,6 +62,7 @@ NNbarHit::NNbarHit(const NNbarHit& right)
     time = right.time;
     trackID = right.trackID;
     xHitID = right.xHitID;
+	origin_rp = right.origin_rp;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
     posZ = right.posZ;
@@ -77,6 +79,7 @@ const NNbarHit& NNbarHit::operator=(const NNbarHit& right)
     time = right.time;
     trackID = right.trackID;
     xHitID = right.xHitID;
+	origin_rp = right.origin_rp;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
     posZ = right.posZ;

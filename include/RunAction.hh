@@ -30,8 +30,26 @@
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
+#include <string>
+#include <vector>
+
+using namespace std;
 
 class G4Run;
+extern std::vector<int> event_ID;
+extern std::vector<int> particle_ID; // particle type (represented by a number)
+extern std::vector<double> particle_KE; //initial KE of the particle
+extern std::vector<double> particle_momentum_x; // Initial momentum (direction info included)
+extern std::vector<double> particle_momentum_y;
+extern std::vector<double> particle_momentum_z;
+extern std::vector<double> particle_time; // Time stamp in second
+extern std::vector<double> particle_x; // initial position of the particle
+extern std::vector<double> particle_y;
+extern std::vector<double> particle_z;
+extern std::vector<std::vector<int>> scint_photon_collection_pri;
+extern std::vector<std::vector<int>> scint_photon_collection_all;
+extern std::vector<int> lead_glass_photon_all;
+extern std::vector<int> lead_glass_photon_pri;
 
 
 class RunAction : public G4UserRunAction
@@ -39,6 +57,11 @@ class RunAction : public G4UserRunAction
   public:
     RunAction();
     virtual ~RunAction();
+
+  private:
+	std::vector<string> particle_name{ "Neutron","Proton","Gamma","Electron","Muon","Pion","Kaon" };
+
+
 
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
