@@ -57,6 +57,10 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
+  G4Track* track = step->GetTrack();
+  //std::cout << step->GetTrack()->GetTouchable()->GetVolume()->GetLogicalVolume()->GetName() <<
+  //step->GetPreStepPoint()->GetPosition().getX() << std::endl;
+
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 
   if (eventNumber != fEventNumber) {
@@ -65,10 +69,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
      fCerenkovCounter = 0;
   }
 
+
+
+/***
   G4Track* track = step->GetTrack();
   G4int ID = track->GetTrackID();
   G4int ltime = track->GetLocalTime();
-
+***/
 
 } 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();

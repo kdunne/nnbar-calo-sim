@@ -33,6 +33,10 @@
 #include "G4THitsMap.hh"
 #include "globals.hh"
 
+extern std::vector<std::vector<int>> scint_photon_collection_pri;
+extern std::vector<std::vector<int>> scint_photon_collection_all;
+extern std::vector<int> lead_glass_photon;
+
 class EventAction : public G4UserEventAction
 {
 public:

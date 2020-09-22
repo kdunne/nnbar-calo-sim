@@ -1,31 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-// Hadrontherapy advanced example for Geant4
-// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
-
 #include "ScintillatorSD.hh"
 
 #include "G4Step.hh"
@@ -67,22 +39,16 @@ ScintillatorSD::~ScintillatorSD()
 {}
 
 //.....
-void ScintillatorSD::Initialize(G4HCofThisEvent*)
-{
-    
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
-}
+void ScintillatorSD::Initialize(G4HCofThisEvent*) 
+{HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);}
 
 //.....
 G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
-    
+
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
-   
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
@@ -97,14 +63,17 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-  
+    //G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    G4double energyDeposit = aStep->GetPreStepPoint()->GetKineticEnergy() - aStep->GetPostStepPoint()->GetKineticEnergy();
+ 
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    
-    // Position
-    G4ThreeVector pos = PreStep->GetPosition();
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();    
+
+    // Position z=0 at center of detector
+    G4ThreeVector pos = PostStep->GetPosition();
+    //G4ThreeVector pos = PreStep->GetPosition();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
@@ -114,6 +83,7 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
     G4int k  = touchable->GetReplicaNumber(0);
+	G4int origin_replica = theTrack->GetOriginTouchable()->GetReplicaNumber(0); // ** I added this here !!!
     //G4int i  = touchable->GetReplicaNumber(2);
     //G4int j  = touchable->GetReplicaNumber(1);
   
@@ -124,75 +94,63 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
     // Get Name
-    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
 
+    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-   
+
     G4int parentID = 0;
     G4String proc = ""; 
+
     // Get Process
     if (trackID > 1){
         parentID = theTrack->GetParentID();
-        proc = theTrack->GetCreatorProcess()->GetProcessName();
+        //proc = theTrack->GetCreatorProcess()->GetProcessName(); // disabled because of the error! 
     } else {
         proc = "primary";
-	parentID = 0;
+	    parentID = 0;
+        if (aStep->GetPreStepPoint()->GetKineticEnergy() == 0){theTrack->SetTrackStatus(fKillTrackAndSecondaries);}
     }
 
     if (proc=="Decay"){
-        G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+        return false; 
     }
 
-    //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
-                  
-        // Get the pre-step kinetic energy
-        G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
-        // Get the post-step kinetic energy
-        G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
-        // Get the step average kinetic energy
-        G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+	// Get the pre-step kinetic energy
+    G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
+    // Get the post-step kinetic energy
+    G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
 
-        NNbarHit* detectorHit = new NNbarHit();
+	NNbarHit* detectorHit = new NNbarHit();
 
-        // Make this kinetic energy and position
-	detectorHit -> SetLocalTime(localTime);
-	detectorHit -> SetParentID(parentID);
-	detectorHit -> SetProcess(proc);
-       	detectorHit -> SetTime(time);
-	detectorHit -> SetName(name);
+    // Make this kinetic energy and position
+    detectorHit -> SetLocalTime(localTime);
+    detectorHit -> SetParentID(parentID);
+    detectorHit -> SetProcess(proc);
+    detectorHit -> SetTime(time);
+    detectorHit -> SetName(name);
 
-	detectorHit -> SetTrackID(trackID);
-        detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
-        detectorHit -> SetEDep(energyDeposit);
-        //detectorHit -> SetKinEn(eKinMean);
-        //detectorHit -> SetKinEn(eKinPre);
-        detectorHit -> SetKinEn(eKinPost);
+    detectorHit -> SetTrackID(trackID);
+    detectorHit -> SetXID(k);
+    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetKinEn(eKinPost);
 
-	HitsCollection -> insert(detectorHit);
+	detectorHit->SetOrigin(origin_replica);
 
-//	G4cout << "Replica: "       << k << G4endl;
-//	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//        if (trackID==1) {
-//        G4cout << "particle: " << name << G4endl;
-//        G4cout << "time: " << time/CLHEP::ns << G4endl;
-//        G4cout << "proc: " << proc << G4endl;
-//	G4cout << "eKinPost: "      << eKinPost << G4endl;
-//        }
-    }
-    
+
+    HitsCollection -> insert(detectorHit);
+
     return true;
 }
 
 //......
 void ScintillatorSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-    
+	//std::cout << "** 6.5 Scintillator Event END --- " << std::endl;
+
     static G4int HCID = -1;
     if(HCID < 0)
     {

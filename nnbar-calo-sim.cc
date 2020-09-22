@@ -24,10 +24,10 @@
 // ********************************************************************
 //
 //
+#include "StackingAction.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 #include "Analysis.hh"
-
 #include "G4Types.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4EmStandardPhysics_option4.hh"
@@ -38,13 +38,30 @@
 #include "G4RunManager.hh"
 #endif
 
+#include <string>
 #include "G4UImanager.hh"
 #include "FTFP_BERT.hh"
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
-//.........
+//Define the data array that we want to collect from the simulation
+using namespace std;
+std::vector<int> event_ID;
+std::vector<int> particle_ID; // particle type (represented by a number)
+std::vector<double> particle_KE; //initial KE of the particle
+std::vector<double> particle_momentum_x; // Initial momentum (direction info included)
+std::vector<double> particle_momentum_y;
+std::vector<double> particle_momentum_z;
+std::vector<double> particle_x; // initial position of the particle
+std::vector<double> particle_y;
+std::vector<double> particle_z;
+
+std::vector<double> particle_time; // Time stamp in second
+std::vector<std::vector<int>> scint_photon_collection_pri;
+std::vector<std::vector<int>> scint_photon_collection_all;
+std::vector<int> lead_glass_photon_pri;
+std::vector<int> lead_glass_photon_all;
 
 namespace {
   void PrintUsage() {
@@ -57,7 +74,7 @@ namespace {
 
 //.........
 
-int main(int argc, char** argv)
+int main(int argc,char** argv)
 {  
   // Evaluate arguments
   if ( argc > 7 ) {
@@ -111,12 +128,31 @@ int main(int argc, char** argv)
 
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
+  opticalPhysics->SetWLSTimeProfile("delta");
+  opticalPhysics->SetScintillationYieldFactor(1.0);
+  opticalPhysics->SetScintillationExcitationRatio(0.0);
+  opticalPhysics->SetMaxNumPhotonsPerStep(2000);
+  opticalPhysics->SetMaxBetaChangePerStep(100.0);
+  opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
+  opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
   physicsList->RegisterPhysics(opticalPhysics);
+
   runManager->SetUserInitialization(physicsList);
 
+  G4UserStackingAction* stacking_action = new StackingAction;
+  runManager->SetUserAction(stacking_action);
+  
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
+
+  // MCPL file
+  //runManager->SetUserAction(new G4MCPLGenerator("cross_photon_eng_RAD_BIN_1cm_shift.mcpl"));
+  //runManager->Initialize();
+  //runManager->BeamOn(std::numeric_limits<G4int>::max());  // crash  
+  //  runManager->BeamOn(5700); 
+
   
   // Initialize visualization
   auto visManager = new G4VisExecutive;
