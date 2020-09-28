@@ -92,32 +92,68 @@ void DetectorConstruction::DefineMaterials()
   G4double z;
   G4double density;
 
-  // Vacuum
-  new G4Material("Galactic", z=1., a=1.01*g/mole, density= universe_mean_density,
-                  kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
-
-  // Tube
-  G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
+//--------------- Elements-----------------------------------
 
   // BC-408 taken from datasheet
   G4Element* elH = nistManager->FindOrBuildElement("H");
   G4Element* elC = nistManager->FindOrBuildElement("C");
 
-  G4Material* Scint = new G4Material("Scint", 1.023*g/cm3, 2);
-  Scint->AddElement(elH, 0.524573);
-  Scint->AddElement(elC, 1 - 0.524573);
 
   // Lead-glass
   // taken from PDG
-
   G4Element* elTi = nistManager->FindOrBuildElement("Ti");
   G4Element* elAs = nistManager->FindOrBuildElement("As");
   G4Element* elPb = nistManager->FindOrBuildElement("Pb");
   G4Element* elO = nistManager->FindOrBuildElement("O");
   G4Element* elSi = nistManager->FindOrBuildElement("Si");
+  
+  // TPC
+  G4Element* elAr = nistManager->FindOrBuildElement("Ar");
 
 
+//----------------- Materials -----------------------------
+
+  // --------Vacuum
+  new G4Material("Galactic", z=1., a=1.01*g/mole, density= universe_mean_density,
+                  kStateGas, 2.73*kelvin, 3.e-18*pascal);
+
+  // --------Tube
+  G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
+
+
+  // ---------FR4
+  //----- Epoxy
+  G4Material* Epoxy = new G4Material("Epoxy" , density=1.2*g/cm3, 2);
+  Epoxy->AddElement(elH, 2);
+  Epoxy->AddElement(elC, 2);
+  //----- SiO2 (Quarz)
+  G4Material* SiO2 = new G4Material("SiO2",density= 2.200*g/cm3, 2);
+  SiO2->AddElement(elSi, 1);
+  SiO2->AddElement(elO , 2);
+  //FR4 (Glass + Epoxy)
+  G4Material* FR4 = new G4Material("FR4" , density=1.86*g/cm3, 2);
+  FR4->AddMaterial(Epoxy, 0.472);
+  FR4->AddMaterial(SiO2, 0.528);
+  //fr4Material = FR4;
+
+  // ----------TPC
+  // CO2
+  G4Material* CO2 = new G4Material("CO2", density= 1.98*g/cm3, 2);
+  CO2->AddElement(elO, 2);
+  CO2->AddElement(elC, 1);
+  // Ar/CO2 80/20
+  G4Material* Gas = new G4Material("Gas", density=1.3954*g/cm3, 2);
+  Gas->AddElement(elAr, .8);
+  Gas->AddMaterial(CO2, .2);
+  
+
+  // ----------Scintillator
+  G4Material* Scint = new G4Material("Scint", 1.023*g/cm3, 2);
+  Scint->AddElement(elH, 0.524573);
+  Scint->AddElement(elC, 1 - 0.524573);
+
+  // ----------Lead-glass Absorber
   G4Material* Abs = new G4Material("Abs", 3.86*g/cm3, 5);
   Abs->AddElement(elO, 0.156453);
   Abs->AddElement(elSi, 0.080866);
