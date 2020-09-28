@@ -99,6 +99,10 @@ void DetectorConstruction::DefineMaterials()
   G4Element* elH = nistManager->FindOrBuildElement("H");
   G4Element* elC = nistManager->FindOrBuildElement("C");
 
+  G4Element* elAl = nistManager->FindOrBuildElement("Al"); 
+
+  // Air
+  G4Element* elN = nistManager->FindOrBuildElement("N");
 
   // Lead-glass
   // taken from PDG
@@ -110,7 +114,7 @@ void DetectorConstruction::DefineMaterials()
   
   // TPC
   G4Element* elAr = nistManager->FindOrBuildElement("Ar");
-
+ 
 
 //----------------- Materials -----------------------------
 
@@ -119,8 +123,15 @@ void DetectorConstruction::DefineMaterials()
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
   // --------Tube
-  G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
+  G4Material* Aluminum = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
 
+  // Silicon
+  G4Material* Silicon = new G4Material("Silicon", z=14., a= 28.0855*g/mole, density = 2.33*g/cm3);
+
+  // --------Air
+  G4Material* Air = new G4Material("Air", density=1.29*mg/cm3, 2); 
+  Air->AddElement(elN, 0.7);
+  Air->AddElement(elO, 0.3);
 
   // ---------FR4
   //----- Epoxy
@@ -284,13 +295,15 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4int  nofLayers = 10;
   G4double  absoThickness  = 25.*cm;
   G4double  scintThickness =  3.*cm;
-  G4double  calorSizeXY    =  1.*m;
+  G4double  calorSizeXY    =  98.*cm;
   G4double  tubeThickness  =  2.*cm;
 
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
-  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
+  auto calorThickness = (nofLayers*scintThickness) + absoThickness;
+  //auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
   auto worldSizeXY = 1 * calorSizeXY;
-  auto worldSizeZ  = 1 * calorThickness;
+  auto worldSizeZ = 446*cm;
+  //auto worldSizeZ  = 1 * calorThickness;
 
 
   // Get materials
@@ -298,6 +311,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
   auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
+  auto FR4Material = G4Material::GetMaterial("FR4");
+  auto TPCMaterial = G4Material::GetMaterial("Gas");
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
@@ -328,7 +343,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
-  
+  /***
   // Calorimeter
   auto calorimeterS
     = new G4Box("Calorimeter",     // its name
@@ -343,14 +358,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto calorPV  
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(),  // at (0,0,0)
+                 G4ThreeVector(0,0, 193.1*cm),  // at (0,0,0)
                  calorLV,          // its logical volume                         
                  "Calorimeter",    // its name
                  worldLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
-  
+  *///
     
   // Absorber
   auto absorberS 
@@ -371,11 +386,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto absorberPV  
     = new G4PVPlacement(
                  0,                // no rotation
-		 G4ThreeVector(0., 0., 16.*cm),
+                 G4ThreeVector(0., 0., 209.6*cm),
+		 //G4ThreeVector(0., 0., 16.*cm),
                  //G4ThreeVector(0., 0., absoThickness/2. + (calorThickness/2. - absoThickness) ),
                  absorberLV,       // its logical volume                         
                  "Abso",           // its name
-                 calorLV,	   // its mother volume
+                 worldLV,	   // its mother volume
 		 //layerLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
@@ -394,11 +410,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto layerPV
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0., -11.5*cm),
+                 G4ThreeVector(0., 0., 181.*cm),
+                 //G4ThreeVector(0., 0., -11.5*cm),
                  //G4ThreeVector(0., 0.,  -(scintThickness*nofLayers/2. ) + (calorThickness/2. - absoThickness) ), //  its position
                  layerLV,            // its logical volume                         
                  "Gap",            // its name
-                 calorLV,          // its mother  volume
+                 worldLV, // its mother volume
+                 //calorLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
@@ -438,10 +456,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto tubePV
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0.,  -27.5*cm), //  its position
+                 G4ThreeVector(0., 0., 113.06*cm),
+                 //G4ThreeVector(0., 0.,  -27.5*cm), //  its position
                  tubeLV,            // its logical volume                         
                  "Tube",            // its name
-                 calorLV,          // its mother  volume
+                 worldLV, // its mother volume
+                 //calorLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
@@ -450,6 +470,94 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   tubeVisAtt->SetVisibility(true);
   tubeLV->SetVisAttributes(tubeVisAtt);
  
+
+  // Construct TPC
+  //
+  // FR4 front
+  auto FR4frontS 
+    = new G4Box("FR4front",           // its name
+                 calorSizeXY/2, calorSizeXY/2, .16*cm/2.); // its size
+                         
+  auto FR4frontLV
+    = new G4LogicalVolume(
+                 FR4frontS,           // its solid
+                 FR4Material,  // its material
+                 "FR4frontLV");         // its name
+
+  auto FR4frontPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 115.08*cm),
+                 //G4ThreeVector(0., 0.,  -27.5*cm), //  its position
+                 FR4frontLV,            // its logical volume                         
+                 "FR4front",            // its name
+                 worldLV, // its mother volume
+                 //calorLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+
+  // FR4 front
+  auto FR4backS 
+    = new G4Box("FR4bacl",           // its name
+                 calorSizeXY/2, calorSizeXY/2, .16*cm/2.); // its size
+                         
+  auto FR4backLV
+    = new G4LogicalVolume(
+                 FR4backS,           // its solid
+                 FR4Material,  // its material
+                 "FR4backLV");         // its name
+
+  auto FR4backPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 165.24*cm),
+                 //G4ThreeVector(0., 0.,  -27.5*cm), //  its position
+                 FR4backLV,            // its logical volume                         
+                 "FR4back",            // its name
+                 worldLV, // its mother volume
+                 //calorLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+
+
+  G4VisAttributes* FR4VisAtt= new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+  FR4VisAtt->SetVisibility(true);
+  FR4frontLV->SetVisAttributes(FR4VisAtt);
+  FR4backLV->SetVisAttributes(FR4VisAtt); 
+
+
+  // TPC
+  auto TPCS 
+    = new G4Box("TPC",           // its name
+                 calorSizeXY/2, calorSizeXY/2, 50*cm/2.); // its size
+                         
+  auto TPCLV
+    = new G4LogicalVolume(
+                 TPCS,           // its solid
+                 TPCMaterial,  // its material
+                 "TPCLV");         // its name
+
+  auto TPCPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 140.16*cm),
+                 //G4ThreeVector(0., 0.,  -27.5*cm), //  its position
+                 TPCLV,            // its logical volume                         
+                 "TPC",            // its name
+                 worldLV, // its mother volume
+                 //calorLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+
+  G4VisAttributes* TPCVisAtt= new G4VisAttributes(G4Colour(1.0, 1.0, 0.0));
+  TPCVisAtt->SetVisibility(true);
+  TPCLV->SetVisAttributes(TPCVisAtt);
 
 
   // print parameters
