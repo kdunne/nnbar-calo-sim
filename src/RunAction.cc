@@ -98,6 +98,27 @@ RunAction::RunAction()
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
   analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
   analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);     //      2
+  analysisManager->CreateH2("XY_Cerenkov", "XY Cerenkov", 100, -50, 50, 100, -50, 50);          // 3
+
+
+  // Optical Photon NTuple
+  analysisManager->CreateNtuple("NNBarEvent", "NNBarEvent");  
+  analysisManager->CreateNtupleIColumn("TrackID");            //0
+  analysisManager->CreateNtupleSColumn("Process");            //1
+  analysisManager->CreateNtupleIColumn("ParentID");           //2
+  analysisManager->CreateNtupleDColumn("LocalTime");          //3
+  analysisManager->CreateNtupleDColumn("GlobalTime");         //4
+  // Curent Position
+  analysisManager->CreateNtupleDColumn("Xpos");               //5
+  analysisManager->CreateNtupleDColumn("Ypos");               //6
+  analysisManager->CreateNtupleDColumn("Zpos");               //7
+  analysisManager->CreateNtupleIColumn("ScintLayer");        //8
+  // Vertex
+  analysisManager->CreateNtupleDColumn("X0");                 //9
+  analysisManager->CreateNtupleDColumn("Y0");                 //10
+  analysisManager->CreateNtupleDColumn("Z0");                 //11
+  analysisManager->FinishNtuple();
+
 }
 
 //....
@@ -132,6 +153,7 @@ void RunAction::EndOfRunAction(const G4Run*)
 {
   
   auto analysisManager = G4AnalysisManager::Instance();
+
 
   // save histograms & ntuple
   analysisManager->Write();

@@ -61,10 +61,15 @@ private:
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
     G4double posZ;
+    G4double posX;
+    G4double posY;
     //G4int zHitID; // Hit z voxel
     //G4int yHitID; // Hit y voxel 
     G4double energyDeposit; // Energy deposit associated with the hit
     G4double kinEnergy;
+    G4double Z0;
+    G4double Y0;
+    G4double X0;
 
 public:
     inline G4double GetLocalTime()
@@ -96,6 +101,22 @@ public:
 
     inline G4double GetPosZ()
     {return posZ;}
+
+    inline G4double GetPosX()
+    {return posX;}
+
+    inline G4double GetPosY()
+    {return posY;}
+
+    inline G4double GetVertexZ()
+    {return Z0;}
+
+    inline G4double GetVertexX()
+    {return X0;}
+
+    inline G4double GetVertexY()
+    {return Y0;}
+
 
     inline G4double GetEdep() // Get energy deposit
     {return energyDeposit;}
@@ -151,7 +172,6 @@ public:
         posZ = z;
     }
 
-
     inline void SetEDep(G4double eDep){
         energyDeposit = eDep;
     }
@@ -159,6 +179,29 @@ public:
     inline void SetKinEn(G4double kinEn){
         kinEnergy = kinEn;
     }
+
+
+    inline void SetPosX(G4double x){
+        posX = x;
+    }
+
+
+    inline void SetPosY(G4double y){
+        posY  = y;
+    }
+
+    inline G4double SetVertexZ(G4double z){  
+        Z0 = z;
+    }
+
+    inline G4double GetVertexX(G4double x){
+        X0 = x;
+    }
+
+    inline G4double GetVertexY(G4double y){
+        Y0 = y;
+    }
+   
 
 
 };

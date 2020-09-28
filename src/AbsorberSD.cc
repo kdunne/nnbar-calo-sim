@@ -104,10 +104,15 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Step Length 
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();    
+
     // Get Position
-    G4ThreeVector pos = PreStep->GetPosition();
+    // Look into presetp - poststep
+    G4ThreeVector pos = PostStep->GetPosition();
     G4double z = pos.getZ();
+    G4double x = pos.getX();
+    G4double y = pos.getY();
+
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();
@@ -172,6 +177,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetPosZ(tracklength);
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinPost);
+    detectorHit -> SetPosX(x);
+    detectorHit -> SetPosY(y);
 
     HitsCollection -> insert(detectorHit);
 

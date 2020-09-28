@@ -261,7 +261,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
-  auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
+  auto tubeMaterial = G4Material::GetMaterial("Galactic"); 
+
+//  auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
