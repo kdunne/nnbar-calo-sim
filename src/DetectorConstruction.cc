@@ -313,6 +313,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
   auto FR4Material = G4Material::GetMaterial("FR4");
   auto TPCMaterial = G4Material::GetMaterial("Gas");
+  auto SiliconMaterial = G4Material::GetMaterial("Silicon");
+
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
@@ -343,6 +345,82 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
+
+  // Vacuum
+  auto VacuumS 
+    = new G4Box("Vacuum",           // its name
+                 worldSizeXY/2, worldSizeXY/2, 112.06*cm/2); // its size
+                         
+  auto VacuumLV
+    = new G4LogicalVolume(
+                 VacuumS,           // its solid
+                 defaultMaterial,  // its material
+                 "Vacuum");         // its name
+                                   
+  auto VacuumPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 56.03*cm),  // at (0,0,0)
+                 VacuumLV,          // its logical volume                         
+                 "Vacuum",          // its name
+                 worldLV,                // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+  G4VisAttributes* VacuumVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
+  VacuumVisAtt->SetVisibility(true);
+  VacuumLV->SetVisAttributes(VacuumVisAtt);
+
+
+  // Silicon
+  auto SiliconS 
+    = new G4Box("Silicon",           // its name
+                 worldSizeXY/2, worldSizeXY/2, .03*cm/2); // its size
+                         
+  auto FirstSiliconLV
+    = new G4LogicalVolume(
+                 SiliconS,           // its solid
+                 SiliconMaterial,  // its material
+                 "FirstSilicon");         // its name
+                                   
+  auto FirstSiliconPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 100.015*cm),  // at (0,0,0)
+                 FirstSiliconLV,          // its logical volume                         
+                 "FirstSilicon",          // its name
+                 worldLV,                // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+
+  auto SecondSiliconLV
+    = new G4LogicalVolume(
+                 SiliconS,           // its solid
+                 SiliconMaterial,  // its material
+                 "SecondSilicon");         // its name
+                                   
+  auto SecondSiliconPV
+    = new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., 110.045*cm),  // at (0,0,0)
+                 SecondSiliconLV,          // its logical volume                         
+                 "SecondSilicon",          // its name
+                 worldLV,                // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+
+
+  G4VisAttributes* SiliconVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.));
+  SiliconVisAtt->SetVisibility(true);
+  FirstSiliconLV->SetVisAttributes(SiliconVisAtt);
+  SecondSiliconLV->SetVisAttributes(SiliconVisAtt);
+
+
+
   /***
   // Calorimeter
   auto calorimeterS
