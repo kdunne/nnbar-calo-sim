@@ -133,7 +133,7 @@ void RunAction::EndOfRunAction(const G4Run*)
   
   auto analysisManager = G4AnalysisManager::Instance();
 
-  // save histograms & ntuple
+  // save histograms
   analysisManager->Write();
   analysisManager->CloseFile();
 }

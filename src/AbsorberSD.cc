@@ -25,7 +25,6 @@
 //
 
 #include "AbsorberSD.hh"
-#include "TubeSD.hh"
 
 #include "NNbarHit.hh"
 

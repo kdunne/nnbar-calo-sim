@@ -28,7 +28,7 @@
 #include "DetectorConstruction.hh"
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
-#include "TubeSD.hh"
+//#include "TubeSD.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -98,7 +98,7 @@ void DetectorConstruction::DefineMaterials()
 
 
   // Tube
-  G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
+  //G4Material* Al = new G4Material("Aluminum", z=13., a=26.98*g/mole, density=2.7*g/cm3);
 
   // BC-408 taken from datasheet
   G4Element* elH = nistManager->FindOrBuildElement("H");
@@ -249,10 +249,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double  absoThickness  = 25.*cm;
   G4double  scintThickness =  3.*cm;
   G4double  calorSizeXY    =  1.*m;
-  G4double  tubeThickness  =  2.*cm;
+  //G4double  tubeThickness  =  2.*cm;
 
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
-  auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
+  auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   auto worldSizeXY = 1 * calorSizeXY;
   auto worldSizeZ  = 1 * calorThickness;
 
@@ -261,7 +261,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
-  auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
+  //auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
@@ -388,6 +388,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  nofLayers,        // number of replica
                  scintThickness);  // width of replica
 
+/***
   // Vacuum Tube
   auto tubeS 
     = new G4Box("Tube",           // its name
@@ -414,7 +415,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   tubeVisAtt->SetVisibility(true);
   tubeLV->SetVisAttributes(tubeVisAtt);
  
-
+***/
 
   // print parameters
   G4cout
@@ -456,12 +457,13 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
 
+/***
   // declare vacuum as TubeSD
   G4String tubeDetectorName = "TubeLV" ;
   TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
   SetSensitiveDetector("TubeLV", tubeDetector);
-
+***/
 
 }
 
