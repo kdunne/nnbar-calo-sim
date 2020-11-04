@@ -123,16 +123,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
         return;
     }
 
-    //int CHCID = -1;
-    //if (CHCID<0) {
         int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");
-    //}
-  
-
-    //int CHCID2 = -1;
-    //if (CHCID2<0) {
         int CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");
-    //}
 
     NNbarHitsCollection* ScintHits = 0;
     NNbarHitsCollection* AbsHits   = 0;
@@ -181,31 +173,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
                // Sum totEdep
                eDepScint += eDep;  
                totEdep += eDep;
-
-               if (trID ==1) {
-                   // Sum eDep for each scintillator sheet
-                   EdepPerSheet[i] += eDep;
-
-		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-	           
-                   // When primary particle stops
-                   if (kinEn == 0) {
-                       analysis->FillH1(13, trackl/CLHEP::cm);
-		       analysis->FillH1(12, time/CLHEP::ns);
-                       analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
-		       
-		   }
-	       } 
+                
 
 	    }
-
-	    // Fill scint bins with Energy Dep
-            for (G4int j=0; j<10; j++) {
-                if (EdepPerSheet[j]) {
-		    analysis->FillH1(j, EdepPerSheet[j]/CLHEP::MeV);
-                }
-	    }
-   
+	       
             // Fill total Edep in Scintillator
             if (eDepScint > 0) {
                 analysis->FillH1(14, eDepScint/CLHEP::MeV);	
@@ -241,33 +212,22 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	          cerenkovCounter++;
 	      }
                
-              if (trID == 1){
-                    //eDepPrimary += eDep;
-                    analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-	            if (kinEn == 0) {
-                                               analysis->FillH1(13, trackl/CLHEP::cm);
-		        analysis->FillH1(12, time/CLHEP::ns);
-                        analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
-                        analysis->FillH2(2, cerenkovCounter, eDepAbs/CLHEP::MeV);
-                    }
-	      }
-                	    
+                              	    
 	   }
            
            if (eDepAbs>0) {
                analysis->FillH1(15, eDepAbs/CLHEP::MeV);
            }
   
-           if(cerenkovCounter>0){
-               analysis->FillH2(3, trackl/CLHEP::cm, cerenkovCounter);
-               analysis->FillH1(10, cerenkovCounter);
-           }
-      }
-        
-      
-    } else {
-        G4cout << "No HCE" << G4endl;
     }
+       
+ 
+    G4cout << "Energy Deposited in Scintillator: " << eDepScint/CLHEP::MeV << " MeV" << G4endl;
+    G4cout << "Energy Deposited in Absorber: " << eDepAbs/CLHEP::MeV << " MeV" << G4endl; 
+      
+  } else {
+        G4cout << "No HCE" << G4endl;
+  }
 
   //print per event (modulo n)
   auto eventID = event->GetEventID();
