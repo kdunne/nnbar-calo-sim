@@ -146,12 +146,12 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
 
     if (proc=="Decay") {
-        G4cout << "Killing particle " << name << G4endl;
+        //G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
 
 
-    if (DX) {
+    //if (DX) {
 	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -178,7 +178,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
 //	G4cout << "eKinPost: "      << eKinPost << G4endl;
-    }
+    ///}
 
     return true;
 }

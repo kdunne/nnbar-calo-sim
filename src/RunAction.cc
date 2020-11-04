@@ -98,6 +98,7 @@ RunAction::RunAction()
   analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
   analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
   analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);     //      2
+  analysisManager->CreateH2("RangevCerenkov", "Range v Cerenkov", 55, 0, 55, 80, 0, 30000); // 3
 }
 
 //....

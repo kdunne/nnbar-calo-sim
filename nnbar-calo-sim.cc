@@ -44,6 +44,8 @@
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
+#include "G4ScoringManager.hh"
+
 //.........
 
 namespace {
@@ -105,6 +107,9 @@ int main(int argc, char** argv)
   auto runManager = new G4RunManager;
 #endif
 
+  // Initiatlize Scorer
+  G4ScoringManager* scoringManager = G4ScoringManager::GetScoringManager();
+ 
   // Set mandatory initialization classes
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);

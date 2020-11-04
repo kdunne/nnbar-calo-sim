@@ -69,7 +69,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
   G4double worldZHalfLength = 57.*cm / 2.;
-  G4cout << "Gun at position " << -(worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
+//  G4cout << "Gun at position " << -(worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
   //G4double worldZHalfLength = 27.5*cm;
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 

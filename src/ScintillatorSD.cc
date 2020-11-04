@@ -78,7 +78,7 @@ void ScintillatorSD::Initialize(G4HCofThisEvent*)
 G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
 
-    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
+    //if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
     
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
@@ -142,12 +142,12 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
 
     if (proc=="Decay"){
-        G4cout << "Killing particle " << name << G4endl;
+        //G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
 
     //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
+    //if(DX) { 		    
                   
         // Get the pre-step kinetic energy
         G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -184,7 +184,7 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //        G4cout << "proc: " << proc << G4endl;
 //	G4cout << "eKinPost: "      << eKinPost << G4endl;
 //        }
-    }
+    //}
     
     return true;
 }

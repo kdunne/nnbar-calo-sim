@@ -142,8 +142,8 @@ void DetectorConstruction::DefineMaterials()
 
   G4double PhotonEnergy[nEntries];
 
-  for (int i=0; i < nEntries; ++i) {
-    PhotonEnergy[i] = (1240.*nm/PhotonWavelength[i])*eV;
+  for (int j=0; j < nEntries; ++j) {
+    PhotonEnergy[j] = (1240.*nm/PhotonWavelength[j])*eV;
   };
 
 
@@ -165,9 +165,9 @@ absMPT->AddProperty("RINDEX", PhotonEnergy, refractiveIndex, nEntries)
 Abs->SetMaterialPropertiesTable(absMPT);
 
 // Print materials
-  G4cout << "Absorber Properties -------" << G4endl;
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-  absMPT->DumpTable();
+//  G4cout << "Absorber Properties -------" << G4endl;
+//  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+//  absMPT->DumpTable();
 
 
 
@@ -251,17 +251,15 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double  calorSizeXY    =  1.*m;
   //G4double  tubeThickness  =  2.*cm;
 
-  //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   auto worldSizeXY = 1 * calorSizeXY;
-  auto worldSizeZ  = 1 * calorThickness;
+  auto worldSizeZ  = 446*cm;
 
 
   // Get materials
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("Abs");
   auto scintMaterial = G4Material::GetMaterial("Scint");
-  //auto tubeMaterial = G4Material::GetMaterial("Aluminum"); 
  
   if ( ! defaultMaterial || ! absorberMaterial || ! scintMaterial) {
     G4ExceptionDescription msg;
@@ -270,8 +268,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
       "MyCode0001", FatalException, msg);
   }  
 
-   
+  ////////////////
   // World
+  ////////////////
+
   auto worldS 
     = new G4Box("World",           // its name
                  worldSizeXY/2, worldSizeXY/2, worldSizeZ/2); // its size
@@ -292,7 +292,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
-  
+ 
+
+/*** 
   // Calorimeter
   auto calorimeterS
     = new G4Box("Calorimeter",     // its name
@@ -314,9 +316,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
-  
-    
+***/  
+
+
+
+  ///////  
   // Absorber
+  ///////
+
   auto absorberS 
     = new G4Box("Abso",            // its name
                  calorSizeXY/2, calorSizeXY/2, absoThickness/2); // its size
@@ -326,25 +333,26 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  absorberS,        // its solid
                  absorberMaterial, // its material
                  "AbsoLV");          // its name
- 
-  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  absorberVisAtt->SetVisibility(true);
-  absorberLV->SetVisAttributes(absorberVisAtt);
- 
 
   auto absorberPV  
     = new G4PVPlacement(
                  0,                // no rotation
-		 G4ThreeVector(0., 0., 16.*cm),
+		 G4ThreeVector(0., 0., 209.6*cm),
                  //G4ThreeVector(0., 0., absoThickness/2. + (calorThickness/2. - absoThickness) ),
                  absorberLV,       // its logical volume                         
                  "Abso",           // its name
-                 calorLV,	   // its mother volume
+                 worldLV,	   // its mother volume
 		 //layerLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
-  // Layer
+
+
+  ///////
+  // Scintillators
+  // ////
+
+
   auto layerS 
     = new G4Box("Layer",           // its name
                  calorSizeXY/2, calorSizeXY/2, (scintThickness * nofLayers)/2); // its size
@@ -352,21 +360,25 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto layerLV
     = new G4LogicalVolume(
                  layerS,           // its solid
-                 defaultMaterial,  // its material
+                 scintMaterial,  // its material
                  "LayerLV");         // its name
 
   auto layerPV
     = new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0., -11.5*cm),
+                 G4ThreeVector(0., 0., 181.*cm),
                  //G4ThreeVector(0., 0.,  -(scintThickness*nofLayers/2. ) + (calorThickness/2. - absoThickness) ), //  its position
                  layerLV,            // its logical volume                         
                  "Gap",            // its name
-                 calorLV,          // its mother  volume
+                 worldLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
+
+
+
+/**
  
   // Scint
   auto scintS 
@@ -387,35 +399,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  kZAxis,           // axis of replication
                  nofLayers,        // number of replica
                  scintThickness);  // width of replica
-
-/***
-  // Vacuum Tube
-  auto tubeS 
-    = new G4Box("Tube",           // its name
-                 calorSizeXY/2, calorSizeXY/2, tubeThickness/2); // its size
-                         
-  auto tubeLV
-    = new G4LogicalVolume(
-                 tubeS,           // its solid
-                 tubeMaterial,  // its material
-                 "TubeLV");         // its name
-
-  auto tubePV
-    = new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(0., 0.,  -27.5*cm), //  its position
-                 tubeLV,            // its logical volume                         
-                 "Tube",            // its name
-                 calorLV,          // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-
-  G4VisAttributes* tubeVisAtt= new G4VisAttributes(G4Colour(0.5,0.5,0.5));
-  tubeVisAtt->SetVisibility(true);
-  tubeLV->SetVisAttributes(tubeVisAtt);
- 
 ***/
+
+  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+  absorberVisAtt->SetVisibility(true);
+  absorberLV->SetVisAttributes(absorberVisAtt);
+
+
 
   // print parameters
   G4cout
@@ -449,21 +439,14 @@ void DetectorConstruction::ConstructSDandField()
   G4String scintDetectorName = "ScintLV" ;
   ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-  SetSensitiveDetector("ScintLV", scintDetector);
+  SetSensitiveDetector("LayerLV", scintDetector);
+//  SetSensitiveDetector("ScintLV", scintDetector);
 
   // declare absorber as AbsorberSD
   G4String absorberDetectorName = "AbsoLV" ;
   AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
   SetSensitiveDetector("AbsoLV", absorberDetector);
-
-/***
-  // declare vacuum as TubeSD
-  G4String tubeDetectorName = "TubeLV" ;
-  TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
-  SetSensitiveDetector("TubeLV", tubeDetector);
-***/
 
 }
 
