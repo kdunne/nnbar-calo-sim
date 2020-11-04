@@ -376,55 +376,27 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  fCheckOverlaps);  // checking overlaps 
 
 
-
-
-/**
- 
+/** 
   // Scint
-  auto scintS 
-    = new G4Box("Scint",             // its name
-                 calorSizeXY/2, calorSizeXY/2, scintThickness/2); // its size
+  auto scintS = new G4Box();
                          
-  auto scintLV
-    = new G4LogicalVolume(
-                 scintS,             // its solid
-                 scintMaterial,      // its material
-                 "ScintLV");      // its name
-                                   
-   auto scintPV
-    = new G4PVReplica(
-                 "Layer",          // its name
-                 scintLV,          // its logical volume
-                 layerLV,          // its mother
-                 kZAxis,           // axis of replication
-                 nofLayers,        // number of replica
-                 scintThickness);  // width of replica
+  auto scintLV = new G4LogicalVolume();
+                                                
+  auto scintPV = new G4PVReplica();
 ***/
 
-  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  absorberVisAtt->SetVisibility(true);
-  absorberLV->SetVisAttributes(absorberVisAtt);
-
-
-
-  // print parameters
-  G4cout
-    << G4endl 
-    << "------------------------------------------------------------" << G4endl
-    << "---> The calorimeter is " << nofLayers << " layers of: [ "
-    << absoThickness/mm << "mm of " << absorberMaterial->GetName() 
-    << " + "
-    << scintThickness/mm << "mm of " << scintMaterial->GetName() << " ] " << G4endl
-    //<< tubeThickness/mm << "mm of " << tubeMaterial->GetName() << " ] " << G4endl
-    << "------------------------------------------------------------" << G4endl;
- 
-    
+   
   // Visualization attributes
   //worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
   layerLV->SetVisAttributes(simpleBoxVisAtt);
+
+  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+  absorberVisAtt->SetVisibility(true);
+  absorberLV->SetVisAttributes(absorberVisAtt);
+ 
 
   return worldPV;
 }
