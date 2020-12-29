@@ -23,65 +23,60 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
+//
+//
+//
+#ifndef PMTSD_h
+#define PMTSD_h 1
 
-#include "PrimaryGeneratorAction.hh"
+#include "G4DataVector.hh"
+#include "G4VSensitiveDetector.hh"
+#include "PMTHit.hh"
 
-#include "G4RunManager.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4LogicalVolume.hh"
-#include "G4Box.hh"
-#include "G4Event.hh"
-#include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4SystemOfUnits.hh"
-#include "Randomize.hh"
+#include <vector>
 
-//.....
+class G4Step;
+class G4HCofThisEvent;
 
-PrimaryGeneratorAction::PrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(),
-   fParticleGun(nullptr)
-{
-  G4int nofParticles = 1;
-  fParticleGun = new G4ParticleGun(nofParticles);
-
-  // default particle kinematic
-  // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
-  auto particleDefinition 
-    = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
-  fParticleGun->SetParticleDefinition(particleDefinition);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,-1.));
-  fParticleGun->SetParticleEnergy(67.5*MeV);
-}
-
-//....
-
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
-}
-
-//....
-
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+class PMTSD : public G4VSensitiveDetector
 {
 
+  public:
 
-  G4double worldZHalfLength = 32.*cm / 2.;
-  //G4double worldZHalfLength = 27.*cm/2.;
-  //G4double worldZHalfLength = 22.*cm/2.;
-  //G4double worldZHalfLength = 17.*cm/2.;
-  G4cout << "Gun at position " << (worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
-  //G4double worldZHalfLength = 27.5*cm;
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
+    PMTSD(G4String name);
+    virtual ~PMTSD();
+ 
+    virtual void Initialize(G4HCofThisEvent* );
+    virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* );
+ 
+    //A version of processHits that keeps aStep constant
+    G4bool ProcessHits_constStep(const G4Step* ,
+                                 G4TouchableHistory* );
+    virtual void EndOfEvent(G4HCofThisEvent* );
+    virtual void clear();
+    void DrawAll();
+    void PrintAll();
+ 
+    //Initialize the arrays to store pmt possitions
+    inline void InitPMTs(G4int nPMTs){
+      if(fPMTPositionsX)delete fPMTPositionsX;
+      if(fPMTPositionsY)delete fPMTPositionsY;
+      if(fPMTPositionsZ)delete fPMTPositionsZ;
+      fPMTPositionsX=new G4DataVector(nPMTs);
+      fPMTPositionsY=new G4DataVector(nPMTs);
+      fPMTPositionsZ=new G4DataVector(nPMTs);
+    }
 
-  // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., worldZHalfLength ));
+    //Store a pmt position
+    void SetPmtPositions(const std::vector<G4ThreeVector>& positions);
 
-  fParticleGun->GeneratePrimaryVertex(anEvent);
-}
+  private:
 
-//....
+    PMTHitsCollection* fPMTHitCollection;
 
+    G4DataVector* fPMTPositionsX;
+    G4DataVector* fPMTPositionsY;
+    G4DataVector* fPMTPositionsZ;
+};
+
+#endif

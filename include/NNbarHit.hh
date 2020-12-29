@@ -33,7 +33,7 @@
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
-
+#include "G4ThreeVector.hh"
 
 class NNbarHit : public G4VHit
 {
@@ -56,20 +56,19 @@ private:
     G4double localTime;
     G4int parentID;
     G4String process;
-    G4String name;
     G4double time;
+    G4String name;
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
-    G4double posZ;
-    G4double posX;
-    G4double posY;
+    G4bool isLast;
+    G4ThreeVector pos;
+    G4ThreeVector vert;
     //G4int zHitID; // Hit z voxel
     //G4int yHitID; // Hit y voxel 
     G4double energyDeposit; // Energy deposit associated with the hit
+    G4double vertex_KE;
     G4double kinEnergy;
-    G4double Z0;
-    G4double Y0;
-    G4double X0;
+//    G4bool isCreated;
 
 public:
     inline G4double GetLocalTime()
@@ -99,30 +98,23 @@ public:
     //inline G4int GetYID() // Get z index of the voxel  
     //{return yHitID;}
 
-    inline G4double GetPosZ()
-    {return posZ;}
+    inline G4ThreeVector GetPos()
+    {return pos;}
 
-    inline G4double GetPosX()
-    {return posX;}
-
-    inline G4double GetPosY()
-    {return posY;}
-
-    inline G4double GetVertexZ()
-    {return Z0;}
-
-    inline G4double GetVertexX()
-    {return X0;}
-
-    inline G4double GetVertexY()
-    {return Y0;}
-
+    inline G4ThreeVector GetVert()
+    {return vert;}
 
     inline G4double GetEdep() // Get energy deposit
     {return energyDeposit;}
  
     inline G4double GetKinEn()
     {return kinEnergy;}
+
+    inline G4double GetVertexKE()
+    {return vertex_KE;}
+
+    inline G4bool GetIsLast()
+    {return isLast;}
 
 
 /***    inline void SetKinEnAndPosition(G4int xx, G4double zz, G4double eDep, G4double kinEn)
@@ -134,6 +126,7 @@ public:
         energyDeposit = eDep;
         kinEnergy = kinEn;
   }***/
+
     inline void SetLocalTime(G4double ltime){
         localTime = ltime;
     }
@@ -168,41 +161,39 @@ public:
     }
 
 
-     inline void SetPosZ(G4double z){
-        posZ = z;
+     inline void SetPos(G4ThreeVector z){
+        pos = z;
     }
+
+    inline void SetVert(G4ThreeVector z){
+        vert = z;
+    }
+
 
     inline void SetEDep(G4double eDep){
         energyDeposit = eDep;
     }
+
 
     inline void SetKinEn(G4double kinEn){
         kinEnergy = kinEn;
     }
 
 
-    inline void SetPosX(G4double x){
-        posX = x;
+    inline void SetVertexKE(G4double vertKE){
+        vertex_KE = vertKE;
     }
 
 
-    inline void SetPosY(G4double y){
-        posY  = y;
-    }
 
-    inline G4double SetVertexZ(G4double z){  
-        Z0 = z;
-    }
-
-    inline G4double GetVertexX(G4double x){
-        X0 = x;
-    }
-
-    inline G4double GetVertexY(G4double y){
-        Y0 = y;
-    }
    
+//    inline bool SetNumCeren(G4bool first){
+//        isCreated = first;
+//    }
 
+    inline bool SetIsLast(G4bool last){
+        isLast = last;
+    }
 
 };
 

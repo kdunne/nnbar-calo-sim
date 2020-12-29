@@ -39,15 +39,16 @@ NNbarHit::NNbarHit()
     localTime = 0.;
     parentID = 0;
     process = "";
-    name = "";
     time = 0.;
+    name = "";
     trackID = 0;
+    isLast = false;
     xHitID = 0;
+    pos = G4ThreeVector(0., 0., 0.);
+    vert = G4ThreeVector(0., 0., 0.);
     energyDeposit = 0.;
+    vertex_KE = 0.;
     kinEnergy = 0.;
-    posZ = 0.;
-    posX = 0.;
-    posY = 0.;
 
 }
 
@@ -60,16 +61,17 @@ NNbarHit::NNbarHit(const NNbarHit& right)
     localTime = right.localTime;
     parentID = right.parentID;
     process = right.process;
-    name = right.name;
     time = right.time;
+    name = right.name;
     trackID = right.trackID;
+    isLast = right.isLast;
     xHitID = right.xHitID;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
-    posZ = right.posZ;
-    posX = right.posX;
-    posY = right.posY;
+    pos = right.pos;
+    vert = right.vert;
     energyDeposit = right.energyDeposit;
+    vertex_KE = right.vertex_KE;
     kinEnergy = right.kinEnergy;
 }
 
@@ -78,17 +80,19 @@ const NNbarHit& NNbarHit::operator=(const NNbarHit& right)
     localTime = right.localTime;
     parentID = right.parentID;
     process = right.process;
-    name = right.name;
     time = right.time;
+    name = right.name;
     trackID = right.trackID;
+    isLast = right.isLast;
     xHitID = right.xHitID;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
-    posZ = right.posZ;
-    posX = right.posX,
-    posY = right.posY;
+    pos = right.pos;
+    vert = right.vert,
     energyDeposit = right.energyDeposit;
+    vertex_KE = right.vertex_KE;
     kinEnergy = right.kinEnergy;
+
     return *this;
 }
 

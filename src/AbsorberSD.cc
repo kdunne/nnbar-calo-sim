@@ -25,8 +25,6 @@
 //
 
 #include "AbsorberSD.hh"
-#include "TubeSD.hh"
-
 #include "NNbarHit.hh"
 
 #include "G4Step.hh"
@@ -81,42 +79,37 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
     
-    
-    // Get Direction
-    G4Track * theTrack = aStep  ->  GetTrack();
-    G4ThreeVector stepDelta = aStep->GetDeltaPosition();
-    G4double direction = stepDelta.getZ();
-    
-    
+    G4Track *theTrack = aStep->GetTrack();
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();
+
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
     
     // Get particle PDG code
-    G4int pdg = particleDef ->GetPDGEncoding();
+    G4int pdg = particleDef->GetPDGEncoding();
     
     // Get unique track_id (in an event)
-    G4int trackID = theTrack -> GetTrackID();
+    G4int trackID = theTrack->GetTrackID();
     
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-   
-    // Get Step Length 
-    G4double DX = aStep -> GetStepLength();
-    G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    G4StepPoint* PostStep = aStep->GetPostStepPoint();    
-
-    // Get Position
-    // Look into presetp - poststep
+    G4double energyDeposit = aStep->GetTotalEnergyDeposit();
+     
+ 
+    // Get post-step position
     G4ThreeVector pos = PostStep->GetPosition();
-    G4double z = pos.getZ();
-    G4double x = pos.getX();
-    G4double y = pos.getY();
+//    G4double z = pos.getZ();
+//    G4double x = pos.getX();
+//    G4double y = pos.getY();
 
-
+    // Get Vertex position
     G4ThreeVector vertex = theTrack->GetVertexPosition();
-    G4double origin = vertex.getZ();
-    G4double tracklength = z - origin;
+//    G4double vertZ = vertex.getZ();
+//    G4double vertX = vertex.getX();
+//    G4double vertY = vertex.getY();
+
+    // Get Vertex Kinetic Energy
+    G4double vertex_KE = theTrack->GetVertexKineticEnergy();
 
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
@@ -124,25 +117,31 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     //G4int i  = touchable->GetReplicaNumber(2);
     //G4int j  = touchable->GetReplicaNumber(1);
 
+    G4bool isLast = aStep->IsLastStepInVolume();
 
-
-    // Get Time 
+    // Get Global Time 
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
 
     // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
-    // Get Name
-    G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
-    
-    G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
-    G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
-    G4String namePre = volumePre->GetName();
+
+    // Should this be in Event Action?
+    G4int photons = 0;
+    G4ParticleDefinition* particle;
+    if (particleName != "opticalphoton") {
+        const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
+        for (int j = 0; j < (*secondary).size(); j++) {
+            particle = (*secondary)[j]->GetDefinition();
+            if (particle->GetParticleName() == "opticalphoton" && (*secondary)[j]->GetCreatorProcess()->GetProcessName() == "Cerenkov") { photons++; } 
+        }
+    }
+   
     
     // Get Process
     G4int parentID = 0;
     G4String proc = "";
-    // Getting Process ond parentID of primary causes seg fault
+    // Getting Process on parentID of primary causes seg fault
     if (trackID > 1){
 	parentID = theTrack->GetParentID();
         proc = theTrack->GetCreatorProcess()->GetProcessName();
@@ -151,13 +150,10 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	parentID = 0;
     }
 
-    if (proc=="Decay") {
-        G4cout << "Killing particle " << name << G4endl;
-        theTrack->SetTrackStatus(fKillTrackAndSecondaries);
-    }
-
-
-    if (DX) {
+//    if (proc=="Decay") {
+//        G4cout << "Killing particle " << particleName << G4endl;
+//        theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+//    }
 	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -167,18 +163,25 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double eKinMean = (eKinPre + eKinPost) * 0.5;
         
     NNbarHit* detectorHit = new NNbarHit();
+
+    // Particle Info
     detectorHit -> SetLocalTime(localTime);
     detectorHit -> SetParentID(parentID);
     detectorHit -> SetProcess(proc);
     detectorHit -> SetTime(time);
-    detectorHit -> SetName(name);
+    detectorHit -> SetName(particleName);
     detectorHit -> SetTrackID(trackID);
+    detectorHit -> SetIsLast(isLast);
+
+    // Position Info
     detectorHit -> SetXID(k);
-    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetPos(pos);
+    detectorHit -> SetVert(vertex);
+
+    // Energy Info
     detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetVertexKE(vertex_KE);
     detectorHit -> SetKinEn(eKinPost);
-    detectorHit -> SetPosX(x);
-    detectorHit -> SetPosY(y);
 
     HitsCollection -> insert(detectorHit);
 
@@ -186,7 +189,6 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
 //	G4cout << "eKinPost: "      << eKinPost << G4endl;
-    }
 
     return true;
 }
