@@ -23,60 +23,39 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
-//
-//
-#ifndef PMTSD_h
-#define PMTSD_h 1
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "G4DataVector.hh"
+#ifndef pmtSD_h
+#define pmtSD_h 1
+
+#include "NNbarHit.hh"
+//#include "AbsorberHit.hh"
+
+
 #include "G4VSensitiveDetector.hh"
-#include "PMTHit.hh"
-
-#include <vector>
+#include "globals.hh"
 
 class G4Step;
 class G4HCofThisEvent;
-
-class PMTSD : public G4VSensitiveDetector
+class G4TouchableHistory;
+class pmtSD : public G4VSensitiveDetector
 {
-
-  public:
-
-    PMTSD(G4String name);
-    virtual ~PMTSD();
- 
-    virtual void Initialize(G4HCofThisEvent* );
-    virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* );
- 
-    //A version of processHits that keeps aStep constant
-    G4bool ProcessHits_constStep(const G4Step* ,
-                                 G4TouchableHistory* );
-    virtual void EndOfEvent(G4HCofThisEvent* );
-    virtual void clear();
-    void DrawAll();
-    void PrintAll();
- 
-    //Initialize the arrays to store pmt possitions
-    inline void InitPMTs(G4int nPMTs){
-      if(fPMTPositionsX)delete fPMTPositionsX;
-      if(fPMTPositionsY)delete fPMTPositionsY;
-      if(fPMTPositionsZ)delete fPMTPositionsZ;
-      fPMTPositionsX=new G4DataVector(nPMTs);
-      fPMTPositionsY=new G4DataVector(nPMTs);
-      fPMTPositionsZ=new G4DataVector(nPMTs);
-    }
-
-    //Store a pmt position
-    void SetPmtPositions(const std::vector<G4ThreeVector>& positions);
-
-  private:
-
-    PMTHitsCollection* fPMTHitCollection;
-
-    G4DataVector* fPMTPositionsX;
-    G4DataVector* fPMTPositionsY;
-    G4DataVector* fPMTPositionsZ;
+public:
+    pmtSD(G4String name);
+    ~pmtSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
+private:
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
 };
-
 #endif
+
+

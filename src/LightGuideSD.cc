@@ -24,7 +24,7 @@
 // ********************************************************************
 //
 
-#include "AbsorberSD.hh"
+#include "LightGuideSD.hh"
 #include "NNbarHit.hh"
 
 #include "G4Step.hh"
@@ -51,47 +51,40 @@
 
 
 //......
-AbsorberSD::AbsorberSD(G4String name):
+LightGuideSD::LightGuideSD(G4String name):
 G4VSensitiveDetector(name)
 {
-    G4String HCname = "AbsorberHitCollection" + name;
-
-    //std::cout << "HCname = " << HCname << std::endl;
-    collectionName.insert(HCname);
+    G4String HCname;
+    collectionName.insert(HCname="LightGuideHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
 }
 
 //......
-AbsorberSD::~AbsorberSD()
+LightGuideSD::~LightGuideSD()
 {}
 
 //......
-void AbsorberSD::Initialize(G4HCofThisEvent*)
+void LightGuideSD::Initialize(G4HCofThisEvent*)
 {
-    //std::cout << "sensitiveDetectorName: " << sensitiveDetectorName <<  " " << collectionName[0] << std::endl;
+    
     HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
                                                              collectionName[0]);
-
-    //std::cout << "CollectionID: " << HitsCollection->GetCollectionID() << std::endl;
-
 }
 
 //.....
-G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool LightGuideSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
 
-     //if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
-//    std::cout << "Volume: " << aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() << std::endl;
-   
+    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "LightGuide") return false;
+    
     G4Track *theTrack = aStep->GetTrack();
     G4StepPoint* PostStep = aStep->GetPostStepPoint();
 
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
-    const G4DynamicParticle *dynParticle = theTrack->GetDynamicParticle();
     
     // Get particle PDG code
     G4int pdg = particleDef->GetPDGEncoding();
@@ -101,13 +94,9 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Get Energy deposited
     G4double energyDeposit = aStep->GetTotalEnergyDeposit();
+     
  
-//    if( aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() == "C2" && trackID==1) {
-
-    //std::cout << "eDep: " << energyDeposit/CLHEP::MeV << std::endl;   
-
-//    }
-        // Get post-step position
+    // Get post-step position
     G4ThreeVector pos = PostStep->GetPosition();
 //    G4double z = pos.getZ();
 //    G4double x = pos.getX();
@@ -147,7 +136,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
             if (particle->GetParticleName() == "opticalphoton" && (*secondary)[j]->GetCreatorProcess()->GetProcessName() == "Cerenkov") { photons++; } 
         }
     }
- 
+   
+    
     // Get Process
     G4int parentID = 0;
     G4String proc = "";
@@ -171,17 +161,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
     // Get the step average kinetic energy
     G4double eKinMean = (eKinPre + eKinPost) * 0.5;
-    
-    G4double stepLength = 0.;
-    if (trackID ==1) {    
-
-      stepLength = aStep->GetStepLength();
-      //std::cout << "Track Length: " << stepLength/CLHEP::cm << " cm" << std::endl;
-//    std::cout << "eKinPost: " << eKinPost << std::endl;
-//    std::cout << "Kinetic Energy: " << theTrack->GetKineticEnergy() << std::endl;
-//    std::cout << "eKinPre: " << eKinPre << std::endl;
-    }
-
+        
 
 /***
     if (trackID == 1 && isLast || eKinPost == 0) {
@@ -189,14 +169,14 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         for (int j = 0; j < (*lastSecondaries).size(); j++) {
             particle = (*lastSecondaries)[j]->GetDefinition();
             G4String process = (*lastSecondaries)[j]->GetCreatorProcess()->GetProcessName();
-            std::cout << "particle: " << particle->GetParticleName() << " process: " << process << std::endl;
+            std::cout << "particle: " << particle->GetParticleName() << " process: " << process; 
         }
 
     } 
 ***/
 
     NNbarHit* detectorHit = new NNbarHit();
-    
+
     // Particle Info
     detectorHit -> SetLocalTime(localTime);
     detectorHit -> SetParentID(parentID);
@@ -209,19 +189,15 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Position Info
     detectorHit -> SetXID(k);
     detectorHit -> SetPos(pos);
-    detectorHit -> SetStepLength(stepLength);
     detectorHit -> SetVert(vertex);
 
     // Energy Info
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetVertexKE(vertex_KE);
-    detectorHit -> SetKinEn(theTrack->GetKineticEnergy());
-    //detectorHit -> SetKinEn(eKinPost);
-    detectorHit -> SetPhotons(photons);
-
+    detectorHit -> SetKinEn(eKinPost);
 
     HitsCollection -> insert(detectorHit);
-    ///std::cout << "HERE" << std::endl;
+
 //	G4cout << "Replica: "       << k << G4endl;
 //	G4cout << "tracklength: "   << tracklength << G4endl;
 //	G4cout << "energyDeposit: " << energyDeposit << G4endl;
@@ -231,7 +207,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 }
 
 //......
-void AbsorberSD::EndOfEvent(G4HCofThisEvent* HCE)
+void LightGuideSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     
     static G4int HCID = -1;
@@ -239,7 +215,7 @@ void AbsorberSD::EndOfEvent(G4HCofThisEvent* HCE)
     {
         HCID = GetCollectionID(0);
     }
-    //std::cout << "HCID: " << HCID << std::endl; 
+    
     HCE -> AddHitsCollection(HCID,HitsCollection);
 }
 

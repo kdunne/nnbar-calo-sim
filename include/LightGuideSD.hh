@@ -23,41 +23,37 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#ifndef DetectorConstruction_h
-#define DetectorConstruction_h 1
+#ifndef LightGuideSD_h
+#define LightGuideSD_h 1
 
-#include "AbsorberSD.hh"
-#include "G4VUserDetectorConstruction.hh"
+#include "NNbarHit.hh"
+
+#include "G4VSensitiveDetector.hh"
 #include "globals.hh"
 
-class G4VPhysicalVolume;
-class G4GlobalMagFieldMessenger;
-
-class DetectorConstruction : public G4VUserDetectorConstruction
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class LightGuideSD : public G4VSensitiveDetector
 {
-  public:
-    DetectorConstruction();
-    virtual ~DetectorConstruction();
-
-  public:
-    virtual G4VPhysicalVolume* Construct();
-    virtual void ConstructSDandField();
-    void BuildAbsorberGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double Thickness);
-    void BuildLightGuideGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double Thickness);
-    void BuildPMTGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double Thickness);
-
-  private:
-    // methods
-    void DefineMaterials();
-    G4VPhysicalVolume* DefineVolumes();
-  
-    // data members
-    G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps
+public:
+    LightGuideSD(G4String name);
+    ~LightGuideSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
+private:
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
 };
-
-//....
-
 #endif
+
 

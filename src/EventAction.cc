@@ -99,11 +99,12 @@ G4double EventAction::GetSum(G4THitsMap<G4double>* hitsMap) const
 
 void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 {
+/***
     G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
     if(scintHitsCollectionID == -1) {
        absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
   }
-
+***/
 
 }
 
@@ -116,18 +117,43 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
     int CHCID1 = -1;
     int CHCID2 = -1;
+    int CHCID3 = -1;
+    //int CHCIDs[25] = {-1};
 
-    if (CHCID2<0) {
-        CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");
+    G4String name[] = {"A", "B", "C", "D", "E"};
+    //G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+
+    G4String scorer = "/eDep";
+    int module_counter = 0;
+    for(int i=0; i<5; i++) {
+      for(int j=0; j<5; j++){
+        //std::cout << "name: " << name[i] << j << scorer << std::endl;
+
+        std::string scorerName = name[i] + std::to_string(j) + scorer;
+
+        int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+
+        auto eDep = GetSum(GetHitsCollection(CHCID, event)); 
+
+/***        if (CHCID == 24) {
+          std::cout << eDep/CLHEP::MeV << " " << std::endl;
+	} else {
+          std::cout << eDep/CLHEP::MeV << " " ;
+        }
+***/
+        G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+        analysis->FillH1(CHCID, eDep);
+
+//   	analysis->FillNtupleDColumn(CHCID, eDep/CLHEP::MeV);
+//	analysis->AddNtupleRow();
+      }
     }
-    if (CHCID1<0){
-        CHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtHitCollection");
-    }
+
   
-    NNbarHitsCollection* AbsHits   = 0;
-    NNbarHitsCollection* pmtHits   = 0;
 
-    if (HCE) {
+
+  if (HCE) {
 
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
 	G4int ltime     = 0.;
@@ -141,12 +167,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4double eDep   = 0.;
         G4double trackl = 0.;	
         G4int hitCount  = 0;
-        G4double X0     = 0.;
-        G4double Y0     = 0.;
-        G4double Z0     = 0.;
-        G4double Xpos   = 0.;
-        G4double Ypos   = 0.;
-        G4double Zpos   = 0.;
         G4double eDepAbs = 0.;
         G4int cerenkovCounter = 0;
         G4double ke_init = 0.;
@@ -159,70 +179,87 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4ThreeVector gammaB_vert = G4ThreeVector(-99.,0,0);
 	G4ThreeVector gammaA_dist = G4ThreeVector(-99.,0,0);
 	G4ThreeVector gammaB_dist = G4ThreeVector(-99.,0,0);
+        G4int AbsPhotons = 0;
+
+	//pmtHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID1));
+	//AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+        //LightGuideHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
+
+        //analysis->FillH1(10, eDep / 210.);
+
+        //"AbsorberHitCollection" + name
+
+/***
+    if (CHCID1<0){
+        iCHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtLV/Pop");
+        //CHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtHitCollection");
+    }
+    if (CHCID3<0){
+        CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("LightGuideHitCollection");
+    }
+***/   
+  
+    //NNbarHitsCollection* AbsHits   = 0;
+    //NNbarHitsCollection* pmtHits   = 0;
+    //NNbarHitsCollection* LightGuideHits   = 0;
+    
+    //auto pop = GetSum(GetHitsCollection(CHCID1, event)); 
+    //std::cout << "Cerenkov Population: " << pop << std::endl;
+    
+   //     std::string HCs[] = {"A0", "A1", "A2", "A3"}; 
 
 
-	pmtHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID1));
-	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+        //NNbarHitsCollection* AbsHits   = 0;
 
-	if(AbsHits) {
+        //for (int i = 0; i<4; i++) {
+          //std::string prefix = "AbsorberHitCollection"; 
+          //std::cout << "HC: " << prefix + HCs[i] << std::endl;
+
+          //CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID(prefix + HCs[i]);
+
+/***          AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+        
+      
+	  if(AbsHits) {
  
 	    hitCount = AbsHits->entries();
-
-            G4double x_pos[hitCount] = {0.};
- 
-            G4cout << "Processing " << hitCount << " hits" << G4endl;
-           
+            G4cout << "Processing " << hitCount << " Absorber hits" << G4endl;
+          
+            cerenkovCounter = 0; 
+            G4double stepLength = 0.;
 	    for (G4int h=0; h<hitCount; h++) {
 	        ltime               = ((*AbsHits)[h]) -> GetLocalTime();
 		parentID 	    = ((*AbsHits)[h]) -> GetParentID();
      	        proc                = ((*AbsHits)[h]) -> GetProcess();
-		G4double time       = ((*AbsHits)[h]) -> GetTime(); 
-	        G4String name       = ((*AbsHits)[h]) -> GetName();
-	    	G4int trID          = ((*AbsHits)[h]) -> GetTrackID();
-		G4int i             = -99;
-	        G4double kinEn      = ((*AbsHits)[h]) -> GetKinEn();
-	        G4double eDep       = ((*AbsHits)[h]) -> GetEdep();
+	        time       	    = ((*AbsHits)[h]) -> GetTime(); 
+	        name       	    = ((*AbsHits)[h]) -> GetName();
+	    	trID          	    = ((*AbsHits)[h]) -> GetTrackID();
+		i             	    = -99;
+	        kinEn      	    = ((*AbsHits)[h]) -> GetKinEn();
+	        eDep       	    = ((*AbsHits)[h]) -> GetEdep();
                 G4double vertex_KE  = ((*AbsHits)[h]) -> GetVertexKE();
                 G4ThreeVector pos   = ((*AbsHits)[h]) -> GetPos();	
                 G4ThreeVector vert  = ((*AbsHits)[h]) -> GetVert();
                 G4double isLastStep = ((*AbsHits)[h]) -> GetIsLast();
-               
-                eDepAbs += eDep/CLHEP::MeV;
-
-                //G4cout << "eDepAbs: " << eDepAbs << G4endl;
-                //G4cout << "eDep: " << eDep << G4endl;
-                //analysis->FillH2(3, sqrt(pow(Xpos,2) + pow(Ypos,2))/CLHEP::cm, eDep/CLHEP::MeV);
-
-                //analysis->FillNtupleIColumn(0,trID);
-		//analysis->FillNtupleIColumn(0, event->GetEventID());
-                //analysis->FillNtupleDColumn(1,sqrt(pow(Xpos,2) + pow(Ypos,2))/CLHEP::cm);
-                //analysis->FillNtupleDColumn(2,eDep); 
-                //analysis->AddNtupleRow(); 
+                G4int photons = ((*AbsHits)[h]) -> GetPhotons();
+                stepLength = ((*AbsHits)[h]) -> GetStepLength();
+                std::cout << "hit : " << h << " eDep: " << eDep << std::endl;
+                AbsPhotons += photons;             
+ 
+                eDepAbs += eDep;
                 
                 if (trID == 1){
 	            ke_init = vertex_KE;
-                    //std::cout << "KE init: " << ke_init << std::endl;
-                    //if (isLastStep) {
-                        //G4cout << "Filling...." << G4endl;
-                        //analysis->FillH1(3, trackl/CLHEP::cm);
-		        //analysis->FillH1(12, time/CLHEP::ns);
-                    //}
-	        }
-     
-                if (trID == 1 && (isLastStep || kinEn == 0) ) {
-                    
-                    G4ThreeVector distance = G4ThreeVector(vert.getX() - pos.getX(), 
-                                                           vert.getY() - pos.getY(), 
-                                                           vert.getZ() - pos.getZ());
-
-                    trackl = sqrt ( pow(distance.getX(),2) + pow(distance.getY(),2) + pow(distance.getZ(),2) );
-                    //std::cout << "trackl: " << trackl << std::endl;
+                    trackl += stepLength;
                 }
 
-                //if (parentID == 1 && name=="gamma" ){
-                    //G4cout << "trackID: " << trID <<  " particle: " << name << "KE: " << vertex_KE << G4endl;
-               // }
+                if (trID == 1 && (isLastStep || kinEn == 0) ) {
+                    
 
+                }
+
+
+                //Pi 0 gammas
                 if (trID==2 && gammaA_KE == -99){
                     gammaA_KE = vertex_KE;
                     //gammaA_pos = pos;
@@ -243,7 +280,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                                                               gammaA_vert.getY() - gammaA_pos.getY(), 
                                                               gammaA_vert.getZ() - gammaA_pos.getZ());
 
-                    std::cout << "Distance gamma 1 Last Step Z: " << gammaA_dist.getZ()/ CLHEP::cm << std::endl;
+                    //std::cout << "Distance gamma 1 Last Step Z: " << gammaA_dist.getZ()/ CLHEP::cm << std::endl;
                 }
 
                 if (trID == 3 && (isLastStep || kinEn==0)){
@@ -253,11 +290,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
                                                               gammaB_vert.getY() - gammaB_pos.getY(), 
                                                               gammaB_vert.getZ() - gammaB_pos.getZ());
 
-                    std::cout << "Distance gamma 2 Last Step Z: " << gammaB_dist / CLHEP::cm << std::endl;
+                    //std::cout << "Distance gamma 2 Last Step Z: " << gammaB_dist / CLHEP::cm << std::endl;
 
                 }
 
-          
+                // Cerenkov Photons
                 if (ltime == 0 && name == "opticalphoton" && proc == "Cerenkov"){
 		    cerenkovCounter++;
                 }
@@ -267,17 +304,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     //analysis->FillH1(6, Ypos/CLHEP::cm);
                 }
 
-                if (eDep >0 ){
-                    //analysis->FillH3(0, Xpos, Ypos, eDep);
-                } 
-
-
-
-	    }
-
-            //G4cout << "eDepAbs: " << eDepAbs << G4endl;
-            //G4cout << "ke_init: " << ke_init << G4endl;
-            //G4cout << "frac: " << eDepAbs/ ke_init << G4endl;
+	    } // End hit count Loop
 
             if (angle == -99 && (gammaA_KE > -99 || gammaB_KE > -99)) {
 
@@ -299,66 +326,76 @@ void EventAction::EndOfEventAction(const G4Event* event)
     
                 }
                
-/***
- if (angle<180.){
-                std::cout << "dotProd: " << dotProd << std::endl;
-                std::cout << "normA: " << normA << std::endl;
-                std::cout << "normB: " << normB << std::endl;
-                std::cout << "dotProd/(normA*normB): " << dotProd/(normA*normB) << std::endl;
-                std::cout << "acos(): " << acos(dotProd/(normA*normB)) << std::endl; 
-                std::cout << "Angle [degrees]: " << angle << std::endl;  
-
-                }
-***/
                 analysis->FillH2(4,gammaA_KE/CLHEP::MeV, gammaB_KE/CLHEP::MeV);
                 analysis->FillH1(11,gammaA_KE/CLHEP::MeV);
                 analysis->FillH1(12,gammaB_KE/CLHEP::MeV);
                 analysis->FillH1(13, angle);
-            }
+            }***/
 
 
-            analysis->FillH1(10, eDepAbs / ke_init);
+            analysis->FillH1(0, cerenkovCounter);     
+            analysis->FillH1(15,AbsPhotons);
 
-            /***G4double moliere, sum, mean, var, std = 0.;
-            for(i=0; i < hitCount; i++) { sum += x_pos[i];}
-            mean = sum / hitCount;
-            for(i=0; i < hitCount; i++) { var += pow(x_pos[i] - mean, 2);};
-            std = sqrt(var/hitCount);***/
- 
-            //G4cout << "Mean: " << mean/CLHEP::cm << " cm" << G4endl;
-            //G4cout << "Std: " << std/CLHEP::cm << " cm" << G4endl;
-
-            //moliere = 1.65*std;
-            //G4cout << "moliere: " << moliere/CLHEP::cm << " cm" << G4endl;
-            //analysis->FillH1(8, moliere/CLHEP::cm);
-
-            
-
-	    
             if (eDepAbs>0){                  
                 if(cerenkovCounter>0){
                     //G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
                     analysis->FillH1(3, trackl/CLHEP::cm);
                     analysis->FillH2(1, cerenkovCounter, eDepAbs/CLHEP::MeV);  
-                    analysis->FillH2(0, trackl/CLHEP::cm, cerenkovCounter);
+                    analysis->FillH2(0, trackl/CLHEP::cm, AbsPhotons);
                     analysis->FillH1(4, eDepAbs/CLHEP::MeV); 
-                    analysis->FillH1(0, cerenkovCounter);     
+                    //analysis->FillH1(0, cerenkovCounter);     
                 }
             }
-            //G4cout << "Total Edep in lead-glass: " << eDepAbs/CLHEP::MeV << G4endl;
-        }         
 
+            //G4cout << "eDepAbs: " << eDepAbs << G4endl;
+            //G4cout << "ke_init: " << ke_init << G4endl;
+            //G4cout << "frac: " << eDepAbs/ ke_init << G4endl;
+            //analysis->FillH1(10, eDepAbs / ke_init);
+
+        //}
+     //}
+
+
+/***
+        if(LightGuideHits) {
+
+           hitCount = LightGuideHits->entries();
+           G4cout << "Processing " << hitCount << " LightGuide hits" << G4endl;
+           
+           G4double eDepLightGuide = 0.; 
+	    for (G4int h=0; h<hitCount; h++) {
+	        ltime               = ((*LightGuideHits)[h]) -> GetLocalTime();
+		parentID 	    = ((*LightGuideHits)[h]) -> GetParentID();
+     	        proc                = ((*LightGuideHits)[h]) -> GetProcess();
+	        time       	    = ((*LightGuideHits)[h]) -> GetTime(); 
+	        name       	    = ((*LightGuideHits)[h]) -> GetName();
+	    	trID          	    = ((*LightGuideHits)[h]) -> GetTrackID();
+		i             	    = -99;
+	        kinEn      	    = ((*LightGuideHits)[h]) -> GetKinEn();
+	        eDep       	    = ((*LightGuideHits)[h]) -> GetEdep();
+                G4double vertex_KE  = ((*LightGuideHits)[h]) -> GetVertexKE();
+                G4ThreeVector pos   = ((*LightGuideHits)[h]) -> GetPos();	
+                G4ThreeVector vert  = ((*LightGuideHits)[h]) -> GetVert();
+                G4double isLastStep = ((*LightGuideHits)[h]) -> GetIsLast();
+               
+                eDepLightGuide += eDep;
+                //std::cout << "eDep PMT: " << eDepPMT << std::endl;
+            }
+
+        std::cout << "eDep LightGuide: " << eDepLightGuide << std::endl;
+
+        }
+***/
 
 
     } else {
         G4cout << "No HCE" << G4endl;
     }
-
   //print per event (modulo n)
   auto eventID = event->GetEventID();
   auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
   if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
-    G4cout << "---> End of event: " << eventID << G4endl;     
+    //G4cout << "---> End of event: " << eventID << G4endl;     
    // PrintEventStatistics(absoEdep, absoTrackLength, gapEdep, scintTrackLength);
   }
 }  

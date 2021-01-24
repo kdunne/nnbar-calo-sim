@@ -69,6 +69,8 @@ private:
     G4double vertex_KE;
     G4double kinEnergy;
 //    G4bool isCreated;
+    G4int photons;
+    G4double stepLength;
 
 public:
     inline G4double GetLocalTime()
@@ -116,6 +118,11 @@ public:
     inline G4bool GetIsLast()
     {return isLast;}
 
+    inline G4int GetPhotons()
+    {return photons;}
+
+    inline G4double GetStepLength()
+    {return stepLength;}
 
 /***    inline void SetKinEnAndPosition(G4int xx, G4double zz, G4double eDep, G4double kinEn)
     {
@@ -169,10 +176,14 @@ public:
         vert = z;
     }
 
+    inline void SetStepLength(G4double dx){
+        stepLength = dx;
+    }
 
     inline void SetEDep(G4double eDep){
         energyDeposit = eDep;
     }
+
 
 
     inline void SetKinEn(G4double kinEn){
@@ -185,14 +196,12 @@ public:
     }
 
 
-
-   
-//    inline bool SetNumCeren(G4bool first){
-//        isCreated = first;
-//    }
-
     inline bool SetIsLast(G4bool last){
         isLast = last;
+    }
+
+    inline int SetPhotons(G4int ceren){
+        photons = ceren;
     }
 
 };
