@@ -1,5 +1,5 @@
-# Calorimeter simulation for NNbar/HIBEAM experiment
-
+# Simulation of lead glass array for the nnbar/HIBEAM prototype
+![Lead glass array](img/lead-glassarray.png?raw=true "Title")
 
 <h3>How to Build</h3>
 
