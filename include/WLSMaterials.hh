@@ -24,42 +24,51 @@
 // ********************************************************************
 //
 //
+/// \file optical/wls/include/WLSMaterials.hh
+/// \brief Definition of the WLSMaterials class
+//
 
-#ifndef DetectorConstruction_h
-#define DetectorConstruction_h 1
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-#include "AbsorberSD.hh"
-#include "G4VUserDetectorConstruction.hh"
+#ifndef WLSMaterials_h
+#define WLSMaterials_h 1
+
 #include "globals.hh"
+#include "G4Material.hh"
+#include "G4NistManager.hh"
 
-class G4VPhysicalVolume;
-class G4GlobalMagFieldMessenger;
-class WLSMaterials;
-class G4Material;
-
-
-class DetectorConstruction : public G4VUserDetectorConstruction
+class WLSMaterials
 {
   public:
-    DetectorConstruction();
-    virtual ~DetectorConstruction();
-    virtual G4VPhysicalVolume* Construct();
-    virtual void ConstructSDandField();
 
-    void BuildScintBar(G4LogicalVolume* logicExtrusion, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ);
-    G4Material *FindMaterial(G4String);
+    virtual ~WLSMaterials();
+ 
+    static WLSMaterials* GetInstance();
+
+    G4Material* GetMaterial(const G4String);
+ 
+  private:
+ 
+    WLSMaterials();
+
+    void CreateMaterials();
 
   private:
-    // methods
-    void DefineMaterials();
-    G4VPhysicalVolume* DefineVolumes();
-    WLSMaterials* fMaterials;
-  
-    // data members
-    G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps
+
+    static WLSMaterials* fInstance;
+
+    G4NistManager*     fNistMan;
+
+    G4Material*        fAir;
+
+    G4Material*        fPMMA;
+    G4Material*        fPethylene;
+    G4Material*        fFPethylene;
+    G4Material*        fPolystyrene;
+    G4Material*        fSilicone;
+    G4Material*        fCoating;
+
 };
 
-//....
-
-#endif
-
+#endif /*WLSMaterials_h*/

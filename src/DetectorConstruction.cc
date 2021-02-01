@@ -29,6 +29,7 @@
 #include "AbsorberSD.hh"
 #include "pmtSD.hh"
 #include "LightGuideSD.hh"
+#include "WLSMaterials.hh"
 
 #include "G4Material.hh"
 #include "G4Element.hh"
@@ -36,6 +37,7 @@
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4EllipticalTube.hh" 
 #include "G4Trap.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
@@ -45,6 +47,7 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSurface.hh"
 #include "G4OpticalSurface.hh"
+#include "G4LogicalSkinSurface.hh"
 
 #include "G4SDManager.hh"
 #include "G4SDChargedFilter.hh"
@@ -88,8 +91,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 //....
 
 
-void DetectorConstruction::DefineMaterials()
-{ 
+void DetectorConstruction::DefineMaterials() { 
 
   //
   // -------------------------- Define Materials -------------------------------
@@ -107,8 +109,7 @@ void DetectorConstruction::DefineMaterials()
   new G4Material("Galactic", z=1., a=1.01*g/mole, density= universe_mean_density,
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
 
-
-
+/***
   G4Element* elTi = nistManager->FindOrBuildElement("Ti");
   G4Element* elAs = nistManager->FindOrBuildElement("As");
   G4Element* elPb = nistManager->FindOrBuildElement("Pb");
@@ -116,128 +117,38 @@ void DetectorConstruction::DefineMaterials()
   G4Element* elSi = nistManager->FindOrBuildElement("Si");
   G4Element* elNa = nistManager->FindOrBuildElement("Na");
   G4Element* elCa = nistManager->FindOrBuildElement("Ca");
+***/
+  
+  fMaterials = WLSMaterials::GetInstance();
 
 
-  // Lead-glass from PDG
-  G4Material* Abs = new G4Material("Abs", 4.07*g/cm3, 5);
-  Abs->AddElement(elO, 0.156453);
-  Abs->AddElement(elSi, 0.080866);
-  Abs->AddElement(elTi, 0.008092);
-  Abs->AddElement(elAs, .002651);
-  Abs->AddElement(elPb, 0.751938);
-
-  // Optical Glass from G4
-  G4Material* Glass = new G4Material("Glass", 2.4*g/cm3, 4);
-  Glass->AddElement(elO, 0.4598  );
-  Glass->AddElement(elNa, 0.096441);
-  Glass->AddElement(elSi, 0.336553);
-  Glass->AddElement(elCa, 0.107205);
-
-  //
-  // ----------------- Generate and Add Material Properties Table ----------------
-  //
-
-
-  /*********** Lead Glass ********************/
-  G4MaterialPropertiesTable* absMPT = new G4MaterialPropertiesTable();
-
-  // Datasheet gives photon wavelengths. Convert to Energies. Energies must be in Ascending order.
-  G4double PhotonWavelength[] =
-      { 2325.4*nm, 1970.1*nm, 1529.6*nm, 1060.0*nm,
-        1014.0*nm, 852.10*nm, 706.50*nm, 656.30*nm,
-        643.80*nm, 632.80*nm, 589.30*nm, 587.60*nm,
-        546.10*nm, 486.10*nm, 480.00*nm, 435.80*nm,
-        404.70*nm, 365.00*nm
-       };
-
-  const G4int nEntries = sizeof(PhotonWavelength)/sizeof(G4double);
-  G4double PhotonEnergy[nEntries];
-  for (int i=0; i < nEntries; ++i) {
-    PhotonEnergy[i] = (1240.*nm/PhotonWavelength[i])*eV;
-  };
-
-  // Lead Glass Schott SF5
-  G4double refractiveIndex[] =
-        { 1.63289, 1.63785, 1.64359, 1.65104,
-          1.65206, 1.65664, 1.66327, 1.66661,
-          1.66756, 1.66846, 1.67252, 1.67270,
-          1.67764, 1.68750, 1.68876, 1.69986,
-          1.71069, 1.73056};
-
-  absMPT->AddProperty("RINDEX", PhotonEnergy, refractiveIndex, nEntries)->SetSpline(true);
-  Abs->SetMaterialPropertiesTable(absMPT);
-
-
-  /*********** Light Guide ********************/
-  G4MaterialPropertiesTable* lightGuideMPT = new G4MaterialPropertiesTable();
-
-  // SCHOTT Datasheet same wavelengths for lead-glass.
-  // Optical Glass Schott N-BK7
-  G4double LGrefractiveIndex[] =
-        { 1.48921, 1.49495, 1.50091, 1.50669,
-          1.50731, 1.50980, 1.51289, 1.51432,
-          1.51472, 1.51509, 1.51673, 1.51680,
-          1.51872, 1.52238, 1.52283, 1.52668,
-          1.53024, 1.53627};
-
-  lightGuideMPT->AddProperty("RINDEX", PhotonEnergy, LGrefractiveIndex, nEntries)->SetSpline(true);
-  Glass->SetMaterialPropertiesTable(lightGuideMPT);
-
-
-  // Print materials
-  //G4cout << "Absorber Properties -------" << G4endl;
-  //G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-  //absMPT->DumpTable();
 }
 
 
-G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
-{
-  // Geometry parameters
-  //G4double absoThickness = 35.*cm;
-  //G4double absoThickness = 30.*cm;
-  //G4double absoThickness = 25.*cm;
-  //G4double absoThickness = 22.*cm;
-  G4double absoThickness = 20.*cm;
-  //G4double absoThickness = 18.*cm;
-  //G4double absoThickness = 15.*cm;
-  //G4double absoThickness = 10.*cm;
+G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
-  G4double rangeThickness = 30.*cm;
-  G4double gap = 5.*cm;
-  G4double layerThickness = 3.*cm;
-  G4double lightGuideThickness = 3.*cm;
-  G4double pmtThickness  = 4.*cm;
-  G4double calorSizeXY   = 10.*cm;
-  G4double worldSizeXY = 20.*cm;
-  //G4double worldSizeXY = 25.*cm;
-  //G4double worldSizeXY   = 1. * calorSizeXY;
-  G4double worldSizeZ    = rangeThickness + gap + absoThickness + lightGuideThickness + pmtThickness;
+  // 10  5x3x50 cm Scintillator Bar
+  G4double WorldSizeX = 30.*cm;
+  G4double WorldSizeY = 5.*cm;
+  G4double WorldSizeZ = .5*m;
+  G4double scintThickness = 3.*cm;
 
-  // Z Positions
-  G4double absPos = 0.5 * (0.5*worldSizeZ - (absoThickness - worldSizeZ*0.5));
-  G4double pmtPos = (-0.5*worldSizeZ + 0.5*pmtThickness);
-  G4double lightGuidePos = (absPos - absoThickness/2.) - (lightGuideThickness / 2.);
-  //G4double pmtPos = (lightGuidePos - lightGuideThickness/2.) - (pmtThickness/2.);
+  G4double WLSfiberZ  = WorldSizeZ;
+  G4double WLSfiberR  = 2.6*mm;
+
+  G4double HoleRadius       = 2.9*mm;
+  G4double HoleLength       = WLSfiberZ;
+  G4double FiberRadius      = 0.5*mm;
+
+  G4double WLSfiberOrigin = 0.0;
 
   // Get materials
   auto defaultMaterial    = G4Material::GetMaterial("Galactic");
-  auto absorberMaterial   = G4Material::GetMaterial("Abs");
-  auto lightGuideMaterial = G4Material::GetMaterial("Glass");
-
  
-  if ( ! defaultMaterial || ! absorberMaterial ) {
-    G4ExceptionDescription msg;
-    msg << "Cannot retrieve materials already defined."; 
-    G4Exception("DetectorConstruction::DefineVolumes()",
-      "MyCode0001", FatalException, msg);
-  }  
-
-   
   // World
   auto worldS 
     = new G4Box("World",           // its name
-                 worldSizeXY/2., worldSizeXY/2., worldSizeZ/2.); // its size
+                 WorldSizeX/2., WorldSizeY/2., WorldSizeZ/2.); // its size
                          
   auto worldLV
     = new G4LogicalVolume(
@@ -256,114 +167,75 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
   
-  //BuildAbsorberGrid(worldLV, AbsorberSD)
 
-  // Absorber
+  //--------------------------------------------------
+  // Extrusion
+  //--------------------------------------------------
 
-  //G4double xGrid[] = {-10., -5., 0., 5., 10.};
-  //G4double yGrid[] = {-10., -5., 0., 5., 10.};
+  auto ExtrusionS =
+        new G4Box("Extrusion", WorldSizeX/2, WorldSizeY/2, WorldSizeZ/2);
 
-  G4double xGrid[] = {-8., -4., 0., 4., 8.};
-  G4double yGrid[] = {-8., -4., 0., 4., 8.};
-
-//  G4double xGrid[] = {-10., -8., -6., -4., -2., 2., 4., 6., 8., 10.};
-//  G4double yGrid[] = {-10., -8., -6., -4., -2., 2., 4., 6., 8., 10.};
-
-  G4String name[] = {"A", "B", "C", "D", "E"};
-  //G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
-  G4String LGname[] = {"lgA", "lgB", "lgC", "lgD", "lgE"};
-  //G4String LGname[] = {"lgA", "lgB", "lgC", "lgD", "lgE", "lgF", "lgG", "lgH", "lgI", "lgJ"};
-  G4String pmtname[] = {"pmtA", "pmtB", "pmtC", "pmtD", "pmtE"};
-  //G4String pmtname[] = {"pmtA", "pmtB", "pmtC", "pmtD", "pmtE", "pmtF", "pmtG", "pmtH", "pmtI", "pmtJ"};
-
-  std::cout << "----Grid Positions-----" << std::endl;
-  for(int i=0; i<5; i++) {
-    for(int j=0; j<5; j++){
-        std::cout << xGrid[i] <<"," << yGrid[j] << std::endl;
-//        std::cout << "name: " << name[i] << j << std::endl;
-
-        std::string absoName = name[i] + std::to_string(j);
-        std::string lgName = LGname[i] + std::to_string(j);
-        std::string pmtName = pmtname[i] + std::to_string(j);
-//        std::cout << "name: " << absoName << std::endl;
-
-        BuildAbsorberGrid(worldLV, 
-                          xGrid[i], 
-                          yGrid[j],
-                          absoName,
-                          absPos, 
-                          calorSizeXY, 
-                          absoThickness);
-
-        BuildLightGuideGrid(worldLV, 
-                          xGrid[i], 
-                          yGrid[j],
-                          lgName,
-                          lightGuidePos, 
-                          calorSizeXY, 
-                          lightGuideThickness);
-
-        BuildPMTGrid(worldLV, 
-                          xGrid[i], 
-                          yGrid[j],
-                          pmtName,
-                          pmtPos, 
-                          calorSizeXY, 
-                          pmtThickness);
+  auto ExtrusionLV =
+        new G4LogicalVolume(ExtrusionS,
+                            FindMaterial("Coating"),
+                            "Extrusion");
 
 
 
-    }
+  G4double fExtrusionReflectivity = 1.;
+  G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface",
+                                                       glisur,
+                                                       ground,
+                                                       dielectric_metal,
+                                                       fExtrusionReflectivity);
+
+  G4MaterialPropertiesTable* TiO2SurfaceProperty =
+                                             new G4MaterialPropertiesTable();
+
+  G4double p_TiO2[] = {2.00*eV, 3.47*eV};
+  const G4int nbins = sizeof(p_TiO2)/sizeof(G4double);
+
+  G4double refl_TiO2[] = {fExtrusionReflectivity,fExtrusionReflectivity};
+  assert(sizeof(refl_TiO2) == sizeof(p_TiO2));
+  G4double effi_TiO2[] = {0, 0};
+  assert(sizeof(effi_TiO2) == sizeof(p_TiO2));
+
+  TiO2SurfaceProperty -> AddProperty("REFLECTIVITY",p_TiO2,refl_TiO2,nbins);
+  TiO2SurfaceProperty -> AddProperty("EFFICIENCY",p_TiO2,effi_TiO2,nbins);
+
+  TiO2Surface -> SetMaterialPropertiesTable(TiO2SurfaceProperty);
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(),
+                    ExtrusionLV,
+                    "Extrusion",
+                    worldLV,
+                    false,
+                    0);
+
+  new G4LogicalSkinSurface("TiO2Surface",ExtrusionLV,TiO2Surface);
+
+  std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+  G4double xPos[] = {-13.5, -10.5, -7.5, -4.5, -1.5, 1.5, 4.5, 7.5, 10.5, 13.5};
+  G4double yPos[] = {0,0,0,0,0,0,0,0,0,0};
+  G4double zPos[] = {0,0,0,0,0,0,0,0,0,0};
+
+  for(int i=0; i<10; i++) {
+//    for(int j=0; j<10; j++){
+        std::cout << xPos[i] <<"," << yPos[i] << std::endl;
+        //std::cout << "name: " << name[i] << j << std::endl;
+
+
+        BuildScintBar(worldLV, 
+                          xPos[i], 
+                          yPos[i],
+                          name[i],
+                          zPos[i], 
+                          scintThickness,
+                          WorldSizeY,
+                          WorldSizeZ);
+   // }
   }
-
-  
-
-
-
-
-
-
-  // ----- Surfaces------
-/***
-  G4OpticalSurface* opAbsSurf = new G4OpticalSurface("AbsSurf");
-
-  opAbsSurf->SetType(dielectric_dielectric);
-  opAbsSurf->SetFinish(polished);
-  opAbsSurf->SetModel(unified); 
-
-
-  G4LogicalBorderSurface* AbsSurf =
-    new G4LogicalBorderSurface("AbsSurf",    // its name
-                                absorberPV,  // PhysicalVolume 1
-                                worldPV,     // Physical Volume 2
-                                opAbsSurf);  //surface Property
-
-  G4OpticalSurface* opticalSurface = dynamic_cast <G4OpticalSurface*>
-        (AbsSurf->GetSurface(absorberPV,worldPV)->GetSurfaceProperty());
-  if (opticalSurface) opticalSurface->DumpInfo();
-***/
-
-
-
-
-//  G4VisAttributes* pmtVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,2.0));
-//  pmtVisAtt->SetVisibility(true);
-//  pmtLV->SetVisAttributes(pmtVisAtt);
-
-  G4VisAttributes* worldVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,0.0));
-  worldVisAtt->SetVisibility(false);
-  worldLV->SetVisAttributes(worldVisAtt);
-
- 
-  // print parameters
-  G4cout
-    << G4endl 
-    << "------------------------------------------------------------" << G4endl
-    << "---> The calorimeter is " << absoThickness/CLHEP::cm << " cm"
-    << "------------------------------------------------------------" << G4endl;
- 
-//  G4cout << "Optical Surface Info:" << G4endl;
-//  if (opticalSurface) { opticalSurface->DumpInfo(); }
 
     
   return worldPV;
@@ -371,181 +243,114 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
 //....
 
+void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ) {
 
+  G4double HoleRadius   = 2.9*mm;
+  G4double WLSfiberR    = 2.6*mm;
+  G4double WLSfiberZ    = WorldSizeZ/2;
 
-void DetectorConstruction::BuildAbsorberGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double absoThickness)
-{
-
-  // declare absorber as AbsorberSD 
-  //AbsorberSD* absorberDetector = new AbsorberSD(name);
 
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
 
-  auto absorberDetector = new G4MultiFunctionalDetector(name);
-  G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
+  auto scintDetector = new G4MultiFunctionalDetector(name);
+  G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
 
-  auto absorberMaterial   = G4Material::GetMaterial("Abs");
+  //--------------------------------------------------
+  // Scintillator
+  //--------------------------------------------------
 
-  auto absorberS 
-    = new G4Box("Abso",            // its name
-                4.*cm, 4.*cm, absoThickness/2.); // its size
-//                 calorSizeXY/2., calorSizeXY/2., absoThickness/2.); // its size
-                        
-  auto absorberLV
+  auto ScintillatorS 
+    = new G4Box("Scintillator", scintThickness/2, WorldSizeY/2, WorldSizeZ/2);
+
+  auto ScintillatorLV 
     = new G4LogicalVolume(
-                 absorberS,        // its solid
-                 absorberMaterial, // its material
-                 name);          // its name
+                 ScintillatorS,
+                 FindMaterial("Polystyrene"),
+                 name);
 
-  auto absorberPV  
+  auto ScintillatorPV 
     = new G4PVPlacement(
-                 0,                // no rotation
-		 G4ThreeVector(xPos*cm, yPos*cm, zPos),  // its position 
-                 absorberLV,       // its logical volume                         
-                 name,           // its name
-                 worldLV,	   // its mother volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
+                 0,
+                 G4ThreeVector(xPos*cm, yPos*cm, zPos*cm),
+                 ScintillatorLV,
+                 name,
+                 logicExtrusion,
+                 false,
+                 0);
+
+  //----------------------------------------------
+  // Hole
+  // ---------------------------------------------
+  std::string hole_name = "hole" + name;
+
+  auto HoleS 
+    = new G4Tubs("Hole",
+                 0.,
+                 HoleRadius,
+                 WorldSizeZ/2,
+                 0.*deg,
+                 360.*deg);
+
+  auto HoleLV 
+    = new G4LogicalVolume(
+                 HoleS,
+                 FindMaterial("G4_AIR"),
+                 hole_name);
+
+  auto holePV = new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., 0.),
+                    HoleLV,
+                    "Hole",
+                    ScintillatorLV,
+                    false,
+                    0);
+
+  //--------------------------------------------------
+  // WLS Fiber
+  //--------------------------------------------------
+  std::string fiber_name = "fiber" + name;
+
+  std::cout << "name: " << fiber_name << " Fiber size: " << WLSfiberR << " Fiber Xpos: " << xPos*cm << std::endl;
 
 
-  //std::cout << "pos: " << xPos << "," << yPos << " name: " << name << std::endl; 
 
-  G4VPrimitiveScorer* primitive;
-  primitive = new G4PSEnergyDeposit("eDep");
-  absorberDetector->RegisterPrimitive(primitive);
+  auto FiberS 
+    = new G4Tubs("WLSFiber",
+                  0.,
+                  WLSfiberR,
+                  WorldSizeZ/2,
+                  0.*deg,
+                  360.*deg);
 
-  SetSensitiveDetector(name, absorberDetector);
+  auto FiberLV 
+    = new G4LogicalVolume(FiberS,
+                          FindMaterial("PMMA"),
+                          fiber_name);
 
-  G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  absorberVisAtt->SetVisibility(true);
-  absorberLV->SetVisAttributes(absorberVisAtt);
+  //     logicWLSfiber->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,10*ms));
+                                 
+  auto FiberPV 
+    = new G4PVPlacement(0,
+                        G4ThreeVector(0.,0.,0.),
+                        FiberLV,
+                        "WLSFiber",
+                        HoleLV,
+                        false,
+                        0);
 
 }
 
-void DetectorConstruction::BuildLightGuideGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double lightGuideThickness) {
-
-  auto lightGuideMaterial = G4Material::GetMaterial("Glass");
-
-
-  G4double dx1 = 3.*cm/2.;
-  G4double dx2 = 2.*cm/2.;
-  G4double dy1 = 3.*cm/2.;
-  G4double dy2 = 2.*cm/2.;
-  G4double dz = lightGuideThickness;
-
-  // Light Guide
-
-/***  G4double dx2 = calorSizeXY/2.; 
-  G4double dx1 = dx2/2.;
-  G4double dy2 = calorSizeXY/2.;
-  G4double dy1 = dy2/2.;
-  G4double dz  = lightGuideThickness;
-***/
-
-
-  auto lightGuideS 
-    = new G4Trap("lightGuide",
-                 dx1, // Dx1
-                 dx2, // Dx2
-                 dy1,      // Dy1
-                 dy2,  // Dy2
-                 dz/2); // Dz
-
-                         
-  auto lightGuideLV
-    = new G4LogicalVolume(
-                 lightGuideS,        // its solid
-                 lightGuideMaterial, // its material
-                 "lightGuideLV");          // its name
-
-  auto lightGuidePV  
-    = new G4PVPlacement(
-                 0,                // no rotation
-		 G4ThreeVector(xPos*cm, yPos*cm, zPos),  // its position 
-                 lightGuideLV,       // its logical volume                         
-                 name,           // its name
-                 worldLV,	   // its mother volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-
-}
-
-
-void DetectorConstruction::BuildPMTGrid(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double calorSizeXY, G4double pmtThickness) {
-
-  auto pmtMaterial = G4Material::GetMaterial("Glass");
-
-  // PMT
-  G4double innerRadius_pmt = 0.*cm;
-  G4double outerRadius_pmt = 3.*cm/2.;
-//  G4double outerRadius_pmt = calorSizeXY/4.;
-  G4double height_pmt = pmtThickness;
-  G4double startAngle_pmt = 0.*deg;
-  G4double spanningAngle_pmt = 360.*deg;
-
-  auto pmtS 
-    = new G4Tubs("PMT",
-                 innerRadius_pmt,
-                 outerRadius_pmt,
-                 height_pmt/2.,
-                 startAngle_pmt,
-                 spanningAngle_pmt);
-
-                         
-  auto pmtLV
-    = new G4LogicalVolume(
-                 pmtS,        // its solid
-                 pmtMaterial, // its material
-                 "pmtLV");          // its name
-
-  auto pmtPV  
-    = new G4PVPlacement(
-                 0,                // no rotation
-		 G4ThreeVector(xPos*cm, yPos*cm, zPos),  // its position 
-                 pmtLV,       // its logical volume                         
-                 name,           // its name
-                 worldLV,	   // its mother volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-
-}
 
 void DetectorConstruction::ConstructSDandField()
 {
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
  
 
-  //G4String absorberDetectorName = "AbsoLV" ;
-  //AbsorberSD* absorberDetector = new AbsorberSD(absorberDetectorName);
-  //G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
-  //SetSensitiveDetector("AbsoLV", absorberDetector);
-
-  // declare light guide  as LightGuideSD
-  G4String LightGuideDetectorName = "LightGuideLV" ;
-  LightGuideSD* LightGuideDetector = new LightGuideSD(LightGuideDetectorName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(LightGuideDetector);
-  //SetSensitiveDetector("lightGuideLV", LightGuideDetector);
-
-  // declare PMT as Primitive Scoreer
-
-  G4String pmtDetectorName = "pmtLV" ;
-  auto pmtDetector = new G4MultiFunctionalDetector(pmtDetectorName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(pmtDetector);
-
-  G4VPrimitiveScorer* primitive;
-  primitive = new G4PSPopulation("Pop");
-
-  G4String fltName, particleName;
-  G4SDParticleFilter* photonFilter = 
-	new G4SDParticleFilter(fltName="optPhoton", particleName="opticalphoton");
-  primitive->SetFilter(photonFilter);
-  pmtDetector->RegisterPrimitive(primitive);
-
-  //SetSensitiveDetector("pmtLV", pmtDetector);
-
 }
 
-//....
+
+G4Material* DetectorConstruction::FindMaterial(G4String name) {
+    G4Material* material = G4Material::GetMaterial(name,true);
+    return material;
+}
+

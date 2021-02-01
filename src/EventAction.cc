@@ -116,37 +116,32 @@ void EventAction::EndOfEventAction(const G4Event* event)
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
     int CHCID1 = -1;
-    int CHCID2 = -1;
-    int CHCID3 = -1;
+//    int CHCID2 = -1;
+//    int CHCID3 = -1;
     //int CHCIDs[25] = {-1};
 
-    G4String name[] = {"A", "B", "C", "D", "E"};
-    //G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+    //G4String name[] = {"A", "B", "C", "D", "E"};
+    G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
-    G4String scorer = "/eDep";
+    G4String scorer = "/Pop";
     int module_counter = 0;
-    for(int i=0; i<5; i++) {
-      for(int j=0; j<5; j++){
+
+
+//  Scintillator Bar Hits
+    for(int i=0; i<10; i++) {
+       
         //std::cout << "name: " << name[i] << j << scorer << std::endl;
 
-        std::string scorerName = name[i] + std::to_string(j) + scorer;
+        std::string scorerName = "Scint_" + name[i] + "_" + scorer;
 
         int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
         //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
 
         auto eDep = GetSum(GetHitsCollection(CHCID, event)); 
 
-/***        if (CHCID == 24) {
-          std::cout << eDep/CLHEP::MeV << " " << std::endl;
-	} else {
-          std::cout << eDep/CLHEP::MeV << " " ;
-        }
-***/
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
         analysis->FillH1(CHCID, eDep);
 
-//   	analysis->FillNtupleDColumn(CHCID, eDep/CLHEP::MeV);
-//	analysis->AddNtupleRow();
       }
     }
 
