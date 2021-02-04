@@ -53,7 +53,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
     = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
   fParticleGun->SetParticleDefinition(particleDefinition);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,-1.));
-  fParticleGun->SetParticleEnergy(67.5*MeV);
+  fParticleGun->SetParticleEnergy(200*MeV);
 }
 
 //....
@@ -67,12 +67,12 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-
+  G4double worldZHalfLength = 94.*cm / 2.; // 35
   //G4double worldZHalfLength = 42.*cm / 2.; // 35
   //G4double worldZHalfLength = 37.*cm / 2.; // 30
   //G4double worldZHalfLength = 32.*cm / 2.; // 25
   //G4double worldZHalfLength = 29.*cm/2;    // 22
-  G4double worldZHalfLength = 27.*cm/2.;   // 20
+//  G4double worldZHalfLength = 27.*cm/2.;   // 20
   //G4double worldZHalfLength = 25.*cm/2;      // 18
   //G4double worldZHalfLength = 22.*cm/2.;   // 15
   //G4double worldZHalfLength = 17.*cm/2.;   // 10

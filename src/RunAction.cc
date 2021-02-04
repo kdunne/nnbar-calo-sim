@@ -58,7 +58,9 @@ RunAction::RunAction()
   G4cout << "Booking histograms " << G4endl;
 
   // 1-D Histos
-  analysisManager->CreateH1("EdepAbs_A0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_A0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      1
+
+/***
   analysisManager->CreateH1("EdepAbs_A1", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A2", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A3", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
@@ -67,10 +69,10 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs_A6", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A7", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A8", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
-  analysisManager->CreateH1("EdepAbs_A9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_A9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      10
 
 
-  analysisManager->CreateH1("EdepAbs_B0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_B0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      11
   analysisManager->CreateH1("EdepAbs_B1", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_B2", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_B3", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
@@ -79,9 +81,9 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs_B6", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_B7", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_B8", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
-  analysisManager->CreateH1("EdepAbs_B9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_B9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      20
 
-  analysisManager->CreateH1("EdepAbs_C0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_C0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      21
   analysisManager->CreateH1("EdepAbs_C1", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_C2", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_C3", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
@@ -90,10 +92,10 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs_C6", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_C7", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_C8", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
-  analysisManager->CreateH1("EdepAbs_C9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_C9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      30
 
 
-  analysisManager->CreateH1("EdepAbs_D0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+  analysisManager->CreateH1("EdepAbs_D0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      
   analysisManager->CreateH1("EdepAbs_D1", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_D2", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_D3", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
@@ -170,34 +172,34 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs_J7", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_J8", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_J9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
+***/
 
 
+  analysisManager->CreateH1("NumCerenkov_Abs", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	100
 
-  analysisManager->CreateH1("NumCerenkov_Abs", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	0
+  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	101
+  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	102 
+  analysisManager->CreateH1("Range", "Primary Particle Range", 70, 0, 35); 			//	103
+  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 700*MeV);       //      104
+  analysisManager->CreateH1("Xpos", "Xpos", 100, -50, 50); 	                	        //      105	
+  analysisManager->CreateH1("Ypos", "Ypos", 100, -50, 50); 	                		//      106	
+  analysisManager->CreateH1("NumCerenkov_PMT", "Num Cerenkov Photons PMT", 80, 0, 60000); 	//   	107
+  analysisManager->CreateH1("MoliereRadius", "MoliereRadius", 100, 0, 10); 			// 108
+  analysisManager->CreateH1("EdepvRadius", "EdepvRadius", 50, 0, 50);				// 109
+  analysisManager->CreateH1("EdepFrac", "EdepFrac", 100, 0, 1.1);				// 110
+  analysisManager->CreateH1("gammaA_KE", "gammaA_KE", 130, 0, 650*MeV);                  // 111
+  analysisManager->CreateH1("gammaB_KE", "gammaB_KE", 130, 0, 650*MeV) ;                 // 112
+  analysisManager->CreateH1("angleDist", "angleDist", 72, 0, 360);			// 113
+  analysisManager->CreateH1("endDist", "endDist", 60, 0, 6*m);				// 114
 
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	1
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	2 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 70, 0, 35); 			//	3
-  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 700*MeV);       //      4
-  analysisManager->CreateH1("Xpos", "Xpos", 100, -50, 50); 	                	        //      5	
-  analysisManager->CreateH1("Ypos", "Ypos", 100, -50, 50); 	                		//      6	
-  analysisManager->CreateH1("NumCerenkov_PMT", "Num Cerenkov Photons PMT", 80, 0, 30000); 	//   	7
-  analysisManager->CreateH1("MoliereRadius", "MoliereRadius", 100, 0, 10); 			// 8
-  analysisManager->CreateH1("EdepvRadius", "EdepvRadius", 50, 0, 50);				// 9
-  analysisManager->CreateH1("EdepFrac", "EdepFrac", 100, 0, 1.1);				// 10
-  analysisManager->CreateH1("gammaA_KE", "gammaA_KE", 130, 0, 650*MeV);                  // 11
-  analysisManager->CreateH1("gammaB_KE", "gammaB_KE", 130, 0, 650*MeV) ;                 // 12
-  analysisManager->CreateH1("angleDist", "angleDist", 72, 0, 360);			// 13
-  analysisManager->CreateH1("endDist", "endDist", 60, 0, 6*m);				// 14
-
-  //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	15
-  analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	15
-  //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	15
+  //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	115
+  analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 60000); 	//   	116
+  //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	117
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("RangevCerenkov", "Range v Cereknov", 35, 0, 35, 80, 0, 30000);      	    // 0
-  analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);  // 1
+  analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 600*MeV, 80, 0, 60000);  // 1
   analysisManager->CreateH2("XY_Cerenkov", "XY Cerenkov", 100, -50, 50, 100, -50, 50);         	 	    // 2
   analysisManager->CreateH2("eDepvR", "eDepvR", 1000, 0, 10, 1000, 0, 10);				    // 3
   analysisManager->CreateH2("gammaKE", "gammaKE", 130, 0, 650*MeV, 130, 0, 650*MeV);			    // 4

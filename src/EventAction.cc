@@ -99,13 +99,12 @@ G4double EventAction::GetSum(G4THitsMap<G4double>* hitsMap) const
 
 void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 {
-/***
-    G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
+
+/***    G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
     if(scintHitsCollectionID == -1) {
        absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
   }
 ***/
-
 }
 
 //....
@@ -115,6 +114,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
  
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
+    HCE = 0;
+
     int CHCID1 = -1;
     int CHCID2 = -1;
     int CHCID3 = -1;
@@ -123,34 +124,46 @@ void EventAction::EndOfEventAction(const G4Event* event)
     G4String name[] = {"A", "B", "C", "D", "E"};
     //G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
-    G4String scorer = "/eDep";
+////////////////////////////////////////
+// eDep Scorer
+// ////////////////////////////////////
+    G4String eDepScorer = "/eDep";
+    G4String popScorer = "/pop";
+    std::string scorerName;
+    int CHCID;
+
     int module_counter = 0;
-    for(int i=0; i<5; i++) {
-      for(int j=0; j<5; j++){
-        //std::cout << "name: " << name[i] << j << scorer << std::endl;
+    for(int i=0; i<1; i++) {
+        for(int j=0; j<1; j++){
+//        std::cout << "name: " << name[i] << j << scorer << std::endl;
 
-        std::string scorerName = name[i] + std::to_string(j) + scorer;
-
-        int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
-        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
-
+        scorerName = "abs_" + name[i] + std::to_string(j) + eDepScorer;
+        //std::cout << "name: " << name[i] << " " << scorerName << std::endl;
+//        scorerName = name[i] + std::to_string(j) + eDepScorer;
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
         auto eDep = GetSum(GetHitsCollection(CHCID, event)); 
 
-/***        if (CHCID == 24) {
-          std::cout << eDep/CLHEP::MeV << " " << std::endl;
-	} else {
-          std::cout << eDep/CLHEP::MeV << " " ;
-        }
-***/
+
+
+
+        scorerName = "abs_" + name[i] + std::to_string(j) + popScorer;
+//        scorerName = name[i] + std::to_string(j) + popScorer;
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        auto pop = GetSum(GetHitsCollection(CHCID, event)); 
+
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
         analysis->FillH1(CHCID, eDep);
+        analysis->FillH1(8, pop);
+
+        analysis->FillH2(1, eDep, pop);
+//        std::cout << "Pop: " << pop << std::endl;
+        std::cout << "eDep: " << eDep << std::endl;
+
 
 //   	analysis->FillNtupleDColumn(CHCID, eDep/CLHEP::MeV);
 //	analysis->AddNtupleRow();
       }
     }
-
-  
 
 
   if (HCE) {
@@ -182,43 +195,31 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4int AbsPhotons = 0;
 
 	//pmtHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID1));
-	//AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+//	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
         //LightGuideHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
 
         //analysis->FillH1(10, eDep / 210.);
 
-        //"AbsorberHitCollection" + name
-
-/***
     if (CHCID1<0){
-        iCHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtLV/Pop");
+        //CHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtLV/Pop");
         //CHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtHitCollection");
     }
+
+/***
     if (CHCID3<0){
         CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("LightGuideHitCollection");
     }
 ***/   
-  
-    //NNbarHitsCollection* AbsHits   = 0;
+        
+        NNbarHitsCollection* AbsHits   = 0;
     //NNbarHitsCollection* pmtHits   = 0;
     //NNbarHitsCollection* LightGuideHits   = 0;
-    
-    //auto pop = GetSum(GetHitsCollection(CHCID1, event)); 
-    //std::cout << "Cerenkov Population: " << pop << std::endl;
     
    //     std::string HCs[] = {"A0", "A1", "A2", "A3"}; 
 
 
-        //NNbarHitsCollection* AbsHits   = 0;
-
-        //for (int i = 0; i<4; i++) {
-          //std::string prefix = "AbsorberHitCollection"; 
-          //std::cout << "HC: " << prefix + HCs[i] << std::endl;
-
-          //CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID(prefix + HCs[i]);
-
-/***          AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-        
+//          AbsHits = (NNbarHitsCollection*)(HCE->GetHC(absHitsCollectionID ));
+            
       
 	  if(AbsHits) {
  
@@ -330,7 +331,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 analysis->FillH1(11,gammaA_KE/CLHEP::MeV);
                 analysis->FillH1(12,gammaB_KE/CLHEP::MeV);
                 analysis->FillH1(13, angle);
-            }***/
+            }
 
 
             analysis->FillH1(0, cerenkovCounter);     
@@ -338,9 +339,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
             if (eDepAbs>0){                  
                 if(cerenkovCounter>0){
-                    //G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
+                    G4cout << "Filling ceren histos with " << AbsPhotons << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
                     analysis->FillH1(3, trackl/CLHEP::cm);
-                    analysis->FillH2(1, cerenkovCounter, eDepAbs/CLHEP::MeV);  
+                    analysis->FillH2(1, eDepAbs/CLHEP::MeV, AbsPhotons);  
                     analysis->FillH2(0, trackl/CLHEP::cm, AbsPhotons);
                     analysis->FillH1(4, eDepAbs/CLHEP::MeV); 
                     //analysis->FillH1(0, cerenkovCounter);     
@@ -349,10 +350,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
             //G4cout << "eDepAbs: " << eDepAbs << G4endl;
             //G4cout << "ke_init: " << ke_init << G4endl;
-            //G4cout << "frac: " << eDepAbs/ ke_init << G4endl;
+           //G4cout << "frac: " << eDepAbs/ ke_init << G4endl;
             //analysis->FillH1(10, eDepAbs / ke_init);
 
-        //}
+        }
      //}
 
 
@@ -389,7 +390,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 
     } else {
-        G4cout << "No HCE" << G4endl;
+  //      G4cout << "No HCE" << G4endl;
     }
   //print per event (modulo n)
   auto eventID = event->GetEventID();

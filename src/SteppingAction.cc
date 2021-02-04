@@ -59,6 +59,10 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 {
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 
+
+
+
+
   if (eventNumber != fEventNumber) {
      fEventNumber = eventNumber;
      fScintillationCounter = 0;
@@ -68,6 +72,27 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4Track* track = step->GetTrack();
   G4int ID = track->GetTrackID();
   G4int ltime = track->GetLocalTime();
+
+
+    G4ParticleDefinition *particleDef = track -> GetDefinition();
+    G4String particleName =  particleDef -> GetParticleName();
+
+if (ID > 1) {
+
+    G4String proc = track->GetCreatorProcess()->GetProcessName();
+
+    if (proc != "Cerenkov" && proc != "Scintillation" && step->GetDeltaPosition().getZ()>0 && step->IsLastStepInVolume()){
+    //std::cout << "delta Z"  << step->GetDeltaPosition().getZ() << std::endl;
+    std::cout << "Process: " << proc << std::endl;
+    std::cout << "Particle: " << particleName << std::endl;
+    }
+
+    if (proc=="Decay" || proc=="Scintillation") {
+        G4cout << "Killing particle " << particleName << G4endl;
+        track->SetTrackStatus(fKillTrackAndSecondaries);
+    }
+}
+
 
 
 } 

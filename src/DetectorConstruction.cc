@@ -194,11 +194,12 @@ void DetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 {
   // Geometry parameters
+  G4double absoThickness = 50.*cm;
   //G4double absoThickness = 35.*cm;
   //G4double absoThickness = 30.*cm;
   //G4double absoThickness = 25.*cm;
   //G4double absoThickness = 22.*cm;
-  G4double absoThickness = 20.*cm;
+  //G4double absoThickness = 20.*cm;
   //G4double absoThickness = 18.*cm;
   //G4double absoThickness = 15.*cm;
   //G4double absoThickness = 10.*cm;
@@ -206,19 +207,21 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double rangeThickness = 30.*cm;
   G4double gap = 5.*cm;
   G4double layerThickness = 3.*cm;
-  G4double lightGuideThickness = 3.*cm;
+  G4double lightGuideThickness = 10.*cm;
   G4double pmtThickness  = 4.*cm;
-  G4double calorSizeXY   = 10.*cm;
-  G4double worldSizeXY = 20.*cm;
+  G4double calorSizeXY   = 50.*cm;
+  G4double worldSizeXY = 50.*cm;
   //G4double worldSizeXY = 25.*cm;
   //G4double worldSizeXY   = 1. * calorSizeXY;
-  G4double worldSizeZ    = rangeThickness + gap + absoThickness + lightGuideThickness + pmtThickness;
+  //G4double worldSizeZ    = rangeThickness + gap + absoThickness + lightGuideThickness + pmtThickness;
+  G4double worldSizeZ    = rangeThickness + absoThickness + lightGuideThickness + pmtThickness;
 
   // Z Positions
   G4double absPos = 0.5 * (0.5*worldSizeZ - (absoThickness - worldSizeZ*0.5));
-  G4double pmtPos = (-0.5*worldSizeZ + 0.5*pmtThickness);
+  //G4double pmtPos = (-0.5*worldSizeZ + 0.5*pmtThickness);
+  
   G4double lightGuidePos = (absPos - absoThickness/2.) - (lightGuideThickness / 2.);
-  //G4double pmtPos = (lightGuidePos - lightGuideThickness/2.) - (pmtThickness/2.);
+  G4double pmtPos = (lightGuidePos - lightGuideThickness/2.) - (pmtThickness/2.);
 
   // Get materials
   auto defaultMaterial    = G4Material::GetMaterial("Galactic");
@@ -260,14 +263,18 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   // Absorber
 
+  G4double xGrid[] = {0};
+  G4double yGrid[] = {0};
+
   //G4double xGrid[] = {-10., -5., 0., 5., 10.};
   //G4double yGrid[] = {-10., -5., 0., 5., 10.};
 
-  G4double xGrid[] = {-8., -4., 0., 4., 8.};
-  G4double yGrid[] = {-8., -4., 0., 4., 8.};
+//  G4double xGrid[] = {-8., -4., 0., 4., 8.};
+//  G4double yGrid[] = {-8., -4., 0., 4., 8.};
 
 //  G4double xGrid[] = {-10., -8., -6., -4., -2., 2., 4., 6., 8., 10.};
 //  G4double yGrid[] = {-10., -8., -6., -4., -2., 2., 4., 6., 8., 10.};
+
 
   G4String name[] = {"A", "B", "C", "D", "E"};
   //G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
@@ -277,8 +284,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   //G4String pmtname[] = {"pmtA", "pmtB", "pmtC", "pmtD", "pmtE", "pmtF", "pmtG", "pmtH", "pmtI", "pmtJ"};
 
   std::cout << "----Grid Positions-----" << std::endl;
-  for(int i=0; i<5; i++) {
-    for(int j=0; j<5; j++){
+  for(int i=0; i<1; i++) {
+    for(int j=0; j<1; j++){
         std::cout << xGrid[i] <<"," << yGrid[j] << std::endl;
 //        std::cout << "name: " << name[i] << j << std::endl;
 
@@ -377,19 +384,17 @@ void DetectorConstruction::BuildAbsorberGrid(G4LogicalVolume* worldLV, G4double 
 {
 
   // declare absorber as AbsorberSD 
-  //AbsorberSD* absorberDetector = new AbsorberSD(name);
 
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
 
-  auto absorberDetector = new G4MultiFunctionalDetector(name);
-  G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
+  //auto absorberDetector = new G4MultiFunctionalDetector(name);
+  //G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
 
   auto absorberMaterial   = G4Material::GetMaterial("Abs");
 
   auto absorberS 
     = new G4Box("Abso",            // its name
-                4.*cm, 4.*cm, absoThickness/2.); // its size
-//                 calorSizeXY/2., calorSizeXY/2., absoThickness/2.); // its size
+                 calorSizeXY/2., calorSizeXY/2., absoThickness/2.); // its size
                         
   auto absorberLV
     = new G4LogicalVolume(
@@ -408,14 +413,34 @@ void DetectorConstruction::BuildAbsorberGrid(G4LogicalVolume* worldLV, G4double 
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
+//  std::cout << "pos: " << xPos << "," << yPos << " name: " << name << std::endl; 
 
-  //std::cout << "pos: " << xPos << "," << yPos << " name: " << name << std::endl; 
+
+
+  // declare absorber as AbsorberSD
+//  AbsorberSD* absorberDetector = new AbsorberSD(name);
+//  G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
+//  SetSensitiveDetector(name, absorberDetector);
+
+  G4String absorberDetectorName = "abs_" + name ;
+  auto absorberDetector = new G4MultiFunctionalDetector(absorberDetectorName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(absorberDetector);
+
 
   G4VPrimitiveScorer* primitive;
   primitive = new G4PSEnergyDeposit("eDep");
   absorberDetector->RegisterPrimitive(primitive);
 
+
+  primitive = new G4PSPopulation("pop");
+  G4String fltName, particleName;
+  G4SDParticleFilter* photonFilter = 
+	new G4SDParticleFilter(fltName="optPhoton", particleName="opticalphoton");
+  primitive->SetFilter(photonFilter);
+  absorberDetector->RegisterPrimitive(primitive);
+
   SetSensitiveDetector(name, absorberDetector);
+
 
   G4VisAttributes* absorberVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
   absorberVisAtt->SetVisibility(true);
@@ -428,30 +453,36 @@ void DetectorConstruction::BuildLightGuideGrid(G4LogicalVolume* worldLV, G4doubl
   auto lightGuideMaterial = G4Material::GetMaterial("Glass");
 
 
-  G4double dx1 = 3.*cm/2.;
-  G4double dx2 = 2.*cm/2.;
-  G4double dy1 = 3.*cm/2.;
-  G4double dy2 = 2.*cm/2.;
-  G4double dz = lightGuideThickness;
+//  G4double dx1 = 3.*cm/2.;
+//  G4double dx2 = 2.*cm/2.;
+//  G4double dy1 = 3.*cm/2.;
+//  G4double dy2 = 2.*cm/2.;
+//  G4double dz = lightGuideThickness;
 
   // Light Guide
 
-/***  G4double dx2 = calorSizeXY/2.; 
+  G4double dx2 = 10.*cm/2.; 
   G4double dx1 = dx2/2.;
-  G4double dy2 = calorSizeXY/2.;
+  G4double dy2 = 10*cm/2.;
   G4double dy1 = dy2/2.;
   G4double dz  = lightGuideThickness;
-***/
 
 
   auto lightGuideS 
+    = new G4Box("lightGuide",
+                 50*cm/2, // Dx1
+                 50*cm/2,  // Dy2
+                 5*cm/2); // Dz
+
+
+ /*** auto lightGuideS 
     = new G4Trap("lightGuide",
                  dx1, // Dx1
                  dx2, // Dx2
                  dy1,      // Dy1
                  dy2,  // Dy2
                  dz/2); // Dz
-
+***/
                          
   auto lightGuideLV
     = new G4LogicalVolume(
