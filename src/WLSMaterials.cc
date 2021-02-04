@@ -406,7 +406,12 @@ void WLSMaterials::CreateMaterials()
   mptPolystyrene->AddProperty("ABSLENGTH",photonEnergy,absPS,nEntries);
   mptPolystyrene->
                AddProperty("FASTCOMPONENT",photonEnergy, scintilFast,nEntries);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",10./keV);
+
+// 68% anthracene - 17400/MeV : 11832/MeV
+//  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000/MeV);
+
+//  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);
   mptPolystyrene->AddConstProperty("FASTTIMECONSTANT", 10.*ns);
  
@@ -415,5 +420,8 @@ void WLSMaterials::CreateMaterials()
   // Set the Birks Constant for the Polystyrene scintillator
 
   fPolystyrene->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
+
+  G4cout << "Scintillator Properties -------" << G4endl;
+  mptPolystyrene->DumpTable();
 
 }

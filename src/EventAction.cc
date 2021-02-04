@@ -131,256 +131,88 @@ void EventAction::EndOfEventAction(const G4Event* event)
     for(int i=0; i<10; i++) {
        
         //std::cout << "name: " << name[i] << j << scorer << std::endl;
-
-        std::string scorerName = "Scint_" + name[i] + "_" + scorer;
+        scorer = "/Pop";
+        std::string scorerName = "scint_" + name[i] + scorer;
 
         int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
         //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto pop = GetSum(GetHitsCollection(CHCID, event)); 
 
-        auto eDep = GetSum(GetHitsCollection(CHCID, event)); 
+        scorer = "/eDep";
+        scorerName = "scint_" + name[i] + scorer;
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto eDep = GetSum(GetHitsCollection(CHCID,event));
+
+
+        scorer = "/Pop";
+        scorerName = "fiber_" + name[i] + scorer;
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto popFiber = GetSum(GetHitsCollection(CHCID, event)); 
 
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-        analysis->FillH1(CHCID, eDep);
+        //analysis->FillH1(CHCID, pop);
+        // eDep in Scint, Pop in Fiber
+        analysis->FillH2(i, eDep/CLHEP::MeV, pop);
+/***
+        analysis->FillH2(i+10, pop, popFiber);
+        std::cout << "Num Fiber Photons " << popFiber << std::endl;
+        std::cout << "Num Scint Photons: " << pop << std::endl;
+        std::cout << "eDep: " << eDep << std::endl;
+***/
 
-      }
+
+    }
+/***
+//  Fiber Hits
+    for(int i=0; i<10; i++) {
+       
+        //std::cout << "name: " << name[i] << j << scorer << std::endl;
+        scorer = "/Pop";
+        std::string scorerName = "fiber_" + name[i] + scorer;
+
+        int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto pop = GetSum(GetHitsCollection(CHCID, event)); 
+
+        G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+        //analysis->FillH1(CHCID, pop);
+        analysis->FillH2(i, eDep, pop);
+    }
+***/
+
+//  PMT Hits
+    for(int i=0; i<10; i++) {
+       
+        //std::cout << "name: " << name[i] << j << scorer << std::endl;
+        scorer = "/Pop";
+        std::string scorerName = "pmt_" + name[i] + scorer;
+
+        int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto pop = GetSum(GetHitsCollection(CHCID, event)); 
+
+        scorer = "/eDep";
+        scorerName = "pmt_" + name[i] + scorer;
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto eDep = GetSum(GetHitsCollection(CHCID,event));
+/***
+        std::cout << "-----------PMT " << i << std::endl;
+        std::cout << "Num Photons: " << pop << std::endl;
+        std::cout << "eDep: "  << eDep << std::endl;
+***/
+        G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+    //    analysis->FillH1(CHCID, pop);
+
     }
 
-  
+
+
 
 
   if (HCE) {
-
-        G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-	G4int ltime     = 0.;
-    	G4int parentID  = 0;
-	G4String proc   = "";
-	G4String name   = "";
-        G4double time   = 0.;
-        G4int trID      = 0;
-	G4int i         = 0;
-	G4double kinEn  = 0.;
-	G4double eDep   = 0.;
-        G4double trackl = 0.;	
-        G4int hitCount  = 0;
-        G4double eDepAbs = 0.;
-        G4int cerenkovCounter = 0;
-        G4double ke_init = 0.;
-        G4double gammaA_KE   = -99.;
-        G4double gammaB_KE   = -99.;
-        G4double angle = -99.;
-	G4ThreeVector gammaA_pos  = G4ThreeVector(-99.,0,0);
-	G4ThreeVector gammaA_vert = G4ThreeVector(-99.,0,0);
-	G4ThreeVector gammaB_pos  = G4ThreeVector(-99.,0,0);
-	G4ThreeVector gammaB_vert = G4ThreeVector(-99.,0,0);
-	G4ThreeVector gammaA_dist = G4ThreeVector(-99.,0,0);
-	G4ThreeVector gammaB_dist = G4ThreeVector(-99.,0,0);
-        G4int AbsPhotons = 0;
-
-	//pmtHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID1));
-	//AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-        //LightGuideHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
-
-        //analysis->FillH1(10, eDep / 210.);
-
-        //"AbsorberHitCollection" + name
-
-/***
-    if (CHCID1<0){
-        iCHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtLV/Pop");
-        //CHCID1 = G4SDManager::GetSDMpointer()->GetCollectionID("pmtHitCollection");
-    }
-    if (CHCID3<0){
-        CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("LightGuideHitCollection");
-    }
-***/   
-  
-    //NNbarHitsCollection* AbsHits   = 0;
-    //NNbarHitsCollection* pmtHits   = 0;
-    //NNbarHitsCollection* LightGuideHits   = 0;
-    
-    //auto pop = GetSum(GetHitsCollection(CHCID1, event)); 
-    //std::cout << "Cerenkov Population: " << pop << std::endl;
-    
-   //     std::string HCs[] = {"A0", "A1", "A2", "A3"}; 
-
-
-        //NNbarHitsCollection* AbsHits   = 0;
-
-        //for (int i = 0; i<4; i++) {
-          //std::string prefix = "AbsorberHitCollection"; 
-          //std::cout << "HC: " << prefix + HCs[i] << std::endl;
-
-          //CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID(prefix + HCs[i]);
-
-/***          AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-        
-      
-	  if(AbsHits) {
- 
-	    hitCount = AbsHits->entries();
-            G4cout << "Processing " << hitCount << " Absorber hits" << G4endl;
-          
-            cerenkovCounter = 0; 
-            G4double stepLength = 0.;
-	    for (G4int h=0; h<hitCount; h++) {
-	        ltime               = ((*AbsHits)[h]) -> GetLocalTime();
-		parentID 	    = ((*AbsHits)[h]) -> GetParentID();
-     	        proc                = ((*AbsHits)[h]) -> GetProcess();
-	        time       	    = ((*AbsHits)[h]) -> GetTime(); 
-	        name       	    = ((*AbsHits)[h]) -> GetName();
-	    	trID          	    = ((*AbsHits)[h]) -> GetTrackID();
-		i             	    = -99;
-	        kinEn      	    = ((*AbsHits)[h]) -> GetKinEn();
-	        eDep       	    = ((*AbsHits)[h]) -> GetEdep();
-                G4double vertex_KE  = ((*AbsHits)[h]) -> GetVertexKE();
-                G4ThreeVector pos   = ((*AbsHits)[h]) -> GetPos();	
-                G4ThreeVector vert  = ((*AbsHits)[h]) -> GetVert();
-                G4double isLastStep = ((*AbsHits)[h]) -> GetIsLast();
-                G4int photons = ((*AbsHits)[h]) -> GetPhotons();
-                stepLength = ((*AbsHits)[h]) -> GetStepLength();
-                std::cout << "hit : " << h << " eDep: " << eDep << std::endl;
-                AbsPhotons += photons;             
- 
-                eDepAbs += eDep;
-                
-                if (trID == 1){
-	            ke_init = vertex_KE;
-                    trackl += stepLength;
-                }
-
-                if (trID == 1 && (isLastStep || kinEn == 0) ) {
-                    
-
-                }
-
-
-                //Pi 0 gammas
-                if (trID==2 && gammaA_KE == -99){
-                    gammaA_KE = vertex_KE;
-                    //gammaA_pos = pos;
-                    //gammaA_vert = vert;
-                    //std::cout << "gammaA Pos: " << pos.getX()/CLHEP::cm << std::endl; 
-                }
-                
-                if (trID==3 && gammaB_KE ==-99){
-                    gammaB_KE = vertex_KE;
-                    //gammaB_pos = pos;
-                    //gammaB_vert = vert;
-		 } 
-
-                if (trID == 2 && (isLastStep || kinEn==0)){
-                    gammaA_pos = pos;
-                    gammaA_vert = vert;
-                    gammaA_dist = G4ThreeVector(gammaA_vert.getX() - gammaA_pos.getX(), 
-                                                              gammaA_vert.getY() - gammaA_pos.getY(), 
-                                                              gammaA_vert.getZ() - gammaA_pos.getZ());
-
-                    //std::cout << "Distance gamma 1 Last Step Z: " << gammaA_dist.getZ()/ CLHEP::cm << std::endl;
-                }
-
-                if (trID == 3 && (isLastStep || kinEn==0)){
-                    gammaB_pos = pos;
-                    gammaB_vert = vert;
-                    gammaB_dist = G4ThreeVector(gammaB_vert.getX() - gammaB_pos.getX(), 
-                                                              gammaB_vert.getY() - gammaB_pos.getY(), 
-                                                              gammaB_vert.getZ() - gammaB_pos.getZ());
-
-                    //std::cout << "Distance gamma 2 Last Step Z: " << gammaB_dist / CLHEP::cm << std::endl;
-
-                }
-
-                // Cerenkov Photons
-                if (ltime == 0 && name == "opticalphoton" && proc == "Cerenkov"){
-		    cerenkovCounter++;
-                }
-	   
-                if (name != "opticalphoton") {
-                    //analysis->FillH1(5, Xpos/CLHEP::cm);
-                    //analysis->FillH1(6, Ypos/CLHEP::cm);
-                }
-
-	    } // End hit count Loop
-
-            if (angle == -99 && (gammaA_KE > -99 || gammaB_KE > -99)) {
-
-                G4double dotProd = (gammaA_dist.getX() * gammaB_dist.getX()) 
-				+ (gammaA_dist.getY() * gammaB_dist.getY())
-				+ (gammaA_dist.getZ() * gammaB_dist.getZ());
-
-
-                G4double normA = sqrt(pow(gammaA_dist.getX(),2) + pow(gammaA_dist.getY(),2) + pow(gammaA_dist.getZ(),2));
-                G4double normB = sqrt(pow(gammaB_dist.getX(),2) + pow(gammaB_dist.getY(),2) + pow(gammaB_dist.getZ(),2));
-
-                G4int ratio = dotProd/(normA*normB);
-                //std::cout << "ratio: " << ratio << std::endl;
-
-                if (ratio == -1){
-                    angle = acos(-1) * 180./M_PI;;
-                } else {
-                    angle = abs(acos(dotProd / (normA*normB)) * 180./M_PI);
-    
-                }
-               
-                analysis->FillH2(4,gammaA_KE/CLHEP::MeV, gammaB_KE/CLHEP::MeV);
-                analysis->FillH1(11,gammaA_KE/CLHEP::MeV);
-                analysis->FillH1(12,gammaB_KE/CLHEP::MeV);
-                analysis->FillH1(13, angle);
-            }***/
-
-
-            analysis->FillH1(0, cerenkovCounter);     
-            analysis->FillH1(15,AbsPhotons);
-
-            if (eDepAbs>0){                  
-                if(cerenkovCounter>0){
-                    //G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
-                    analysis->FillH1(3, trackl/CLHEP::cm);
-                    analysis->FillH2(1, cerenkovCounter, eDepAbs/CLHEP::MeV);  
-                    analysis->FillH2(0, trackl/CLHEP::cm, AbsPhotons);
-                    analysis->FillH1(4, eDepAbs/CLHEP::MeV); 
-                    //analysis->FillH1(0, cerenkovCounter);     
-                }
-            }
-
-            //G4cout << "eDepAbs: " << eDepAbs << G4endl;
-            //G4cout << "ke_init: " << ke_init << G4endl;
-            //G4cout << "frac: " << eDepAbs/ ke_init << G4endl;
-            //analysis->FillH1(10, eDepAbs / ke_init);
-
-        //}
-     //}
-
-
-/***
-        if(LightGuideHits) {
-
-           hitCount = LightGuideHits->entries();
-           G4cout << "Processing " << hitCount << " LightGuide hits" << G4endl;
-           
-           G4double eDepLightGuide = 0.; 
-	    for (G4int h=0; h<hitCount; h++) {
-	        ltime               = ((*LightGuideHits)[h]) -> GetLocalTime();
-		parentID 	    = ((*LightGuideHits)[h]) -> GetParentID();
-     	        proc                = ((*LightGuideHits)[h]) -> GetProcess();
-	        time       	    = ((*LightGuideHits)[h]) -> GetTime(); 
-	        name       	    = ((*LightGuideHits)[h]) -> GetName();
-	    	trID          	    = ((*LightGuideHits)[h]) -> GetTrackID();
-		i             	    = -99;
-	        kinEn      	    = ((*LightGuideHits)[h]) -> GetKinEn();
-	        eDep       	    = ((*LightGuideHits)[h]) -> GetEdep();
-                G4double vertex_KE  = ((*LightGuideHits)[h]) -> GetVertexKE();
-                G4ThreeVector pos   = ((*LightGuideHits)[h]) -> GetPos();	
-                G4ThreeVector vert  = ((*LightGuideHits)[h]) -> GetVert();
-                G4double isLastStep = ((*LightGuideHits)[h]) -> GetIsLast();
-               
-                eDepLightGuide += eDep;
-                //std::cout << "eDep PMT: " << eDepPMT << std::endl;
-            }
-
-        std::cout << "eDep LightGuide: " << eDepLightGuide << std::endl;
-
-        }
-***/
 
 
     } else {

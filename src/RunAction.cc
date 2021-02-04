@@ -49,7 +49,7 @@ RunAction::RunAction()
 
   // Create directories 
   //analysisManager->SetHistoDirectoryName("histograms");
-  analysisManager->SetNtupleDirectoryName("ntuple");
+//  analysisManager->SetNtupleDirectoryName("ntuple");
   analysisManager->SetVerboseLevel(1);
 //  analysisManager->SetNtupleMerging(true);
 
@@ -58,6 +58,7 @@ RunAction::RunAction()
   G4cout << "Booking histograms " << G4endl;
 
   // 1-D Histos
+/***
   analysisManager->CreateH1("EdepAbs_A0", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A1", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
   analysisManager->CreateH1("EdepAbs_A2", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
@@ -172,7 +173,6 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs_J9", "Energy Deposited in Lead-glass", 700, 0, 700*MeV);       //      4
 
 
-
   analysisManager->CreateH1("NumCerenkov_Abs", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	0
 
   analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	1
@@ -189,6 +189,11 @@ RunAction::RunAction()
   analysisManager->CreateH1("gammaB_KE", "gammaB_KE", 130, 0, 650*MeV) ;                 // 12
   analysisManager->CreateH1("angleDist", "angleDist", 72, 0, 360);			// 13
   analysisManager->CreateH1("endDist", "endDist", 60, 0, 6*m);				// 14
+***/
+
+
+
+
 
   //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	15
   analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	15
@@ -196,16 +201,41 @@ RunAction::RunAction()
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("RangevCerenkov", "Range v Cereknov", 35, 0, 35, 80, 0, 30000);      	    // 0
+/**  analysisManager->CreateH2("RangevCerenkov", "Range v Cereknov", 35, 0, 35, 80, 0, 30000);      	    // 0
   analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);  // 1
   analysisManager->CreateH2("XY_Cerenkov", "XY Cerenkov", 100, -50, 50, 100, -50, 50);         	 	    // 2
   analysisManager->CreateH2("eDepvR", "eDepvR", 1000, 0, 10, 1000, 0, 10);				    // 3
   analysisManager->CreateH2("gammaKE", "gammaKE", 130, 0, 650*MeV, 130, 0, 650*MeV);			    // 4
+***/
+  
+  analysisManager->CreateH2("A_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("B_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("C_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("D_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("E_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("F_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("G_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("H_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("I_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("J_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+
+  analysisManager->CreateH2("A_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("B_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("C_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("D", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("E", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("F", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("G", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("H", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("I", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("J", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+
 
   // 3-D Histos
   // name, title, nxbins, xmin, xmas, nybins, ymin, ymax
   analysisManager->CreateH3("lateralsize", "lateralsize", 100, -50, 50, 100, -50, 50, 100, 0, 1*keV); // 0
 
+/***
   // eDep NTuple
   analysisManager->CreateNtuple("EnergyDeposit", "EnergyDeposit");  
   analysisManager->CreateNtupleDColumn("A0");	// 0
@@ -234,7 +264,7 @@ RunAction::RunAction()
   analysisManager->CreateNtupleDColumn("E3");   // 23
   analysisManager->CreateNtupleDColumn("E4");   // 24
   analysisManager->FinishNtuple();
-
+***/
 }
 
 //....
