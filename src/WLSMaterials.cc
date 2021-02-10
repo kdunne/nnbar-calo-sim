@@ -423,5 +423,4 @@ void WLSMaterials::CreateMaterials()
 
   G4cout << "Scintillator Properties -------" << G4endl;
   mptPolystyrene->DumpTable();
-
 }

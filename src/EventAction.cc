@@ -154,17 +154,20 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
         //analysis->FillH1(CHCID, pop);
         // eDep in Scint, Pop in Fiber
-        analysis->FillH2(i, eDep/CLHEP::MeV, pop);
-/***
-        analysis->FillH2(i+10, pop, popFiber);
-        std::cout << "Num Fiber Photons " << popFiber << std::endl;
-        std::cout << "Num Scint Photons: " << pop << std::endl;
-        std::cout << "eDep: " << eDep << std::endl;
-***/
 
+        if (eDep >0) { 
+
+        analysis->FillH1(i+1, eDep/CLHEP::MeV);
+
+        analysis->FillH2(i, eDep/CLHEP::MeV, pop);
+        analysis->FillH2(i+10, pop, popFiber);
+        }
+
+ //     std::cout << "Num Fiber Photons " << popFiber << std::endl;
+ //       std::cout << "Num Scint Photons: " << pop << std::endl;
+ //       std::cout << "eDep: " << eDep << std::endl;
 
     }
-/***
 //  Fiber Hits
     for(int i=0; i<10; i++) {
        
@@ -176,11 +179,21 @@ void EventAction::EndOfEventAction(const G4Event* event)
         //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
         auto pop = GetSum(GetHitsCollection(CHCID, event)); 
 
+        scorer = "/eDep";
+        scorerName = "fiber_" + name[i] + scorer;
+
+        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+        auto eDep = GetSum(GetHitsCollection(CHCID, event)); 
+
+//        std::cout << "eDep Fiber: " << eDep << std::endl;
+
+
+
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
         //analysis->FillH1(CHCID, pop);
-        analysis->FillH2(i, eDep, pop);
+        //analysis->FillH2(i, eDep, pop);
     }
-***/
 
 //  PMT Hits
     for(int i=0; i<10; i++) {

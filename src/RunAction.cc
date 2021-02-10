@@ -197,6 +197,18 @@ RunAction::RunAction()
 
   //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 80, 0, 30000); 	//   	15
   analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	15
+  analysisManager->CreateH1("Edep0", "Edep0", 60, 0, 15);
+  analysisManager->CreateH1("Edep1", "Edep1", 60, 0, 15);
+   analysisManager->CreateH1("Edep2", "Edep2", 60, 0, 15);
+  analysisManager->CreateH1("Edep3", "Edep3", 60, 0, 15);
+  analysisManager->CreateH1("Edep4", "Edep4", 60, 0, 15);
+   analysisManager->CreateH1("Edep5", "Edep5", 60, 0, 15);
+  analysisManager->CreateH1("Edep6", "Edep6", 60, 0, 15);
+ analysisManager->CreateH1("Edep7", "Edep7", 60, 0, 15);
+  analysisManager->CreateH1("Edep8", "Edep8", 60, 0, 15);
+  analysisManager->CreateH1("Edep9", "Edep9", 60, 0, 15);
+
+
   //analysisManager->CreateH1("NumCerenkov_2", "Num Cerenkov Photons Abs", 240, 0, 90000); 	//   	15
 
   // 2-D Histos

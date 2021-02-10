@@ -127,11 +127,12 @@ void DetectorConstruction::DefineMaterials() {
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
   // 10  5x3x50 cm Scintillator Bar
-  G4double WorldSizeX = 40.*cm;
+  G4double WorldSizeX = 30.*cm;
+//  G4double WorldSizeX = 40.*cm;
   G4double WorldSizeY = 5.*cm;
   G4double WorldSizeZ = 502*mm;
-  //G4double scintThickness = 3.*cm; 
-  G4double scintThickness = 4.*cm;
+  G4double scintThickness = 3.*cm; 
+  //G4double scintThickness = 4.*cm;
 
   G4double WLSfiberZ  = WorldSizeZ - 2*mm;
   G4double WLSfiberR  = 1.8*mm;
@@ -168,12 +169,55 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
                  fCheckOverlaps);  // checking overlaps 
   
 
+
+  std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+  G4double xPos[] = {-13.5, -10.5, -7.5, -4.5, -1.5, 1.5, 4.5, 7.5, 10.5, 13.5};
+//  G4double xPos[] = {-18, -14, -10, -6, -2, 2, 6, 10, 14, 18};
+
+  G4double yPos[] = {0,0,0,0,0,0,0,0,0,0};
+  G4double zPos[] = {0,0,0,0,0,0,0,0,0,0};
+
+  for(int i=0; i<10; i++) {
+//    for(int j=0; j<10; j++){
+        std::cout << xPos[i] <<"," << yPos[i] << std::endl;
+        //std::cout << "name: " << name[i] << j << std::endl;
+
+
+        BuildScintBar(worldLV, 
+                          xPos[i], 
+                          yPos[i],
+                          name[i],
+                          zPos[i], 
+                          scintThickness,
+                          WorldSizeY,
+                          WorldSizeZ);
+   // }
+  }
+
+    
+  return worldPV;
+}
+
+//....
+
+void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ) {
+
+  G4double HoleRadius   = 2*mm;
+  G4double WLSfiberR    = 1.4*mm;
+  G4double WLSfiberZ    = (WorldSizeZ-2*mm) /2.;
+  //G4double WLSfiberZ  = WorldSizeZ/2;
+  G4double CoatingThickness = .25*mm;
+
+  G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
+
+
   //--------------------------------------------------
   // Extrusion
   //--------------------------------------------------
 
+
   auto ExtrusionS =
-        new G4Box("Extrusion", WorldSizeX/2, WorldSizeY/2, WorldSizeZ/2);
+        new G4Box("Extrusion", scintThickness/2, WorldSizeY/2, (WorldSizeZ-2*mm)/2);
 
   auto ExtrusionLV =
         new G4LogicalVolume(ExtrusionS,
@@ -206,7 +250,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   TiO2Surface -> SetMaterialPropertiesTable(TiO2SurfaceProperty);
 
   new G4PVPlacement(0,
-                    G4ThreeVector(),
+                    G4ThreeVector(xPos*cm, yPos*cm, zPos*cm),
                     ExtrusionLV,
                     "Extrusion",
                     worldLV,
@@ -215,45 +259,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
   new G4LogicalSkinSurface("TiO2Surface",ExtrusionLV,TiO2Surface);
 
-  std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
-//  G4double xPos[] = {-13.5, -10.5, -7.5, -4.5, -1.5, 1.5, 4.5, 7.5, 10.5, 13.5};
-  G4double xPos[] = {-18, -14, -10, -6, -2, 2, 6, 10, 14, 18};
-
-  G4double yPos[] = {0,0,0,0,0,0,0,0,0,0};
-  G4double zPos[] = {0,0,0,0,0,0,0,0,0,0};
-
-  for(int i=0; i<10; i++) {
-//    for(int j=0; j<10; j++){
-        std::cout << xPos[i] <<"," << yPos[i] << std::endl;
-        //std::cout << "name: " << name[i] << j << std::endl;
 
 
-        BuildScintBar(worldLV, 
-                          xPos[i], 
-                          yPos[i],
-                          name[i],
-                          zPos[i], 
-                          scintThickness,
-                          WorldSizeY,
-                          WorldSizeZ);
-   // }
-  }
-
-    
-  return worldPV;
-}
-
-//....
-
-void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ) {
-
-  G4double HoleRadius   = 2*mm;
-  G4double WLSfiberR    = 1.4*mm;
-  G4double WLSfiberZ    = (WorldSizeZ-2*mm) /2.;
-  //G4double WLSfiberZ  = WorldSizeZ/2;
 
 
-  G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
 
   //--------------------------------------------------
   // Scintillator
@@ -262,7 +271,7 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4doub
   std::string scintName = "scint_" + name;
 
   auto ScintillatorS 
-    = new G4Box("Scintillator", scintThickness/2, WorldSizeY/2, (WorldSizeZ-2*mm)/2);
+    = new G4Box("Scintillator", (scintThickness-CoatingThickness)/2, (WorldSizeY-CoatingThickness)/2, (WorldSizeZ-2*mm-CoatingThickness)/2);
 
   auto ScintillatorLV 
     = new G4LogicalVolume(
@@ -273,10 +282,10 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4doub
   auto ScintillatorPV 
     = new G4PVPlacement(
                  0,
-                 G4ThreeVector(xPos*cm, yPos*cm, zPos*cm),
+                 G4ThreeVector(0, 0, 0),
                  ScintillatorLV,
                  scintName,
-                 logicExtrusion,
+                 ExtrusionLV,
                  false,
                  0);
 
@@ -284,7 +293,12 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4doub
   auto scintDetector = new G4MultiFunctionalDetector(scintName);
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
 
-  G4VPrimitiveScorer* primitive;
+
+  G4VPrimitiveScorer* primitive = new G4PSEnergyDeposit("eDep");
+  scintDetector->RegisterPrimitive(primitive);
+
+
+  //G4VPrimitiveScorer* primitive;
   primitive = new G4PSPopulation("Pop");
 
   G4String fltName, particleName;
@@ -292,10 +306,6 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4doub
         new G4SDParticleFilter(fltName="optPhoton", particleName="opticalphoton");
   primitive->SetFilter(photonFilter);
   scintDetector->RegisterPrimitive(primitive);
-
-  primitive = new G4PSEnergyDeposit("eDep");
-  scintDetector->RegisterPrimitive(primitive);
-
 
   SetSensitiveDetector(scintName, scintDetector);
 
@@ -429,7 +439,7 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* logicExtrusion, G4doub
                         G4ThreeVector(xPos*cm, yPos*cm, (WorldSizeZ-1*mm)/2),
                         sipmLV,
                         pmt_name,
-                        logicExtrusion,
+                        worldLV,
                         false,
                         0);
 
