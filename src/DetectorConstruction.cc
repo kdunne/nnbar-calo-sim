@@ -150,11 +150,11 @@ void DetectorConstruction::DefineMaterials()
 
   // ----------TPC
   // CO2
-  G4Material* CO2 = new G4Material("CO2", density= 1.98*g/cm3, 2);
+  G4Material* CO2 = new G4Material("CO2", density= 1.98*mg/cm3, 2);
   CO2->AddElement(elO, 2);
   CO2->AddElement(elC, 1);
   // Ar/CO2 80/20
-  G4Material* Gas = new G4Material("Gas", density=1.3954*g/cm3, 2);
+  G4Material* Gas = new G4Material("Gas", density=1.3954*mg/cm3, 2);
   Gas->AddElement(elAr, .8);
   Gas->AddMaterial(CO2, .2);
   
@@ -482,7 +482,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto layerLV
     = new G4LogicalVolume(
                  layerS,           // its solid
-                 defaultMaterial,  // its material
+                 scintMaterial, //defaultMaterial,  // its material
                  "LayerLV");         // its name
 
   auto layerPV
@@ -492,14 +492,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  //G4ThreeVector(0., 0., -11.5*cm),
                  //G4ThreeVector(0., 0.,  -(scintThickness*nofLayers/2. ) + (calorThickness/2. - absoThickness) ), //  its position
                  layerLV,            // its logical volume                         
-                 "Gap",            // its name
+                 "Layer",            // its name
                  worldLV, // its mother volume
                  //calorLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
- 
+ /***
   // Scint
   auto scintS 
     = new G4Box("Scint",             // its name
@@ -519,6 +519,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  kZAxis,           // axis of replication
                  nofLayers,        // number of replica
                  scintThickness);  // width of replica
+
+***/
 
   // Vacuum Tube
   auto tubeS 
@@ -667,10 +669,11 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
 
   // declare Scintillator as SinctillatorSD
-  G4String scintDetectorName = "ScintLV" ;
+  G4String scintDetectorName = "LayerLV" ;
   ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-  SetSensitiveDetector("ScintLV", scintDetector);
+  SetSensitiveDetector("LayerLV", scintDetector);
+//  SetSensitiveDetector("ScintLV", scintDetector);
 
   // declare absorber as AbsorberSD
   G4String absorberDetectorName = "AbsoLV" ;

@@ -45,7 +45,10 @@ NNbarHit::NNbarHit()
     xHitID = 0;
     energyDeposit = 0.;
     kinEnergy = 0.;
+    posX = 0.;
+    posY = 0.;
     posZ = 0.;
+
 }
 
 NNbarHit::~NNbarHit()
@@ -63,6 +66,8 @@ NNbarHit::NNbarHit(const NNbarHit& right)
     xHitID = right.xHitID;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
+    posX = right.posX;
+    posY = right.posY;
     posZ = right.posZ;
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;
@@ -79,6 +84,8 @@ const NNbarHit& NNbarHit::operator=(const NNbarHit& right)
     xHitID = right.xHitID;
     //zHitID = right.zHitID;
     //yHitID = right.yHitID;
+    posX = right.posX;
+    posY = right.posY;
     posZ = right.posZ;
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;

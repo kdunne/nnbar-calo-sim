@@ -87,7 +87,9 @@ RunAction::RunAction()
   analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 80, 0, 30000); 		//   	10
   analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	11
   analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 55, 0, 55); 			//	13
+  analysisManager->CreateH1("Range", "Primary Particle Range", 90, 0, 30); 			//	13
+
+//  analysisManager->CreateH1("Range", "Primary Particle Range", 220, 0, 220); 			//	13
   //analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
   analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV);  //      14
   analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
@@ -95,7 +97,11 @@ RunAction::RunAction()
 
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
+  analysisManager->CreateH2("KEvRange","KEvRange", 90, 0 , 30, 400, 0, 400); 			//	0 
+
+  //analysisManager->CreateH2("KEvRange","KEvRange", 400, 0, 400, 220, 0, 220); 			//	0 
+
+//  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
   analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
   analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);     //      2
 }
@@ -117,7 +123,7 @@ void RunAction::BeginOfRunAction(const G4Run*)
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
   
-  G4String fileName = "../output/calo-sim.root";
+  G4String fileName = "../../output/calo-sim.root";
   //G4String Dir = "../output/";
   //G4String fileName = Dir + "scint-calo-sim.root";
   //G4String fileName = Dir + "abs-calo-sim.root";

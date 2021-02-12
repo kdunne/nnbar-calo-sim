@@ -149,6 +149,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4int i         = 0;
 	G4double kinEn  = 0.;
 	G4double eDep   = 0.;
+        G4double posZ   = 0.;
+        G4double posX   = 0.;
+        G4double posY   = 0.;
         G4double trackl = 0.;	
         G4int hitCount  = 0;
 
@@ -167,13 +170,14 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4double eDepHadElas = 0.;
         G4double eDepPrimary = 0.;
         G4double eDepOther = 0.;
+        G4bool stopped = 0;
 
         if (ScintHits) {
 	    hitCount = ScintHits->entries();
-
+            std::cout << "Processing: " << hitCount << " Scintillator Hits" << std::endl;
 	    for (G4int h=0; h<hitCount; h++) {
 
-                if (h==0) G4cout << "Hit eDep: " << eDep << G4endl;
+                //if (h==0) G4cout << "Hit eDep: " << eDep << G4endl;
 	        // In future can instead define aHit and assign like track.member[i]
 	        ltime    = ((*ScintHits)[h]) -> GetLocalTime();
 	        parentID = ((*ScintHits)[h]) -> GetParentID();
@@ -184,8 +188,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		i        = ((*ScintHits)[h]) -> GetXID();
 	        kinEn    = ((*ScintHits)[h]) -> GetKinEn();
 	        eDep     = ((*ScintHits)[h]) -> GetEdep();
-                trackl   = ((*ScintHits)[h]) -> GetPosZ();	
-
+                posX     = ((*ScintHits)[h]) -> GetPosX();	
+                posY     = ((*ScintHits)[h]) -> GetPosY();	
+                posZ     = ((*ScintHits)[h]) -> GetPosZ();	
 
 
                 //if(trID>1 && eDep>0){
@@ -198,7 +203,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                // Sum totEdep
                eDepScint += eDep;  
                totEdep += eDep;
-                
+/***                
 
                if (proc != "primary" & eDep > 0) {
 
@@ -216,7 +221,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                    else eDepOther += eDep;
                    continue;
                }
-
+***/
 
                   
                //G4cout << "eDepScint: " << eDepScint << G4endl;
@@ -230,19 +235,21 @@ void EventAction::EndOfEventAction(const G4Event* event)
                    EdepPerSheet[i] += eDep;
 	           eDepPrimary += eDep;
 
-                   //G4cout << "Kinetic Energy: " << kinEn << " " << G4endl;
+                   G4cout << "Kinetic Energy: " << kinEn << " " << G4endl;
+                   G4cout << "Position Z: " << posZ/CLHEP::cm << std::endl;
 
-		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
+		   analysis->FillH2(0, posZ/CLHEP::cm - 166., kinEn/CLHEP::MeV);
 	           
                    // When primary particle stops
-                   if (kinEn == 0) {
-                       //G4cout << "Filling with position: " << trackl/CLHEP::cm << " cm" << G4endl;
+                   if (kinEn == 0 && stopped!=1) {
+                       stopped = 1;
+                       G4cout << "Filling with position: " << posZ/CLHEP::cm - 166. << " cm" << G4endl;
                        //G4cout << "Filling with time: " << time/CLHEP::ns << " ns" <<  G4endl;
                        //G4cout << "Filling pos vs eDepScint with energy: " << eDepScint/CLHEP::MeV << " MeV" << G4endl;
-                       analysis->FillH1(13, trackl/CLHEP::cm);
+                       analysis->FillH1(13, posZ/CLHEP::cm - 166.);
 		       analysis->FillH1(12, time/CLHEP::ns);
                        // Filling only when trackID==1
-                       analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
+                       analysis->FillH2(1, posZ/CLHEP::cm, totEdep/CLHEP::MeV);
 		       
                        //G4cout << "hit number: " << h << G4endl;
                        //G4double prevKin = ((*ScintHits)[h-1])->GetKinEn();
@@ -270,6 +277,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 //                eDepPrimary += EdepPerSheet[j];
 //            }
 
+
+/***
            // if (eDepScint > 240){
                 G4cout << "Total Edep in scint: " << eDepScint/CLHEP::MeV << G4endl;         
                 G4cout << "Sheet 1: " << EdepPerSheet[0]/CLHEP::MeV << G4endl;
@@ -282,7 +291,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 G4cout << "Sheet 8: " << EdepPerSheet[7]/CLHEP::MeV << G4endl;
                 G4cout << "Sheet 9: " << EdepPerSheet[8]/CLHEP::MeV << G4endl;
                 G4cout << "Sheet 10: " << EdepPerSheet[9]/CLHEP::MeV << G4endl;
-
+***/
             //}
 
           }
@@ -343,7 +352,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     eDepPrimary += eDep;
                     analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
-                        analysis->FillH1(13, trackl/CLHEP::cm);
+                        //analysis->FillH1(13, trackl/CLHEP::cm);
 		        analysis->FillH1(12, time/CLHEP::ns);
                         analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
                     }
@@ -432,7 +441,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
      	            analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
 	            if (kinEn == 0) {
              //           G4cout << "Filling with pos " << trackl << G4endl;
-                        analysis->FillH1(13, trackl/CLHEP::cm);
+                        //analysis->FillH1(13, trackl/CLHEP::cm);
 		        analysis->FillH1(12, time/CLHEP::ns);
 		        analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
                     }
@@ -443,24 +452,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
             analysis->FillH1(16, eDepTube/CLHEP::MeV);	
             //G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << G4endl;         
         }
-          G4cout << G4endl;
-          G4cout << "---------Energy Depostied by Volume----------" << G4endl;
-          G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep in scint: " << eDepScint/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep in abs: " << eDepAbs/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Missing Energy: " << (totEdep - eDepTube - eDepScint - eDepAbs ) / CLHEP::MeV << " MeV" << G4endl << G4endl;
-          G4cout << "---------Energy Deposited by Particles--------" << G4endl;
-          G4cout << "Total Edep by non primary particles: " << extraEdep/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep by primary particle: " << eDepPrimary/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep: " << totEdep/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Missing Energy = " << (totEdep -  extraEdep - eDepPrimary) / CLHEP::MeV << " MeV" << G4endl << G4endl; 
-          G4cout << "-------- Energy Deposited by Non-primary Process-----------" << G4endl;
-          G4cout << "compt: " << eDepCompt/CLHEP::MeV << G4endl;
-          G4cout << "pi+Inelastic: " << eDepInelastic/CLHEP::MeV << G4endl;
-          G4cout << "hIoni: " << eDephIoni/CLHEP::MeV << G4endl;
-          G4cout << "hadElastic: " << eDepHadElas/CLHEP::MeV << G4endl;
-          G4cout << "Other: " << eDepOther/CLHEP::MeV << G4endl;
-          G4cout << "Missing Energy: " << (totEdep - eDepPrimary - eDepCompt - eDepInelastic - eDephIoni - eDepHadElas - eDepOther ) / CLHEP::MeV << " MeV" << G4endl << "---------------------------------" << G4endl << G4endl;
+
 
     } else {
         G4cout << "No HCE" << G4endl;

@@ -79,37 +79,46 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
 
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Layer") return false;
-    
-    // Get Direction
-    G4Track * theTrack = aStep  ->  GetTrack();
    
+ 
+    G4Track *theTrack = aStep->GetTrack();
+    
+   
+
+    // Get Direction
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
     //Get particle name
-    G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
-    G4String particleName =  particleDef -> GetParticleName();
+    G4ParticleDefinition *particleDef = theTrack->GetDefinition();
+    G4String particleName =  particleDef->GetParticleName();
     
     // Get particle PDG code
-    G4int pdg = particleDef ->GetPDGEncoding();
+    G4int pdg = particleDef->GetPDGEncoding();
     
     // Get unique track_id (in an event)
-    G4int trackID = theTrack -> GetTrackID();
+    G4int trackID = theTrack->GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
+    G4double energyDeposit = aStep->GetTotalEnergyDeposit();
   
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();    
+
     // Position
     G4ThreeVector pos = PreStep->GetPosition();
+    G4double x = pos.getX();
+    G4double y = pos.getY();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
-    G4double origin = vertex.getZ();
-    G4double tracklength = z - origin;
+    G4double vertX = vertex.getX();
+    G4double vertY = vertex.getY();
+    G4double vertZ = vertex.getZ();
+
+    //G4double tracklength = z - origin;
 
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
@@ -146,15 +155,13 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
 
-    //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
-                  
         // Get the pre-step kinetic energy
         G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
         // Get the post-step kinetic energy
         G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
         // Get the step average kinetic energy
         G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+
 
         NNbarHit* detectorHit = new NNbarHit();
 
@@ -167,11 +174,13 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
 	detectorHit -> SetTrackID(trackID);
         detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
         detectorHit -> SetEDep(energyDeposit);
-        //detectorHit -> SetKinEn(eKinMean);
-        //detectorHit -> SetKinEn(eKinPre);
         detectorHit -> SetKinEn(eKinPost);
+
+        detectorHit -> SetPosX(x);
+        detectorHit -> SetPosY(y); 
+        detectorHit -> SetPosZ(z);
+
 
 	HitsCollection -> insert(detectorHit);
 
@@ -184,7 +193,6 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 //        G4cout << "proc: " << proc << G4endl;
 //	G4cout << "eKinPost: "      << eKinPost << G4endl;
 //        }
-    }
     
     return true;
 }

@@ -60,6 +60,8 @@ private:
     G4double time;
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
+    G4double posX;
+    G4double posY;
     G4double posZ;
     //G4int zHitID; // Hit z voxel
     //G4int yHitID; // Hit y voxel 
@@ -93,6 +95,12 @@ public:
 
     //inline G4int GetYID() // Get z index of the voxel  
     //{return yHitID;}
+
+    inline G4double GetPosX()
+    {return posX;}
+
+    inline G4double GetPosY()
+    {return posY;}
 
     inline G4double GetPosZ()
     {return posZ;}
@@ -146,6 +154,13 @@ public:
         xHitID = xID;
     }
 
+     inline void SetPosX(G4double x){
+        posX = x;
+    }
+
+     inline void SetPosY(G4double y){
+        posY = y;
+    }
 
      inline void SetPosZ(G4double z){
         posZ = z;
