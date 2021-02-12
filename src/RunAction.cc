@@ -231,16 +231,16 @@ RunAction::RunAction()
   analysisManager->CreateH2("I_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
   analysisManager->CreateH2("J_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
 
-  analysisManager->CreateH2("A_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("B_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("C_popFiber", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("D", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("E", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("F", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("G", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("H", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("I", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
-  analysisManager->CreateH2("J", "eDepvscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("A_popFiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("B_popFiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("C_popFiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("D_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("E_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("F_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("G_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("H_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("I_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
+  analysisManager->CreateH2("J_popfiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
 
 
   // 3-D Histos

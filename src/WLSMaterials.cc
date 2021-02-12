@@ -408,8 +408,8 @@ void WLSMaterials::CreateMaterials()
                AddProperty("FASTCOMPONENT",photonEnergy, scintilFast,nEntries);
 
 // 68% anthracene - 17400/MeV : 11832/MeV
-//  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000/MeV);
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
+  //mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000/MeV);
 
 //  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);

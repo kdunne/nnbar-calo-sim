@@ -57,7 +57,12 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
-  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+
+
+
+/***  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+
+
 
   if (eventNumber != fEventNumber) {
      fEventNumber = eventNumber;
@@ -87,13 +92,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
     //std::cout << "Volume: " << track->GetVolume()->GetName() << std::endl;
 
-/**
     if (proc=="Decay" || proc=="Scintillation") {
         G4cout << "Killing particle " << particleName << G4endl;
         track->SetTrackStatus(fKillTrackAndSecondaries);
     }
-***/
 
+
+***/
 } 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
 
