@@ -105,11 +105,16 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Position
     G4ThreeVector pos = PreStep->GetPosition();
+    G4double x = pos.getX();
+    G4double y = pos.getY();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
-    G4double origin = vertex.getZ();
-    G4double tracklength = z - origin;
+    G4double vertX = vertex.getX();
+    G4double vertY = vertex.getY();
+    G4double vertZ = vertex.getZ();
+
+
 
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
@@ -158,7 +163,6 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
         NNbarHit* detectorHit = new NNbarHit();
 
-        // Make this kinetic energy and position
 	detectorHit -> SetLocalTime(localTime);
 	detectorHit -> SetParentID(parentID);
 	detectorHit -> SetProcess(proc);
@@ -167,11 +171,17 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
 	detectorHit -> SetTrackID(trackID);
         detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
         detectorHit -> SetEDep(energyDeposit);
-        //detectorHit -> SetKinEn(eKinMean);
-        //detectorHit -> SetKinEn(eKinPre);
         detectorHit -> SetKinEn(eKinPost);
+
+        detectorHit -> SetPosX(x);
+        detectorHit -> SetPosY(y);
+        detectorHit -> SetPosZ(z);
+
+        detectorHit -> SetVertX(x);
+        detectorHit -> SetVertY(y);
+        detectorHit -> SetVertZ(z);
+
 
 	HitsCollection -> insert(detectorHit);
 

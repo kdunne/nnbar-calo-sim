@@ -63,6 +63,12 @@ private:
     G4double posX;
     G4double posY;
     G4double posZ;
+    G4double vertX;
+    G4double vertY;
+    G4double vertZ;
+
+
+
     //G4int zHitID; // Hit z voxel
     //G4int yHitID; // Hit y voxel 
     G4double energyDeposit; // Energy deposit associated with the hit
@@ -104,6 +110,17 @@ public:
 
     inline G4double GetPosZ()
     {return posZ;}
+
+
+    inline G4double GetVertX()
+    {return posX;}
+
+    inline G4double GetVertY()
+    {return posY;}
+
+    inline G4double GetVertZ()
+    {return posZ;}
+
 
     inline G4double GetEdep() // Get energy deposit
     {return energyDeposit;}
@@ -163,6 +180,18 @@ public:
     }
 
      inline void SetPosZ(G4double z){
+        posZ = z;
+    }
+
+     inline void SetVertX(G4double x){
+        posX = x;
+    }
+
+     inline void SetVertY(G4double y){
+        posY = y;
+    }
+
+     inline void SetVertZ(G4double z){
         posZ = z;
     }
 

@@ -95,6 +95,9 @@ RunAction::RunAction()
   analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
   analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 250*MeV);     //      16
 
+  analysisManager->CreateH1("DeutKE", "DeutKE", 200,0, 200*MeV); // 17
+  analysisManager->CreateH1("DeutVertexZ", "DeutVertexZ", 200,0, 200); // 18
+
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KEvRange","KEvRange", 90, 0 , 30, 400, 0, 400); 			//	0 

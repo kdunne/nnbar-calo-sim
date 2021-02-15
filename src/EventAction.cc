@@ -152,6 +152,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4double posZ   = 0.;
         G4double posX   = 0.;
         G4double posY   = 0.;
+        G4double vertZ   = 0.;
+        G4double vertX   = 0.;
+        G4double vertY   = 0.;
+
+
         G4double trackl = 0.;	
         G4int hitCount  = 0;
 
@@ -171,6 +176,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4double eDepPrimary = 0.;
         G4double eDepOther = 0.;
         G4bool stopped = 0;
+        G4bool de_stopped = 0;
+        G4int trackID = 0;
 
         if (ScintHits) {
 	    hitCount = ScintHits->entries();
@@ -191,6 +198,26 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 posX     = ((*ScintHits)[h]) -> GetPosX();	
                 posY     = ((*ScintHits)[h]) -> GetPosY();	
                 posZ     = ((*ScintHits)[h]) -> GetPosZ();	
+                vertX     = ((*ScintHits)[h]) -> GetVertX();	
+                vertY     = ((*ScintHits)[h]) -> GetVertY();	
+                vertZ     = ((*ScintHits)[h]) -> GetVertZ();	
+
+
+	      if (name=="deuteron") {
+                   if (kinEn == 0 && de_stopped!=1){
+                       std::cout << " Stopping position: " << posZ/CLHEP::cm << std::endl;
+                       de_stopped=1;
+                   } 
+                   //std::cout << "deuteron KE: " << kinEn/CLHEP::MeV << std::endl;
+                   //std::cout << "posZ: " << posZ << std::endl;
+		   //std::cout << "proc: " << proc << std::endl;
+                   //std::cout << "trackID: " << trID << std::endl;
+                   if (trackID!=trID) {
+                   analysis->FillH1(17, kinEn/CLHEP::MeV);
+                   analysis->FillH1(18, vertZ/CLHEP::cm);
+                   trackID = trID;
+                   }
+              }
 
 
                 //if(trID>1 && eDep>0){
@@ -199,6 +226,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                if (proc == "Decay") {
                    continue;
                }
+
 
                // Sum totEdep
                eDepScint += eDep;  
@@ -319,6 +347,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	        G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
                 G4double trackl = ((*AbsHits)[h]) -> GetPosZ();	
                 
+
+
+
  
                 //if(trID>1 && eDep>0){
                     //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
@@ -329,7 +360,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                
                 eDepAbs += eDep;
                 totEdep += eDep;
-           
+           /***
                 if (proc != "primary" & eDep > 0) {
                    G4cout << "Absorber Edep by non primary particle" << G4endl;
                    G4cout << "----------------------------" << G4endl;
@@ -345,7 +376,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                    else eDepOther += eDep;  
                    continue;
                }
-
+***/
  	   
                
                 if (trID == 1){
@@ -401,10 +432,31 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		i        = ((*TubeHits)[h]) -> GetXID();
 	        kinEn    = ((*TubeHits)[h]) -> GetKinEn();
 	        eDep     = ((*TubeHits)[h]) -> GetEdep();
-                trackl   = ((*TubeHits)[h]) -> GetPosZ();	
+                posX     = ((*TubeHits)[h]) -> GetPosX();	
+                posY     = ((*TubeHits)[h]) -> GetPosY();	
+                posZ     = ((*TubeHits)[h]) -> GetPosZ();	
+                vertX     = ((*TubeHits)[h]) -> GetVertX();	
+                vertY     = ((*TubeHits)[h]) -> GetVertY();	
+                vertZ     = ((*TubeHits)[h]) -> GetVertZ();	
 
 
-  
+
+  	      if (name=="deuteron") {
+                   if (kinEn == 0 && de_stopped!=1){
+                       std::cout << " Stopping position: " << posZ/CLHEP::cm << std::endl;
+                       de_stopped=1;
+                   } 
+                   //std::cout << "deuteron KE: " << kinEn/CLHEP::MeV << std::endl;
+                   //std::cout << "posZ: " << posZ << std::endl;
+		   //std::cout << "proc: " << proc << std::endl;
+                   //std::cout << "trackID: " << trID << std::endl;
+                   if (trackID!=trID) {
+                   analysis->FillH1(17, kinEn/CLHEP::MeV);
+                   analysis->FillH1(18, vertZ/CLHEP::cm);
+                   trackID = trID;
+                   }
+              }
+
                 //if(trID>1 && eDep>0){
                     //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
                 //}
@@ -416,7 +468,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 eDepTube += eDep;  
                 totEdep += eDep;
 
-
+/***
 
                 if (proc != "primary" & eDep > 0) {
                    G4cout << "Tube Edep by non primary particle" << G4endl;
@@ -434,7 +486,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	           continue;
                }
 
-
+***/
                          
                 if (trID ==1) {
 	            eDepPrimary += eDep;

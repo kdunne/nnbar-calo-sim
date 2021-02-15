@@ -69,6 +69,10 @@ NNbarHit::NNbarHit(const NNbarHit& right)
     posX = right.posX;
     posY = right.posY;
     posZ = right.posZ;
+    vertX = right.vertX;
+    vertY = right.vertY;
+    vertZ = right.vertZ;
+
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;
 }
@@ -87,6 +91,10 @@ const NNbarHit& NNbarHit::operator=(const NNbarHit& right)
     posX = right.posX;
     posY = right.posY;
     posZ = right.posZ;
+    vertX = right.vertX;
+    vertY = right.vertY;
+    vertZ = right.vertZ;
+
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;
     return *this;

@@ -118,6 +118,12 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double vertY = vertex.getY();
     G4double vertZ = vertex.getZ();
 
+/***
+    if (particleName = "deuteron") { 
+        std::cout << "deuteron vertex: " << vertZ/CLHEP::cm << std::endl;
+    }
+***/
+
     //G4double tracklength = z - origin;
 
     // Read voxel indexes: i is the x index, k is the z index
@@ -181,6 +187,9 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         detectorHit -> SetPosY(y); 
         detectorHit -> SetPosZ(z);
 
+        detectorHit -> SetVertX(x);
+        detectorHit -> SetVertY(y); 
+        detectorHit -> SetVertZ(z);
 
 	HitsCollection -> insert(detectorHit);
 
