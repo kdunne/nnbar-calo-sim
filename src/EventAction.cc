@@ -166,8 +166,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
         if (eDep >0) { 
 
         analysis->FillH1(i+1, eDep/CLHEP::MeV);
-
-        analysis->FillH2(i, eDep/CLHEP::MeV, popFiber);
+        analysis->FillH2(i, eDep/CLHEP::MeV, pop);
         analysis->FillH2(i+10, pop, popFiber);
         }
 

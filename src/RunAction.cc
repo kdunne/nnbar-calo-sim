@@ -220,16 +220,16 @@ RunAction::RunAction()
   analysisManager->CreateH2("gammaKE", "gammaKE", 130, 0, 650*MeV, 130, 0, 650*MeV);			    // 4
 ***/
   
-  analysisManager->CreateH2("A_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("B_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("C_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("D_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("E_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("F_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("G_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("H_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("I_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
-  analysisManager->CreateH2("J_eDepvscint", "eDepvscint", 60, 0, 15, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("A_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("B_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("C_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("D_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("E_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("F_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("G_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("H_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("I_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
+  analysisManager->CreateH2("J_eDepvscint", "eDepvscint", 60, 0, 60, 100, 0, 15000);			    // 4
 
   analysisManager->CreateH2("A_popFiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4
   analysisManager->CreateH2("B_popFiber", "fibervscint", 100, 0, 15000, 100, 0, 500);			    // 4

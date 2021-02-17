@@ -50,9 +50,10 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
   // default particle kinematic
   // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
   auto particleDefinition 
-    = G4ParticleTable::GetParticleTable()->FindParticle("gamma");
+    = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
   fParticleGun->SetParticleDefinition(particleDefinition);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1,0.,0.));
+//  fParticleGun->SetParticlePosition(G4ThreeVector(15.,0.,0.));
+//  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1.,0.,0.));
   fParticleGun->SetParticleEnergy(200*MeV);
 }
 

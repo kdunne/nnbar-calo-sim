@@ -77,10 +77,24 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4String particleName =  particleDef -> GetParticleName();
 
 
-  //  std::cout << "Process: " << proc << std::endl;
-//    std::cout << "Particle: " << particleName << std::endl;
-    //G4double eDep = step->GetTotalEnergyDeposit();
-    //std::cout << "eDep: " << eDep << std::endl;
+
+
+      G4double eDep = step->GetTotalEnergyDeposit();
+     
+/***
+if (eDep >0) {
+      std::cout << "Volume: " << track->GetVolume()->GetName() << std::endl;
+      if (eDep > 3e-5) {
+      std::cout << "eDep: " << eDep << std::endl;
+      std::cout << "Track ID: " << ID << std::endl;
+      if (ID > 1){
+      std::cout << "Process: " << track->GetCreatorProcess()->GetProcessName();
+      std::cout << "Particle: " << particleName << std::endl;
+      }
+      }
+
+}
+***/  
 
 //    std::cout << "Position: " << track->GetPosition().getZ() << std::endl;
 
@@ -88,16 +102,21 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     G4String material = track->GetMaterial()->GetName(); 
     //std::cout << "Material: " << material << std::endl;
 
-    //std::cout << "Volume: " << track->GetVolume()->GetName() << std::endl;
+    G4String proc;
 
     if (ID != 1) {
-      G4String proc = track->GetCreatorProcess()->GetProcessName();
+      proc = track->GetCreatorProcess()->GetProcessName();
 
-      if (proc=="Decay") {
-        G4cout << "Killing particle " << particleName << G4endl;
-        track->SetTrackStatus(fKillTrackAndSecondaries);
-      }
+    } else {
+      proc ="primary";
     }
+
+
+    if (proc=="Decay") {
+      G4cout << "Killing particle " << particleName << G4endl;
+      track->SetTrackStatus(fKillTrackAndSecondaries);
+    }
+    
 } 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
 
