@@ -59,8 +59,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 {
 
 
-
-/***  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 
 
 
@@ -76,13 +75,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   G4ParticleDefinition *particleDef = track -> GetDefinition();
   G4String particleName =  particleDef -> GetParticleName();
-//  G4String proc = track->GetCreatorProcess()->GetProcessName();
 
 
   //  std::cout << "Process: " << proc << std::endl;
 //    std::cout << "Particle: " << particleName << std::endl;
-    G4double eDep = step->GetTotalEnergyDeposit();
-//    std::cout << "eDep: " << eDep << std::endl;
+    //G4double eDep = step->GetTotalEnergyDeposit();
+    //std::cout << "eDep: " << eDep << std::endl;
 
 //    std::cout << "Position: " << track->GetPosition().getZ() << std::endl;
 
@@ -92,13 +90,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
     //std::cout << "Volume: " << track->GetVolume()->GetName() << std::endl;
 
-    if (proc=="Decay" || proc=="Scintillation") {
+    if (ID != 1) {
+      G4String proc = track->GetCreatorProcess()->GetProcessName();
+
+      if (proc=="Decay") {
         G4cout << "Killing particle " << particleName << G4endl;
         track->SetTrackStatus(fKillTrackAndSecondaries);
+      }
     }
-
-
-***/
 } 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
 
