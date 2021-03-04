@@ -60,106 +60,53 @@ private:
     G4double time;
     G4int trackID; 
     G4int xHitID; // Hit x voxel 
+    G4double posX;
+    G4double posY;
     G4double posZ;
-    //G4int zHitID; // Hit z voxel
-    //G4int yHitID; // Hit y voxel 
-    G4double energyDeposit; // Energy deposit associated with the hit
+    G4int group_ID_;
+    G4int module_ID_;
+    G4int origin_rp;
+    G4double energyDeposit;
     G4double kinEnergy;
-
+    G4int photons;
+    G4double TrackLength;
 public:
-    inline G4double GetLocalTime()
-    {return localTime;}
+    inline G4double GetLocalTime(){return localTime;}
+    inline G4int GetParentID(){return parentID;}
+    inline G4String GetProcess(){return process;}
+    inline G4String GetName(){return name;}
+    inline G4double GetTime(){return time;}
+    inline G4int GetTrackID(){return trackID;}
+    inline G4int GetXID(){return xHitID;} //For the replica number
+    inline G4int GetGroup_ID(){return group_ID_;}
+    inline G4int GetMod_ID(){return module_ID_;}
+    inline G4double GetPosX(){return posX;}
+    inline G4double GetPosY(){return posY;}
+    inline G4double GetPosZ(){return posZ;}
+    inline G4double GetTrackLength(){return TrackLength;}
+    inline G4double GetEdep(){return energyDeposit;}
+    inline G4double GetKinEn(){return kinEnergy;}
+    inline G4double GetOrigin(){return origin_rp;} // get which layer this hit particle is from
+    inline G4int GetPhotons(){return photons;}
 
-    inline G4int GetParentID()
-    {return parentID;}
-
-    inline G4String GetProcess()
-    {return process;}
-
-    inline G4String GetName()
-    {return name;}
-
-    inline G4double GetTime()
-    {return time;}
-
-    inline G4int GetTrackID()
-    {return trackID;}
-
-    inline G4int GetXID() // Get x index of the voxel 
-    {return xHitID;}
-
-    //inline G4int GetZID() // Get y index of the voxel   
-    //{return zHitID;}
-
-    //inline G4int GetYID() // Get z index of the voxel  
-    //{return yHitID;}
-
-    inline G4double GetPosZ()
-    {return posZ;}
-
-    inline G4double GetEdep() // Get energy deposit
-    {return energyDeposit;}
- 
-    inline G4double GetKinEn()
-    {return kinEnergy;}
-
-
-/***    inline void SetKinEnAndPosition(G4int xx, G4double zz, G4double eDep, G4double kinEn)
-    {
-        xHitID = xx;
-        posZ = zz;
-        //yHitID = yy;
-        //zHitID = zz;
-        energyDeposit = eDep;
-        kinEnergy = kinEn;
-  }***/
-    inline void SetLocalTime(G4double ltime){
-        localTime = ltime;
-    }
- 
-
-    inline void SetParentID(G4int parent){
-        parentID = parent;
-    }
+    inline void SetLocalTime(G4double ltime){localTime = ltime;}
+    inline void SetParentID(G4int parent){parentID = parent;}
+    inline void SetProcess(G4String p){process = p;}
+    inline void SetName(G4String n){name = n;}
+    inline void SetTime(G4double t){time = t;}
+    inline void SetTrackID(G4int track){trackID = track;}
+    inline void SetXID(G4int xID){xHitID = xID;}
+    inline void SetGroup_ID(G4int groupID){group_ID_=groupID;}
+    inline void SetMod_ID(G4int ModID){module_ID_=ModID;}
     
-    inline void SetProcess(G4String p){
-        process = p;
-    }
-
-
-    inline void SetName(G4String n){
-        name = n;
-    }
-
-
-    inline void SetTime(G4double t){
-        time = t;
-    }
-
-
-    inline void SetTrackID(G4int track){
-        trackID = track;
-    }
-
-
-    inline void SetXID(G4int xID){
-        xHitID = xID;
-    }
-
-
-     inline void SetPosZ(G4double z){
-        posZ = z;
-    }
-
-
-    inline void SetEDep(G4double eDep){
-        energyDeposit = eDep;
-    }
-
-    inline void SetKinEn(G4double kinEn){
-        kinEnergy = kinEn;
-    }
-
+    inline void SetPosX(G4double x){posX = x;}
+    inline void SetPosY(G4double y){posY = y;}
+    inline void SetPosZ(G4double z){posZ = z;}
+    inline void SetTrackLength(G4double tracklength) {TrackLength = tracklength;}
+    inline void SetEDep(G4double eDep){energyDeposit = eDep;}
+    inline void SetKinEn(G4double kinEn){kinEnergy = kinEn;}
+    inline void SetOrigin(G4int origin) {origin_rp = origin;}
+    inline void SetPhotons(G4int photon) {photons = photon;}
 
 };
 

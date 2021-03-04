@@ -23,49 +23,64 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+//
+// $Id$
+//
 // 
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ThreeVector.hh"
-#include "G4DataVector.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleGun.hh"
-#include "Randomize.hh"
+#ifndef PhysicsList_h
+#define PhysicsList_h 1
+
+#include "G4VUserPhysicsList.hh"
 #include "globals.hh"
-#include "PrimaryGeneratorMessenger.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4GenericMessenger.hh"
+#include "G4EmConfigurator.hh"
 
-using namespace std;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+class G4Cerenkov;
+class G4Scintillation;
+class G4OpAbsorption;
+class G4OpRayleigh;
+class G4OpBoundaryProcess;
 
-
-class G4ParticleGun;
-class G4Event;
-
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class PhysicsList: public G4VUserPhysicsList
 {
-  public:
-  PrimaryGeneratorAction();
-  virtual ~PrimaryGeneratorAction();
+public:
+  PhysicsList();
+  virtual ~PhysicsList();
 
-  public:
-	void GeneratePrimaries(G4Event* anEvent);
+  // Construct particle and physics
+  void ConstructParticle();
+  void ConstructProcess();
+  void ConstructNeutron();
+  void SetCuts();
+   
+private:
 
-  void SetRandomFlag(G4bool value);
+  // these methods Construct physics processes and register them
+  void ConstructDecay();
+  void ConstructEM();
+  void ConstructOptical();
+  void  AddPAIModel(const G4String&);
+  void  NewPAIModel(const G4ParticleDefinition*, const G4String& modname, const G4String& procname);
+  //void NewPAIModel(const G4ParticleDefinition* part,const G4String& modname,const G4String& procname);
+  //void AddPAIModel(const G4String& modname);
 
-  private:
-    G4ParticleGun*  fParticleGun; 
 
-  private:
-	G4GenericMessenger* fMessenger;
-        G4ParticleTable* particleTable;
-	G4ParticleGun* particleGun;
-	PrimaryGeneratorMessenger* gunMessenger;
+private:
+  G4Cerenkov*          theCerenkovProcess;
+  G4Scintillation*     theScintillationProcess;
+  G4OpAbsorption*      theAbsorptionProcess;
+  G4OpRayleigh*        theRayleighScatteringProcess;
+  G4OpBoundaryProcess* theBoundaryProcess;
+  G4EmConfigurator*    fConfig;
 };
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+
+
+

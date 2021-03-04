@@ -55,6 +55,7 @@ public:
 private:
     NNbarHitsCollection *HitsCollection;
     G4String sensitiveDetectorName;
+	int error_count;
 };
 #endif
 

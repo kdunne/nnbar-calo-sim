@@ -23,11 +23,10 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// Hadrontherapy advanced example for Geant4
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "AbsorberSD.hh"
-#include "TubeSD.hh"
-
-#include "NNbarHit.hh"
+#include "TPCSD.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -50,66 +49,67 @@
 #include "G4TransportationManager.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4SystemOfUnits.hh"
-
+#include "G4Scintillation.hh"
 #include "G4Cerenkov.hh"
 
-
-//......
-AbsorberSD::AbsorberSD(G4String name):
+//.....
+TPCSD::TPCSD(G4String name):
 G4VSensitiveDetector(name)
 {
-	error_count = 0;
     G4String HCname;
-    collectionName.insert(HCname="AbsorberHitCollection");
+    collectionName.insert(HCname="TPCHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
+    
 }
 
-//......
-AbsorberSD::~AbsorberSD()
+//.....
+TPCSD::~TPCSD()
 {}
 
-//......
-void AbsorberSD::Initialize(G4HCofThisEvent*)
+//.....
+void TPCSD::Initialize(G4HCofThisEvent*)
 {
     
     HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
-G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-    //std::cout << aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() << aStep -> GetPostStepPoint() -> GetPhysicalVolume() -> GetName() << std::endl;
-    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "AbsoPV") return false;
+
 
     // Get Direction
-    G4Track * theTrack = aStep  ->  GetTrack();
+    G4Track * theTrack = aStep  ->  GetTrack();   
+
+    G4int parentID = 0;
+    parentID = theTrack->GetParentID();
+    if (parentID >0) {return false;}
+
+    G4String proc = "primary"; 
+
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
-    
+
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
-
-    if (particleName == "opticalphoton") return false;
-
-    
     
     // Get particle PDG code
     G4int pdg = particleDef ->GetPDGEncoding();
     
     // Get unique track_id (in an event)
     G4int trackID = theTrack -> GetTrackID();
-    
-    // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
    
-    // Get Step Length 
+    // Get Energy deposited
+    G4double energyDeposit = 0.;
+    energyDeposit = aStep -> GetTotalEnergyDeposit();
+
+    // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-
-
-    // Get Position
+    
+    // Position
     G4ThreeVector pos = PreStep->GetPosition();
     G4double x = pos.getX();
     G4double y = pos.getY();
@@ -118,63 +118,34 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();
     G4double tracklength = z - origin;
-
+    
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
-    G4int k  = touchable->GetReplicaNumber(0);
-    //G4int group_ID = touchable->GetReplicaNumber(4);
-    //G4int module_ID = touchable->GetReplicaNumber(3);
+    G4int k = touchable ->GetReplicaNumber(0); // which layer it is in 
+    G4int TPC_index = touchable -> GetReplicaNumber(1); // which TPC it is in
 
-    // Get Time 
+    // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
-    // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
     // Get Name
     G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
-    
+
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-    
-    G4int photons = 0;
+
+    G4int electrons = 0;
     G4ParticleDefinition* particle;
     if (particleName != "opticalphoton") {
             const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
             for (int j = 0; j < (*secondary).size(); j++) {
                     particle = (*secondary)[j]->GetDefinition();
-                    if (particle->GetParticleName() == "opticalphoton") { photons++; } // Cerenkov exists in scintillator
+                    if (particle->GetParticleName() == "e-") { electrons++; } // Cerenkov exists in scintillator
             }
     }
 
-    // Get Process
-    G4int parentID = 0;
-    G4String proc = "";
-    // Getting Process ond parentID of primary causes seg fault
-    if (trackID > 1 && theTrack->GetOriginTouchable()->GetVolume()->GetName() != "World"){
-		//std::cout << name << " " <<theTrack->GetOriginTouchable()->GetVolume()->GetName() << std::endl;
-		parentID = theTrack->GetParentID();
-		if (parentID != 0) { proc = theTrack->GetCreatorProcess()->GetProcessName(); }
-		else { proc = "primary"; }
-		//std::cout << " Abso hit : " << name << " ID : " << trackID << theTrack->GetOriginTouchable()->GetVolume()->GetName() << "  " << proc << " the parent ID is : " << parentID << std::endl;
-    } 
 
-	else {
-        proc = "primary";
-		parentID = 0;
-    }
-	/***
-    if (proc=="Decay") {
-        G4cout << "Killing particle " << name << G4endl;
-        theTrack->SetTrackStatus(fKillTrackAndSecondaries);
-    }
-	***/
-    
-    //if (name=="opticalphoton" &  aStep -> IsLastStepInVolume()) {theTrack->SetTrackStatus(fKillTrackAndSecondaries);}
-
-    //if (DX) { // *** tried to cancel the statement to see if things work
-	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
     // Get the post-step kinetic energy
@@ -183,49 +154,43 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double eKinMean = (eKinPre + eKinPost) * 0.5;
 
     NNbarHit* detectorHit = new NNbarHit();
+
+    // Make this kinetic energy and position
     detectorHit -> SetLocalTime(localTime);
     detectorHit -> SetParentID(parentID);
     detectorHit -> SetProcess(proc);
     detectorHit -> SetTime(time);
     detectorHit -> SetName(name);
     detectorHit -> SetTrackID(trackID);
+    
     detectorHit -> SetXID(k);
+    detectorHit -> SetMod_ID(TPC_index);
+
     detectorHit -> SetPosX(x);
     detectorHit -> SetPosY(y);
     detectorHit -> SetPosZ(z);
-    //detectorHit -> SetGroup_ID(group_ID);
-    //detectorHit -> SetMod_ID(module_ID);
-    detectorHit -> SetTrackLength(tracklength);
+
+    // remarks: here it is named set photons but actually it counts the electrons in the TPC, too lazy to add one more function
+    detectorHit -> SetPhotons(electrons);
+
+    detectorHit -> SetTrackLength(DX); // not actually trackLength but lets stay in this way..
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinPost);
-    detectorHit-> SetPhotons(photons);
-
     HitsCollection -> insert(detectorHit);
-
-	if (parentID == 0) {
-		G4double x_o = (aStep->GetPreStepPoint()->GetPosition())[0];
-		G4double x_p = (aStep->GetPostStepPoint()->GetPosition())[0];
-		G4double y_o = (aStep->GetPreStepPoint()->GetPosition())[1];
-		G4double y_p = (aStep->GetPostStepPoint()->GetPosition())[1];
-		G4double z_o = (aStep->GetPreStepPoint()->GetPosition())[2];
-		G4double z_p = (aStep->GetPostStepPoint()->GetPosition())[2];
-
-		if (x_o == x_p && y_o == y_p && z_o == z_p && DX < 10^-10 && energyDeposit < 10^-10)
-                {error_count++;
-                if (error_count > 100) { std::cout << " *** - - - - Error with the propagation " << error_count << " *** - - - - -"<< std::endl;
-                theTrack->SetTrackStatus(fStopAndKill);
-                error_count = 0;}
-		}
-
-	}
+    
     return true;
 }
 
-void AbsorberSD::EndOfEvent(G4HCofThisEvent* HCE)
+//......
+void TPCSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
+    
     static G4int HCID = -1;
     if(HCID < 0)
-    {HCID = GetCollectionID(0);}
+    {
+        HCID = GetCollectionID(0);
+    }
+    
     HCE -> AddHitsCollection(HCID,HitsCollection);
 }
 

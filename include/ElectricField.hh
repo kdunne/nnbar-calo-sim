@@ -23,49 +23,40 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
+//
+/// \file ElectricField.hh
+/// \brief Definition of the ElectricField class
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef ElectricField_H
+#define ElectricField_H 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ThreeVector.hh"
-#include "G4DataVector.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleGun.hh"
-#include "Randomize.hh"
 #include "globals.hh"
-#include "PrimaryGeneratorMessenger.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4GenericMessenger.hh"
+#include "G4ElectricField.hh"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string.h>
+#include <vector>
+#include <stdlib.h>
 
-using namespace std;
+class G4GenericMessenger;
 
+/// Electric field
 
-class G4ParticleGun;
-class G4Event;
-
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class ElectricField : public G4ElectricField
 {
   public:
-  PrimaryGeneratorAction();
-  virtual ~PrimaryGeneratorAction();
-
-  public:
-	void GeneratePrimaries(G4Event* anEvent);
-
-  void SetRandomFlag(G4bool value);
-
+    ElectricField();
+    virtual ~ElectricField();
+    
+    virtual void GetFieldValue(const G4double point[4],double* eField ) const;
+    
   private:
-    G4ParticleGun*  fParticleGun; 
+    void DefineCommands();
 
-  private:
-	G4GenericMessenger* fMessenger;
-        G4ParticleTable* particleTable;
-	G4ParticleGun* particleGun;
-	PrimaryGeneratorMessenger* gunMessenger;
+    G4GenericMessenger* fMessenger;
 };
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
