@@ -23,49 +23,36 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef Scint_DetSD_h
+#define Scint_DetSD_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ThreeVector.hh"
-#include "G4DataVector.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleGun.hh"
-#include "Randomize.hh"
+#include "G4VSensitiveDetector.hh"
 #include "globals.hh"
-#include "PrimaryGeneratorMessenger.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4GenericMessenger.hh"
 
-using namespace std;
+#include "NNbarHit.hh"
 
-
-class G4ParticleGun;
-class G4Event;
-
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class Scint_DetSD : public G4VSensitiveDetector
 {
-  public:
-  PrimaryGeneratorAction();
-  virtual ~PrimaryGeneratorAction();
-
-  public:
-	void GeneratePrimaries(G4Event* anEvent);
-
-  void SetRandomFlag(G4bool value);
-
-  private:
-    G4ParticleGun*  fParticleGun; 
-
-  private:
-	G4GenericMessenger* fMessenger;
-        G4ParticleTable* particleTable;
-	G4ParticleGun* particleGun;
-	PrimaryGeneratorMessenger* gunMessenger;
+public:
+    Scint_DetSD(G4String name);
+    ~Scint_DetSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
+private:
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
 };
-
-//....
-
 #endif
+
+

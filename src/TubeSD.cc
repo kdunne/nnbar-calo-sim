@@ -77,7 +77,6 @@ void TubeSD::Initialize(G4HCofThisEvent*)
 //.....
 G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-
     if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Tube") return false;
     
     // Get Direction
@@ -113,10 +112,8 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
-    G4int k  = touchable->GetReplicaNumber(0);
-    //G4int i  = touchable->GetReplicaNumber(2);
-    //G4int j  = touchable->GetReplicaNumber(1);
-  
+
+    //std::cout << aStep->GetPreStepPoint()-> GetPhysicalVolume() << std::endl;
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
 
@@ -135,53 +132,51 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Process
     if (trackID > 1){
         parentID = theTrack->GetParentID();
-        proc = theTrack->GetCreatorProcess()->GetProcessName();
-    } else {
-        proc = "primary";
-	parentID = 0;
+		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
+		else { proc = "primary"; }
+        
+    } 
+	
+	else {
+       proc = "primary";
+	   parentID = 0;
     }
 
+	/***
     if (proc=="Decay"){
         G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
+	***/
 
     //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    if(DX) { 		    
+    //if(DX) { 		    
                   
-        // Get the pre-step kinetic energy
-        G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
-        // Get the post-step kinetic energy
-        G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
-        // Get the step average kinetic energy
-        G4double eKinMean = (eKinPre + eKinPost) * 0.5;
+    // Get the pre-step kinetic energy
+    G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
+    // Get the post-step kinetic energy
+    G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
+    // Get the step average kinetic energy
+    G4double eKinMean = (eKinPre + eKinPost) * 0.5;
 
-        NNbarHit* detectorHit = new NNbarHit();
+    NNbarHit* detectorHit = new NNbarHit();
 
-        // Make this kinetic energy and position
-	detectorHit -> SetLocalTime(localTime);
-	detectorHit -> SetParentID(parentID);
-	detectorHit -> SetProcess(proc);
-       	detectorHit -> SetTime(time);
-	detectorHit -> SetName(name);
+    // Make this kinetic energy and position
+    detectorHit -> SetLocalTime(localTime);
+    detectorHit -> SetParentID(parentID);
+    detectorHit -> SetProcess(proc);
+    detectorHit -> SetTime(time);
+    detectorHit -> SetName(name);
+    detectorHit -> SetTrackID(trackID);
+    //detectorHit -> SetXID(k);
+    //detectorHit -> SetGroup_ID(group_ID);
+    //detectorHit -> SetMod_ID(module_ID);
+    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetKinEn(eKinPost);
+    HitsCollection -> insert(detectorHit);
 
-	detectorHit -> SetTrackID(trackID);
-        detectorHit -> SetXID(k);
-        detectorHit -> SetPosZ(tracklength);
-        detectorHit -> SetEDep(energyDeposit);
-        //detectorHit -> SetKinEn(eKinMean);
-        //detectorHit -> SetKinEn(eKinPre);
-        detectorHit -> SetKinEn(eKinPost);
-
-	HitsCollection -> insert(detectorHit);
-
-//	G4cout << "Replica: "       << k << G4endl;
-//	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinPost: "      << eKinPost << G4endl;
-
-    }
-    
+    //std::cout << " TUBE SD : A hit created in moudle: "<< module_ID << " group: " << group_ID << std::endl;
     return true;
 }
 

@@ -36,7 +36,7 @@
 #include "G4OpticalPhoton.hh"
 #include "G4Event.hh"
 #include "G4RunManager.hh"
-
+#include "G4DynamicParticle.hh"
 //....
 
 SteppingAction::SteppingAction()
@@ -57,29 +57,9 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
+ 
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-
-  if (eventNumber != fEventNumber) {
-     fEventNumber = eventNumber;
-     fScintillationCounter = 0;
-     fCerenkovCounter = 0;
-  }
-
   G4Track* track = step->GetTrack();
+  G4int parentID = track->GetParentID();
   G4int ID = track->GetTrackID();
-  G4int ltime = track->GetLocalTime();
-
-
 } 
-  //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
-
-//  if (secondaries->size()>0) {
-  //   for(unsigned int i=0; i<secondaries->size(); ++i) {
-    //      G4cout << "secondary particle: " << secondaries->at(i)->GetDynamicParticle()->GetParticleDefinition()->GetParticleName() << G4endl;
-      //    G4cout << "Creator process: " << secondaries->at(i)->GetCreatorProcess()->GetProcessName() << G4endl;
-     //}
-  //}
-
-//}
-
-//....

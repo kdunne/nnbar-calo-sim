@@ -1,39 +1,26 @@
-
-#----------------------------------------------------------------------------
-# Setup the project
-#
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(nnbar-calo-sim)
 
-#----------------------------------------------------------------------------
-# Find Geant4 package, activating all available UI and Vis drivers by default
-# You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
-# to build a batch mode only executable
-#
 option(WITH_GEANT4_UIVIS "Build nnbar-calo-sim with Geant4 UI and Vis drivers" ON)
+
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED ui_all vis_all)
 else()
   find_package(Geant4 REQUIRED)
 endif()
 
+include(${Geant4_USE_FILE})
+
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
-include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include)
 
-#----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# NB: headers are included so they will show up in IDEs
-#
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+include_directories(${PROJECT_SOURCE_DIR}/include )
 
-#----------------------------------------------------------------------------
-# Add the executable, and link it to the Geant4 libraries
-#
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*)
+
 add_executable(nnbar-calo-sim nnbar-calo-sim.cc ${sources} ${headers})
 target_link_libraries(nnbar-calo-sim ${Geant4_LIBRARIES})
 
@@ -42,11 +29,18 @@ target_link_libraries(nnbar-calo-sim ${Geant4_LIBRARIES})
 # build. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
+
 set(SCRIPTS
   nnbar-calo-sim.in
   gui.mac
   init_vis.mac
   vis.mac
+  setup.file
+  /lead_glass_position/non_axial.csv
+  /lead_glass_position/non_axial_fb.csv
+  /lead_glass_position/pmt_pos.csv
+  /lead_glass_position/lead_glass_posx.csv
+  /lead_glass_position/lead_glass_posz.csv
   )
 
 foreach(_script ${SCRIPTS})
