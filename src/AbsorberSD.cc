@@ -51,16 +51,18 @@
 #include "G4VSensitiveDetector.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "G4Cerenkov.hh"
+
 
 //......
 AbsorberSD::AbsorberSD(G4String name):
 G4VSensitiveDetector(name)
 {
+	error_count = 0;
     G4String HCname;
     collectionName.insert(HCname="AbsorberHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
-    
 }
 
 //......
@@ -71,26 +73,27 @@ AbsorberSD::~AbsorberSD()
 void AbsorberSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
 G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
+    //std::cout << aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() << aStep -> GetPostStepPoint() -> GetPhysicalVolume() -> GetName() << std::endl;
+    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "AbsoPV") return false;
 
-    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Abso") return false;
-    
-    
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
     
-    
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
+
+    if (particleName == "opticalphoton") return false;
+
+    
     
     // Get particle PDG code
     G4int pdg = particleDef ->GetPDGEncoding();
@@ -104,9 +107,12 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get Step Length 
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    
+
+
     // Get Position
     G4ThreeVector pos = PreStep->GetPosition();
+    G4double x = pos.getX();
+    G4double y = pos.getY();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
@@ -116,10 +122,8 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
     G4int k  = touchable->GetReplicaNumber(0);
-    //G4int i  = touchable->GetReplicaNumber(2);
-    //G4int j  = touchable->GetReplicaNumber(1);
-
-
+    //G4int group_ID = touchable->GetReplicaNumber(4);
+    //G4int module_ID = touchable->GetReplicaNumber(3);
 
     // Get Time 
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
@@ -134,25 +138,42 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
     
+    G4int photons = 0;
+    G4ParticleDefinition* particle;
+    if (particleName != "opticalphoton") {
+            const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
+            for (int j = 0; j < (*secondary).size(); j++) {
+                    particle = (*secondary)[j]->GetDefinition();
+                    if (particle->GetParticleName() == "opticalphoton" && (*secondary)[j]->GetCreatorProcess()->GetProcessName() == "Cerenkov") { photons++; } // Cerenkov exists in scintillator       // 
+            }
+    }
+
     // Get Process
     G4int parentID = 0;
     G4String proc = "";
     // Getting Process ond parentID of primary causes seg fault
-    if (trackID > 1){
-	parentID = theTrack->GetParentID();
-        proc = theTrack->GetCreatorProcess()->GetProcessName();
-    } else {
-        proc = "primary";
-	parentID = 0;
-    }
+    if (trackID > 1 && theTrack->GetOriginTouchable()->GetVolume()->GetName() != "World"){
+		//std::cout << name << " " <<theTrack->GetOriginTouchable()->GetVolume()->GetName() << std::endl;
+		parentID = theTrack->GetParentID();
+		if (parentID != 0) { proc = theTrack->GetCreatorProcess()->GetProcessName(); }
+		else { proc = "primary"; }
+		//std::cout << " Abso hit : " << name << " ID : " << trackID << theTrack->GetOriginTouchable()->GetVolume()->GetName() << "  " << proc << " the parent ID is : " << parentID << std::endl;
+    } 
 
+	else {
+        proc = "primary";
+		parentID = 0;
+    }
+	/***
     if (proc=="Decay") {
         G4cout << "Killing particle " << name << G4endl;
         theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     }
+	***/
+    
+    //if (name=="opticalphoton" &  aStep -> IsLastStepInVolume()) {theTrack->SetTrackStatus(fKillTrackAndSecondaries);}
 
-
-    if (DX) {
+    //if (DX) { // *** tried to cancel the statement to see if things work
 	    
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -160,7 +181,7 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4double eKinPost = aStep -> GetPostStepPoint() -> GetKineticEnergy();
     // Get the step average kinetic energy
     G4double eKinMean = (eKinPre + eKinPost) * 0.5;
-        
+
     NNbarHit* detectorHit = new NNbarHit();
     detectorHit -> SetLocalTime(localTime);
     detectorHit -> SetParentID(parentID);
@@ -169,31 +190,42 @@ G4bool AbsorberSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetName(name);
     detectorHit -> SetTrackID(trackID);
     detectorHit -> SetXID(k);
-    detectorHit -> SetPosZ(tracklength);
+    detectorHit -> SetPosX(x);
+    detectorHit -> SetPosY(y);
+    detectorHit -> SetPosZ(z);
+    //detectorHit -> SetGroup_ID(group_ID);
+    //detectorHit -> SetMod_ID(module_ID);
+    detectorHit -> SetTrackLength(tracklength);
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinPost);
+    detectorHit-> SetPhotons(photons);
 
     HitsCollection -> insert(detectorHit);
 
-//	G4cout << "Replica: "       << k << G4endl;
-//	G4cout << "tracklength: "   << tracklength << G4endl;
-//	G4cout << "energyDeposit: " << energyDeposit << G4endl;
-//	G4cout << "eKinPost: "      << eKinPost << G4endl;
-    }
+	if (parentID == 0) {
+		G4double x_o = (aStep->GetPreStepPoint()->GetPosition())[0];
+		G4double x_p = (aStep->GetPostStepPoint()->GetPosition())[0];
+		G4double y_o = (aStep->GetPreStepPoint()->GetPosition())[1];
+		G4double y_p = (aStep->GetPostStepPoint()->GetPosition())[1];
+		G4double z_o = (aStep->GetPreStepPoint()->GetPosition())[2];
+		G4double z_p = (aStep->GetPostStepPoint()->GetPosition())[2];
 
+		if (x_o == x_p && y_o == y_p && z_o == z_p && DX < 10^-10 && energyDeposit < 10^-10)
+                {error_count++;
+                if (error_count > 100) { std::cout << " *** - - - - Error with the propagation " << error_count << " *** - - - - -"<< std::endl;
+                theTrack->SetTrackStatus(fStopAndKill);
+                error_count = 0;}
+		}
+
+	}
     return true;
 }
 
-//......
 void AbsorberSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
-    
     static G4int HCID = -1;
     if(HCID < 0)
-    {
-        HCID = GetCollectionID(0);
-    }
-    
+    {HCID = GetCollectionID(0);}
     HCE -> AddHitsCollection(HCID,HitsCollection);
 }
 

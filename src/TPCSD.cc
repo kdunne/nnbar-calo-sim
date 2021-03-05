@@ -26,7 +26,7 @@
 // Hadrontherapy advanced example for Geant4
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "ScintillatorSD.hh"
+#include "TPCSD.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -53,43 +53,47 @@
 #include "G4Cerenkov.hh"
 
 //.....
-ScintillatorSD::ScintillatorSD(G4String name):
+TPCSD::TPCSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="ScintillatorHitCollection");
+    collectionName.insert(HCname="TPCHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
 }
 
 //.....
-ScintillatorSD::~ScintillatorSD()
+TPCSD::~TPCSD()
 {}
 
 //.....
-void ScintillatorSD::Initialize(G4HCofThisEvent*)
+void TPCSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
-G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-    
-    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint_layerPV") return false; 
+
 
     // Get Direction
-    G4Track * theTrack = aStep  ->  GetTrack();
+    G4Track * theTrack = aStep  ->  GetTrack();   
+
+    G4int parentID = 0;
+    parentID = theTrack->GetParentID();
+    //if (parentID >0) {return false;}
+
+    G4String proc = "primary"; 
+
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
-    if (particleName == "opticalphoton") return false;
     
     // Get particle PDG code
     G4int pdg = particleDef ->GetPDGEncoding();
@@ -98,8 +102,9 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-  
+    G4double energyDeposit = 0.;
+    energyDeposit = aStep -> GetTotalEnergyDeposit();
+
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
@@ -113,18 +118,14 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();
     G4double tracklength = z - origin;
-
-    // Read voxel indeces: i is the x index, k is the z index
-    const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
-    G4int k  = touchable->GetReplicaNumber(0);
-    //G4int origin_replica = theTrack->GetOriginTouchable()->GetReplicaNumber(0); // Not used anymore
-    G4int group_ID = touchable->GetReplicaNumber(2); 
-    G4int module_ID = touchable->GetReplicaNumber(1);
     
+    // Read voxel indexes: i is the x index, k is the z index
+    const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
+    G4int k = touchable ->GetReplicaNumber(0); // which layer it is in 
+    G4int TPC_index = touchable -> GetReplicaNumber(1); // which TPC it is in
+
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
-    // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
     // Get Name
@@ -133,33 +134,19 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-   
-    G4int parentID = 0;
-    G4String proc = ""; 
 
-    if (trackID > 1 && theTrack->GetOriginTouchable()->GetVolume()->GetName() != "World") {
-        parentID = theTrack->GetParentID();
-        if (parentID > 0) { proc = theTrack->GetCreatorProcess()->GetProcessName();}
-        else { proc = "primary"; }
-    }
-	
-    else {proc = "primary"; parentID = 0;}
-
-    G4int photons = 0;
+    G4int electrons = 0;
     G4ParticleDefinition* particle;
-
-    if (particleName != "opticalphoton"){
-        const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
-        for (int j = 0; j < (*secondary).size(); j++) {
-            particle = (*secondary)[j]->GetDefinition();
-            if (particle->GetParticleName() == "opticalphoton" && (*secondary)[j]->GetCreatorProcess()->GetProcessName() == "Scintillation"  ) { photons++; } // But Cerenkov exists in scintillator!!
-            // !!!! 
-        }
+    if (particleName != "opticalphoton") {
+            const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
+            for (int j = 0; j < (*secondary).size(); j++) {
+                    particle = (*secondary)[j]->GetDefinition();
+                    if (particle->GetParticleName() == "e-") {electrons++;}
+                    else {std::cout<< particle->GetParticleName() << std::endl;} // Cerenkov exists in scintillator
+            }
     }
 
-    //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    //if(DX) { 	    
-                  
+
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
     // Get the post-step kinetic energy
@@ -176,25 +163,27 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetTime(time);
     detectorHit -> SetName(name);
     detectorHit -> SetTrackID(trackID);
-    detectorHit -> SetXID(k);
-    detectorHit -> SetGroup_ID(group_ID);
-    detectorHit -> SetMod_ID(module_ID);
     
+    detectorHit -> SetXID(k);
+    detectorHit -> SetMod_ID(TPC_index);
+
     detectorHit -> SetPosX(x);
     detectorHit -> SetPosY(y);
     detectorHit -> SetPosZ(z);
 
-    detectorHit -> SetTrackLength(tracklength);
+    // remarks: here it is named set photons but actually it counts the electrons in the TPC, too lazy to add one more function
+    detectorHit -> SetPhotons(electrons);
+
+    detectorHit -> SetTrackLength(DX); // not actually trackLength but lets stay in this way..
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinPost);
-    detectorHit->SetPhotons(photons);
     HitsCollection -> insert(detectorHit);
-
+    
     return true;
 }
 
 //......
-void ScintillatorSD::EndOfEvent(G4HCofThisEvent* HCE)
+void TPCSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     
     static G4int HCID = -1;

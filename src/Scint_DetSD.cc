@@ -26,8 +26,7 @@
 // Hadrontherapy advanced example for Geant4
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "ScintillatorSD.hh"
-
+#include "Scint_DetSD.hh"
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
 #include "G4TouchableHistory.hh"
@@ -49,38 +48,35 @@
 #include "G4TransportationManager.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4Scintillation.hh"
-#include "G4Cerenkov.hh"
+
 
 //.....
-ScintillatorSD::ScintillatorSD(G4String name):
+Scint_DetSD::Scint_DetSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="ScintillatorHitCollection");
+    collectionName.insert(HCname="Scint_DetHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
 }
 
 //.....
-ScintillatorSD::~ScintillatorSD()
+Scint_DetSD::~Scint_DetSD()
 {}
 
 //.....
-void ScintillatorSD::Initialize(G4HCofThisEvent*)
+void Scint_DetSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
-G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool Scint_DetSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
+    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint_detectorPV") return false;
     
-    if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint_layerPV") return false; 
-
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
@@ -89,7 +85,6 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     //Get particle name
     G4ParticleDefinition *particleDef = theTrack -> GetDefinition();
     G4String particleName =  particleDef -> GetParticleName();
-    if (particleName == "opticalphoton") return false;
     
     // Get particle PDG code
     G4int pdg = particleDef ->GetPDGEncoding();
@@ -106,59 +101,54 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Position
     G4ThreeVector pos = PreStep->GetPosition();
-    G4double x = pos.getX();
-    G4double y = pos.getY();
     G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();
     G4double tracklength = z - origin;
 
-    // Read voxel indeces: i is the x index, k is the z index
+    // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
     G4int k  = touchable->GetReplicaNumber(0);
-    //G4int origin_replica = theTrack->GetOriginTouchable()->GetReplicaNumber(0); // Not used anymore
-    G4int group_ID = touchable->GetReplicaNumber(2); 
-    G4int module_ID = touchable->GetReplicaNumber(1);
+    G4int group_ID  = touchable->GetReplicaNumber(2);
+    G4int module_ID = touchable -> GetReplicaNumber(1);
     
+    // number of photons hitting the detector
+
+    //std::cout << aStep->GetPreStepPoint()-> GetPhysicalVolume() << std::endl;
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
     // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
-
     // Get Name
     G4String name = theTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
-
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-   
     G4int parentID = 0;
     G4String proc = ""; 
 
-    if (trackID > 1 && theTrack->GetOriginTouchable()->GetVolume()->GetName() != "World") {
+    // Get Process
+    if (trackID > 1){
         parentID = theTrack->GetParentID();
-        if (parentID > 0) { proc = theTrack->GetCreatorProcess()->GetProcessName();}
-        else { proc = "primary"; }
-    }
+		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
+		else { proc = "primary"; }
+        
+    } 
 	
-    else {proc = "primary"; parentID = 0;}
-
-    G4int photons = 0;
-    G4ParticleDefinition* particle;
-
-    if (particleName != "opticalphoton"){
-        const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
-        for (int j = 0; j < (*secondary).size(); j++) {
-            particle = (*secondary)[j]->GetDefinition();
-            if (particle->GetParticleName() == "opticalphoton" && (*secondary)[j]->GetCreatorProcess()->GetProcessName() == "Scintillation"  ) { photons++; } // But Cerenkov exists in scintillator!!
-            // !!!! 
-        }
+	else {
+       proc = "primary";
+	   parentID = 0;
     }
 
+	
+    // kill all things entering
+    //G4cout << particleName << " ID: "<< trackID << " Killing particle " << name << G4endl;
+    theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+    
+	
     //if( direction>0 && DX>0) { //&& trackID==1 ) {
-    //if(DX) { 	    
+    //if(DX) { 		    
                   
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
@@ -179,22 +169,15 @@ G4bool ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetXID(k);
     detectorHit -> SetGroup_ID(group_ID);
     detectorHit -> SetMod_ID(module_ID);
-    
-    detectorHit -> SetPosX(x);
-    detectorHit -> SetPosY(y);
-    detectorHit -> SetPosZ(z);
-
-    detectorHit -> SetTrackLength(tracklength);
     detectorHit -> SetEDep(energyDeposit);
-    detectorHit -> SetKinEn(eKinPost);
-    detectorHit->SetPhotons(photons);
+    detectorHit -> SetKinEn(eKinMean);
     HitsCollection -> insert(detectorHit);
 
     return true;
 }
 
 //......
-void ScintillatorSD::EndOfEvent(G4HCofThisEvent* HCE)
+void Scint_DetSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     
     static G4int HCID = -1;

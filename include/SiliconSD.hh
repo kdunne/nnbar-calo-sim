@@ -23,52 +23,40 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-//
+// See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "SteppingAction.hh"
-#include "EventAction.hh"
-#include "Analysis.hh"
+#ifndef SiliconSD_h
+#define SiliconSD_h 1
 
-#include "G4UnitsTable.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4Step.hh"
-#include "G4Track.hh"
-#include "G4OpticalPhoton.hh"
-#include "G4Event.hh"
-#include "G4RunManager.hh"
-#include "G4DynamicParticle.hh"
-//....
+#include "NNbarHit.hh"
+//#include "SiliconHit.hh"
 
-SteppingAction::SteppingAction()
-: G4UserSteppingAction()
-{ 
-  fScintillationCounter = 0;
-  fCerenkovCounter      = 0;
-  fEventNumber = -1;
-}
 
-//....
+#include "G4VSensitiveDetector.hh"
+#include "globals.hh"
 
-SteppingAction::~SteppingAction()
-{ 
-}
-
-//....
-
-void SteppingAction::UserSteppingAction(const G4Step* step)
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class SiliconSD : public G4VSensitiveDetector
 {
- 
-  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+public:
+    SiliconSD(G4String name);
+    ~SiliconSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
+private:
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
+	int error_count;
+};
+#endif
 
-  
-  G4Track* track = step->GetTrack();
-  G4int parentID = track->GetParentID();
-  G4int ID = track->GetTrackID();
 
-  if (parentID == 0 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
-    auto momentum = track->GetDynamicParticle()->GetMomentum();
-    //G4ParticleDefinition *particleDef = track -> GetDefinition();
-    //G4String particleName =  particleDef -> GetParticleName();
-    //std::cout << momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
-  }
-} 

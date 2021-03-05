@@ -24,51 +24,63 @@
 // ********************************************************************
 //
 //
+// $Id$
+//
+// 
 
-#include "SteppingAction.hh"
-#include "EventAction.hh"
-#include "Analysis.hh"
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "G4UnitsTable.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4Step.hh"
-#include "G4Track.hh"
-#include "G4OpticalPhoton.hh"
-#include "G4Event.hh"
-#include "G4RunManager.hh"
-#include "G4DynamicParticle.hh"
-//....
+#ifndef PhysicsList_h
+#define PhysicsList_h 1
 
-SteppingAction::SteppingAction()
-: G4UserSteppingAction()
-{ 
-  fScintillationCounter = 0;
-  fCerenkovCounter      = 0;
-  fEventNumber = -1;
-}
+#include "G4VUserPhysicsList.hh"
+#include "globals.hh"
+#include "G4EmConfigurator.hh"
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+class G4Cerenkov;
+class G4Scintillation;
+class G4OpAbsorption;
+class G4OpRayleigh;
+class G4OpBoundaryProcess;
 
-SteppingAction::~SteppingAction()
-{ 
-}
-
-//....
-
-void SteppingAction::UserSteppingAction(const G4Step* step)
+class PhysicsList: public G4VUserPhysicsList
 {
- 
-  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+public:
+  PhysicsList();
+  virtual ~PhysicsList();
 
-  
-  G4Track* track = step->GetTrack();
-  G4int parentID = track->GetParentID();
-  G4int ID = track->GetTrackID();
+  // Construct particle and physics
+  void ConstructParticle();
+  void ConstructProcess();
+  void ConstructNeutron();
+  void SetCuts();
+   
+private:
 
-  if (parentID == 0 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
-    auto momentum = track->GetDynamicParticle()->GetMomentum();
-    //G4ParticleDefinition *particleDef = track -> GetDefinition();
-    //G4String particleName =  particleDef -> GetParticleName();
-    //std::cout << momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
-  }
-} 
+  // these methods Construct physics processes and register them
+  void ConstructDecay();
+  void ConstructEM();
+  void ConstructOptical();
+  void  AddPAIModel(const G4String&);
+  void  NewPAIModel(const G4ParticleDefinition*, const G4String& modname, const G4String& procname);
+  //void NewPAIModel(const G4ParticleDefinition* part,const G4String& modname,const G4String& procname);
+  //void AddPAIModel(const G4String& modname);
+
+
+private:
+  G4Cerenkov*          theCerenkovProcess;
+  G4Scintillation*     theScintillationProcess;
+  G4OpAbsorption*      theAbsorptionProcess;
+  G4OpRayleigh*        theRayleighScatteringProcess;
+  G4OpBoundaryProcess* theBoundaryProcess;
+  G4EmConfigurator*    fConfig;
+};
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif
+
+
+
