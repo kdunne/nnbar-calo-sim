@@ -295,7 +295,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4int  nofLayers = 10;
   G4double  absoThickness  = 25.*cm;
   G4double  scintThickness =  3.*cm;
-  G4double  calorSizeXY    =  98.*cm;
+  G4double calorSizeXY = 16.*cm;
+//  G4double  calorSizeXY    =  98.*cm;
   G4double  tubeThickness  =  2.*cm;
 
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
