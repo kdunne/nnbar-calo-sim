@@ -98,6 +98,9 @@ RunAction::RunAction()
   analysisManager->CreateH1("DeutKE", "DeutKE", 200,0, 200*MeV); // 17
   analysisManager->CreateH1("DeutVertexZ", "DeutVertexZ", 200,0, 200); // 18
 
+  analysisManager->CreateH1("Time", "Time", 50, 0, 1000);
+  analysisManager->CreateH1("KinEn","KinEn", 50, 0, 5);
+
   // 2-D Histos
   // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
   analysisManager->CreateH2("KEvRange","KEvRange", 90, 0 , 30, 400, 0, 400); 			//	0 

@@ -295,14 +295,18 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4int  nofLayers = 10;
   G4double  absoThickness  = 25.*cm;
   G4double  scintThickness =  3.*cm;
-  G4double calorSizeXY = 16.*cm;
+  G4double calorSizeX = 1.*m;
+  G4double calorSizeY = 5.*cm;
 //  G4double  calorSizeXY    =  98.*cm;
   G4double  tubeThickness  =  2.*cm;
 
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   auto calorThickness = (nofLayers*scintThickness) + absoThickness;
   //auto calorThickness = (nofLayers*scintThickness) + absoThickness + tubeThickness;
-  auto worldSizeXY = 1 * calorSizeXY;
+  auto worldSizeX = 1 * calorSizeX;
+auto worldSizeY = 1 * calorSizeY;
+
+  //auto worldSizeXY = 1 * calorSizeXY;
   auto worldSizeZ = 446*cm;
   //auto worldSizeZ  = 1 * calorThickness;
 
@@ -328,7 +332,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // World
   auto worldS 
     = new G4Box("World",           // its name
-                 worldSizeXY/2, worldSizeXY/2, worldSizeZ/2); // its size
+                 worldSizeX/2, worldSizeY/2, worldSizeZ/2); // its size
                          
   auto worldLV
     = new G4LogicalVolume(
@@ -350,7 +354,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Vacuum
   auto VacuumS 
     = new G4Box("Vacuum",           // its name
-                 worldSizeXY/2, worldSizeXY/2, 112.06*cm/2); // its size
+                 worldSizeX/2, worldSizeY/2, 112.06*cm/2); // its size
                          
   auto VacuumLV
     = new G4LogicalVolume(
@@ -377,7 +381,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Silicon
   auto SiliconS 
     = new G4Box("Silicon",           // its name
-                 worldSizeXY/2, worldSizeXY/2, .03*cm/2); // its size
+                 worldSizeX/2, worldSizeY/2, .03*cm/2); // its size
                          
   auto FirstSiliconLV
     = new G4LogicalVolume(
@@ -449,7 +453,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Absorber
   auto absorberS 
     = new G4Box("Abso",            // its name
-                 calorSizeXY/2, calorSizeXY/2, absoThickness/2); // its size
+                 calorSizeX/2, calorSizeY/2, absoThickness/2); // its size
                          
   auto absorberLV
     = new G4LogicalVolume(
@@ -478,7 +482,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Layer
   auto layerS 
     = new G4Box("Layer",           // its name
-                 calorSizeXY/2, calorSizeXY/2, (scintThickness * nofLayers)/2); // its size
+                 calorSizeX/2, calorSizeY/2, (scintThickness * nofLayers)/2); // its size
                          
   auto layerLV
     = new G4LogicalVolume(
@@ -526,7 +530,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Vacuum Tube
   auto tubeS 
     = new G4Box("Tube",           // its name
-                 calorSizeXY/2, calorSizeXY/2, tubeThickness/2); // its size
+                 calorSizeX/2, calorSizeY/2, tubeThickness/2); // its size
                          
   auto tubeLV
     = new G4LogicalVolume(
@@ -557,7 +561,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // FR4 front
   auto FR4frontS 
     = new G4Box("FR4front",           // its name
-                 calorSizeXY/2, calorSizeXY/2, .16*cm/2.); // its size
+                 calorSizeX/2, calorSizeY/2, .16*cm/2.); // its size
                          
   auto FR4frontLV
     = new G4LogicalVolume(
@@ -582,7 +586,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // FR4 front
   auto FR4backS 
     = new G4Box("FR4bacl",           // its name
-                 calorSizeXY/2, calorSizeXY/2, .16*cm/2.); // its size
+                 calorSizeX/2, calorSizeY/2, .16*cm/2.); // its size
                          
   auto FR4backLV
     = new G4LogicalVolume(
@@ -614,7 +618,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // TPC
   auto TPCS 
     = new G4Box("TPC",           // its name
-                 calorSizeXY/2, calorSizeXY/2, 50*cm/2.); // its size
+                 calorSizeY/2, calorSizeY/2, 50*cm/2.); // its size
                          
   auto TPCLV
     = new G4LogicalVolume(

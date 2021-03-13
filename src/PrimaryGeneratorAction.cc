@@ -74,9 +74,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0. ));
+//  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0. ));
 
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+//  fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
 //....

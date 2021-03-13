@@ -181,6 +181,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
         if (ScintHits) {
 	    hitCount = ScintHits->entries();
+
+            if (hitCount>0) {
             std::cout << "Processing: " << hitCount << " Scintillator Hits" << std::endl;
 	    for (G4int h=0; h<hitCount; h++) {
 
@@ -201,8 +203,20 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 vertX     = ((*ScintHits)[h]) -> GetVertX();	
                 vertY     = ((*ScintHits)[h]) -> GetVertY();	
                 vertZ     = ((*ScintHits)[h]) -> GetVertZ();	
+              
+              if(h==0) {
+                if (time/CLHEP::ms >= 400) {
+                analysis->FillH1(19, time/CLHEP::ms);
+                analysis->FillH1(20, kinEn/CLHEP::MeV);
+                }
+              }
 
-
+              //std::cout << "time: " << time/CLHEP::ms << std::endl;
+              //std::cout << "posX: " << posX/CLHEP::cm << std::endl;
+              //std::cout << "posY: " << posY/CLHEP::cm << std::endl;
+              //std::cout << "posZ: " << posZ/CLHEP::cm << std::endl;
+ 
+/***
 	      if (name=="deuteron") {
                    if (kinEn == 0 && de_stopped!=1){
                        std::cout << " Stopping position: " << posZ/CLHEP::cm << std::endl;
@@ -218,7 +232,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                    trackID = trID;
                    }
               }
-
+***/
 
                 //if(trID>1 && eDep>0){
                   //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
@@ -263,8 +277,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
                    EdepPerSheet[i] += eDep;
 	           eDepPrimary += eDep;
 
-                   G4cout << "Kinetic Energy: " << kinEn << " " << G4endl;
-                   G4cout << "Position Z: " << posZ/CLHEP::cm << std::endl;
+                   //G4cout << "Kinetic Energy: " << kinEn << " " << G4endl;
+                   //G4cout << "Position Z: " << posZ/CLHEP::cm << std::endl;
 
 		   analysis->FillH2(0, posZ/CLHEP::cm - 166., kinEn/CLHEP::MeV);
 	           
@@ -289,7 +303,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	       } 
 
 	    }
-
+	    }
 	    // Fill scint bins with Energy Dep
             for (G4int i=0; i<10; i++) {
                 if (EdepPerSheet[i]) {

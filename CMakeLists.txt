@@ -16,7 +16,6 @@ if(WITH_GEANT4_UIVIS)
 else()
   find_package(Geant4 REQUIRED)
 endif()
-
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
@@ -36,6 +35,23 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #
 add_executable(nnbar-calo-sim nnbar-calo-sim.cc ${sources} ${headers})
 target_link_libraries(nnbar-calo-sim ${Geant4_LIBRARIES})
+#----------------------------------------------------------------------------
+# MCPL libraries
+add_library(mcpl STATIC ${PROJECT_SOURCE_DIR}/src/mcpl.c)
+install(TARGETS mcpl DESTINATION lib)
+install(FILES mcpl.h DESTINATION include)
+
+add_library(G4MCPLGenerator STATIC ${PROJECT_SOURCE_DIR}/src/G4MCPLGenerator.cc)
+install(TARGETS G4MCPLGenerator DESTINATION lib)
+install(FILES G4MCPLGenerator.hh DESTINATION include)
+
+add_library(G4MCPLWriter STATIC ${PROJECT_SOURCE_DIR}/src/G4MCPLWriter.cc)
+install(TARGETS G4MCPLWriter DESTINATION lib)
+install(FILES G4MCPLWriter.hh DESTINATION include)
+
+target_link_libraries(nnbar-calo-sim mcpl)
+target_link_libraries(nnbar-calo-sim G4MCPLGenerator)
+target_link_libraries(nnbar-calo-sim G4MCPLWriter)
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

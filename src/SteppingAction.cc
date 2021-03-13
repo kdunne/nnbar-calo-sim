@@ -57,7 +57,10 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
+
+/***
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+
 
   if (eventNumber != fEventNumber) {
      fEventNumber = eventNumber;
@@ -69,10 +72,28 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4int ID = track->GetTrackID();
   G4int ltime = track->GetLocalTime();
 
+
+    //Get particle name
+    G4ParticleDefinition *particleDef = track->GetDefinition();
+    G4String particleName =  particleDef->GetParticleName();
+
+    // Get particle PDG code
+    G4int pdg = particleDef->GetPDGEncoding();
+
+    // Get unique track_id (in an event)
+    G4int trackID = track->GetTrackID();
+***/
+
+/*** 
+    std::cout << "particle: " << particleName << std::endl;
+    std::cout << "time: " << track->GetGlobalTime()/CLHEP::ms << std::endl;
+
+    std::cout << "position: " << track->GetPosition().getZ() << std::endl;
+    std::cout << "direction: " << track->GetMomentumDirection().getZ() << std::endl;
+    std::cout << "kinetic energy: " << track->GetKineticEnergy()/CLHEP::MeV << std::endl;
+***/
+}
  
-
-
-} 
   //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
 
 //  if (secondaries->size()>0) {

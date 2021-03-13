@@ -44,6 +44,12 @@
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
+#include "G4MCPLGenerator.hh"
+#include "G4MCPLWriter.hh"
+#include  "mcpl.h"
+
+
+
 //.........
 
 namespace {
@@ -105,9 +111,11 @@ int main(int argc, char** argv)
   auto runManager = new G4RunManager;
 #endif
 
+
   // Set mandatory initialization classes
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
+ 
 
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
@@ -118,11 +126,16 @@ int main(int argc, char** argv)
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
   
+
+
   // Initialize visualization
   auto visManager = new G4VisExecutive;
+
+  runManager->SetUserAction(new G4MCPLGenerator("HIBEAM_tsol_gamma_MUAOq_PHITS_bmei_3M_AsZOH.mcpl"));
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
+  runManager->BeamOn(3464115);
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
