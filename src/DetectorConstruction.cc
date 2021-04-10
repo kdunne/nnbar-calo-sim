@@ -24,34 +24,25 @@
 // ********************************************************************
 //
 //
+/// \file B4dDetectorConstruction.cc
+/// \brief Implementation of the B4dDetectorConstruction class
 
 #include "DetectorConstruction.hh"
-#include "LightGuideSD.hh"
-#include "WLSMaterials.hh"
+#include "ScintillatorSD.hh"
 
+#include "WLSMaterials.hh"
 #include "G4Material.hh"
-#include "G4Element.hh"
 #include "G4NistManager.hh"
 
 #include "G4Box.hh"
-#include "G4Tubs.hh"
-#include "G4EllipticalTube.hh" 
-#include "G4Trap.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4PVReplica.hh"
 #include "G4GlobalMagFieldMessenger.hh"
 #include "G4AutoDelete.hh"
 
-#include "G4LogicalBorderSurface.hh"
-#include "G4LogicalSurface.hh"
-#include "G4OpticalSurface.hh"
-#include "G4LogicalSkinSurface.hh"
-
 #include "G4SDManager.hh"
 #include "G4SDChargedFilter.hh"
-#include "G4PSPopulation.hh"
-#include "G4SDParticleFilter.hh"
 #include "G4MultiFunctionalDetector.hh"
 #include "G4VPrimitiveScorer.hh"
 #include "G4PSEnergyDeposit.hh"
@@ -63,7 +54,8 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-//....
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::DetectorConstruction()
  : G4VUserDetectorConstruction(),
@@ -71,12 +63,13 @@ DetectorConstruction::DetectorConstruction()
 {
 }
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 DetectorConstruction::~DetectorConstruction()
 { 
 }
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
@@ -87,69 +80,63 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   return DefineVolumes();
 }
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
-void DetectorConstruction::DefineMaterials() { 
-
-  //
-  // -------------------------- Define Materials -------------------------------
-  //
-
-
-  // Use materials defined in NIST Manager LUT
+void DetectorConstruction::DefineMaterials()
+{ 
+  // Lead material defined using NIST Manager
   auto nistManager = G4NistManager::Instance();
-  
-  G4double a;
-  G4double z;
-  G4double density;
 
-  // Vacuum
-  new G4Material("Galactic", z=1., a=1.01*g/mole, density= universe_mean_density,
-                  kStateGas, 2.73*kelvin, 3.e-18*pascal);
-
-/***
-  G4Element* elTi = nistManager->FindOrBuildElement("Ti");
-  G4Element* elAs = nistManager->FindOrBuildElement("As");
-  G4Element* elPb = nistManager->FindOrBuildElement("Pb");
-  G4Element* elO = nistManager->FindOrBuildElement("O");
-  G4Element* elSi = nistManager->FindOrBuildElement("Si");
-  G4Element* elNa = nistManager->FindOrBuildElement("Na");
-  G4Element* elCa = nistManager->FindOrBuildElement("Ca");
-***/
-  
   fMaterials = WLSMaterials::GetInstance();
 
+  nistManager->FindOrBuildMaterial("G4_Pb");
+  
+  G4double a;  // mass of a mole;
+  G4double z;  // z=mean number of protons;  
+  G4double density; 
 
+  // Vacuum
+  new G4Material("Galactic", z=1., a=1.01*g/mole,density= universe_mean_density,
+                  kStateGas, 2.73*kelvin, 3.e-18*pascal);
+
+  // Print materials
+  //G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
+G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
+{
+  // Geometry parameters
+  G4int  nofLayers = 10;
+  G4double  absoThickness = 5.*mm;
+  G4double  gapThickness =  3.*cm;
+  G4double  calorSizeXY  = 35.*cm;
 
-  // 10  5x3x50 cm Scintillator Bar
-  G4double WorldSizeX = 30.*cm;
-//  G4double WorldSizeX = 40.*cm;
-  G4double WorldSizeY = 5.*cm;
-  G4double WorldSizeZ = 502*mm;
-  G4double scintThickness = 3.*cm; 
-  //G4double scintThickness = 4.*cm;
-
-  G4double WLSfiberZ  = WorldSizeZ - 2*mm;
-  G4double WLSfiberR  = 1.8*mm;
-
-  G4double HoleRadius       = 1*mm;
-  G4double HoleLength       = WLSfiberZ;
-  G4double FiberRadius      = .7*mm;
-
-  G4double WLSfiberOrigin = 0.0;
-
+  auto  layerThickness = absoThickness + gapThickness;
+  auto  calorThickness = nofLayers * layerThickness;
+  auto  worldSizeXY = 1.2 * calorSizeXY;
+  auto  worldSizeZ  = 1.2 * calorThickness; 
+  
   // Get materials
-  auto defaultMaterial    = G4Material::GetMaterial("Galactic");
- 
+  auto defaultMaterial = G4Material::GetMaterial("Galactic");
+  auto absorberMaterial = G4Material::GetMaterial("G4_Pb");
+  auto gapMaterial = GetMaterial("PMMA");
+  
+  if ( ! defaultMaterial || ! absorberMaterial || ! gapMaterial ) {
+    G4ExceptionDescription msg;
+    msg << "Cannot retrieve materials already defined."; 
+    G4Exception("DetectorConstruction::DefineVolumes()",
+      "MyCode0001", FatalException, msg);
+  }  
+
+   
+  //     
   // World
+  //
   auto worldS 
     = new G4Box("World",           // its name
-                 WorldSizeX/2., WorldSizeY/2., WorldSizeZ/2.); // its size
+                 worldSizeXY/2, worldSizeXY/2, worldSizeZ/2); // its size
                          
   auto worldLV
     = new G4LogicalVolume(
@@ -168,342 +155,162 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
   
+  //                               
+  // Calorimeter
+  //  
+  auto calorimeterS
+    = new G4Box("Calorimeter",     // its name
+                 calorSizeXY/2, calorSizeXY/2, calorThickness/2); // its size
+                         
+  auto calorLV
+    = new G4LogicalVolume(
+                 calorimeterS,    // its solid
+                 defaultMaterial, // its material
+                 "Calorimeter");  // its name
+                                   
+  new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(),  // at (0,0,0)
+                 calorLV,          // its logical volume                         
+                 "Calorimeter",    // its name
+                 worldLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
+  
+  //                                 
+  // Layer
+  //
+  auto layerS 
+    = new G4Box("Layer",           // its name
+                 calorSizeXY/2, calorSizeXY/2, layerThickness/2); // its size
+                         
+  auto layerLV
+    = new G4LogicalVolume(
+                 layerS,           // its solid
+                 defaultMaterial,  // its material
+                 "Layer");         // its name
 
+  new G4PVReplica(
+                 "Layer",          // its name
+                 layerLV,          // its logical volume
+                 calorLV,          // its mother
+                 kZAxis,           // axis of replication
+                 nofLayers,        // number of replica
+                 layerThickness);  // witdth of replica
+  
+  //                               
+  // Absorber
+  //
+  auto absorberS 
+    = new G4Box("Abso",            // its name
+                 calorSizeXY/2, calorSizeXY/2, absoThickness/2); // its size
+                         
+  auto absorberLV
+    = new G4LogicalVolume(
+                 absorberS,        // its solid
+                 absorberMaterial, // its material
+                 "AbsoLV");          // its name
+                                   
+   new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., -gapThickness/2), //  its position
+                 absorberLV,       // its logical volume                         
+                 "Abso",           // its name
+                 layerLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
 
-  std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
-  G4double xPos[] = {-13.5, -10.5, -7.5, -4.5, -1.5, 1.5, 4.5, 7.5, 10.5, 13.5};
-//  G4double xPos[] = {-18, -14, -10, -6, -2, 2, 6, 10, 14, 18};
+  //                               
+  // Gap
+  //
+  auto gapS 
+    = new G4Box("Gap",             // its name
+                 calorSizeXY/2, calorSizeXY/2, gapThickness/2); // its size
+                         
+  auto gapLV
+    = new G4LogicalVolume(
+                 gapS,             // its solid
+                 gapMaterial,      // its material
+                 "GapLV");      // its name
+                                   
+  new G4PVPlacement(
+                 0,                // no rotation
+                 G4ThreeVector(0., 0., absoThickness/2), //  its position
+                 gapLV,            // its logical volume                         
+                 "Gap",            // its name
+                 layerLV,          // its mother  volume
+                 false,            // no boolean operation
+                 0,                // copy number
+                 fCheckOverlaps);  // checking overlaps 
 
-  G4double yPos[] = {0,0,0,0,0,0,0,0,0,0};
-  G4double zPos[] = {0,0,0,0,0,0,0,0,0,0};
+  //                                        
+  // Visualization attributes
+  //
+  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
 
-  for(int i=0; i<10; i++) {
-//    for(int j=0; j<10; j++){
-        std::cout << xPos[i] <<"," << yPos[i] << std::endl;
-        //std::cout << "name: " << name[i] << j << std::endl;
+  auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  simpleBoxVisAtt->SetVisibility(true);
+  calorLV->SetVisAttributes(simpleBoxVisAtt);
 
-
-        BuildScintBar(worldLV, 
-                          xPos[i], 
-                          yPos[i],
-                          name[i],
-                          zPos[i], 
-                          scintThickness,
-                          WorldSizeY,
-                          WorldSizeZ);
-   // }
-  }
-
-    
+  //
+  // Always return the physical World
+  //
   return worldPV;
 }
 
-//....
-
-void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ) {
-
-  G4double HoleRadius   = 1*mm;
-  G4double WLSfiberR    = .9*mm;
-  G4double WLSfiberZ    = (WorldSizeZ-2*mm) /2.;
-  //G4double WLSfiberZ  = WorldSizeZ/2;
-  G4double CoatingThickness = .25*mm;
-  G4double SiPMThickness = 2.*mm;
-
-  G4double ScintZSize = WorldSizeZ-(SiPMThickness*2);
-  G4double ScintXYSize = scintThickness-CoatingThickness;
-
-
-  G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
-
-
-  //--------------------------------------------------
-  // Extrusion
-  //--------------------------------------------------
-
-
-  auto ExtrusionS =
-        new G4Box("Extrusion", scintThickness/2, WorldSizeY/2, ScintZSize/2);
-
-  auto ExtrusionLV =
-        new G4LogicalVolume(ExtrusionS,
-                            FindMaterial("Coating"),
-                            "Extrusion");
-
-
-
-  G4double fExtrusionReflectivity = 1.;
-  G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface",
-                                                       glisur,
-                                                       ground,
-                                                       dielectric_metal,
-                                                       fExtrusionReflectivity);
-
-  G4MaterialPropertiesTable* TiO2SurfaceProperty =
-                                             new G4MaterialPropertiesTable();
-
-  G4double p_TiO2[] = {2.00*eV, 3.47*eV};
-  G4int nbins = sizeof(p_TiO2)/sizeof(G4double);
-
-  G4double refl_TiO2[] = {fExtrusionReflectivity,fExtrusionReflectivity};
-  assert(sizeof(refl_TiO2) == sizeof(p_TiO2));
-  G4double effi_TiO2[] = {0, 0};
-  assert(sizeof(effi_TiO2) == sizeof(p_TiO2));
-
-  TiO2SurfaceProperty -> AddProperty("REFLECTIVITY",p_TiO2,refl_TiO2,nbins);
-  TiO2SurfaceProperty -> AddProperty("EFFICIENCY",p_TiO2,effi_TiO2,nbins);
-
-  TiO2Surface -> SetMaterialPropertiesTable(TiO2SurfaceProperty);
-
-  new G4PVPlacement(0,
-                    G4ThreeVector(xPos*cm, yPos*cm, zPos*cm),
-                    ExtrusionLV,
-                    "Extrusion",
-                    worldLV,
-                    false,
-                    0);
-
-  new G4LogicalSkinSurface("TiO2Surface",ExtrusionLV,TiO2Surface);
-
-
-
-
-
-
-  //--------------------------------------------------
-  // Scintillator
-  //--------------------------------------------------
-
-
- 
-  std::string scintName = "scint_" + name;
-
-  auto ScintillatorS 
-    = new G4Box("Scintillator", (scintThickness-CoatingThickness*2)/2, (WorldSizeY-CoatingThickness*2)/2, (ScintZSize-CoatingThickness*2)/2);
-
-  auto ScintillatorLV 
-    = new G4LogicalVolume(
-                 ScintillatorS,
-                 FindMaterial("Polystyrene"),
-                 scintName);
-
-  auto ScintillatorPV 
-    = new G4PVPlacement(
-                 0,
-                 G4ThreeVector(0, 0, 0),
-                 ScintillatorLV,
-                 scintName,
-                 ExtrusionLV,
-                 false,
-                 0);
-
-  // declare scint as Primitive Scoreer
-  auto scintDetector = new G4MultiFunctionalDetector(scintName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-
-
-  G4VPrimitiveScorer* primitive = new G4PSEnergyDeposit("eDep");
-  scintDetector->RegisterPrimitive(primitive);
-
-
-  //G4VPrimitiveScorer* primitive;
-  primitive = new G4PSPopulation("Pop");
-
-  G4String fltName, particleName;
-  G4SDParticleFilter* photonFilter =
-        new G4SDParticleFilter(fltName="optPhoton", particleName="opticalphoton");
-  primitive->SetFilter(photonFilter);
-  scintDetector->RegisterPrimitive(primitive);
-
-  SetSensitiveDetector(scintName, scintDetector);
-
-
-  //----------------------------------------------
-  // Hole
-  // ---------------------------------------------
-  std::string hole_name = "hole" + name;
-
-  auto HoleS 
-    = new G4Tubs("Hole",
-                 0.,
-                 HoleRadius,
-                 (ScintZSize-CoatingThickness*2)/2,
-                 0.*deg,
-                 360.*deg);
-
-  auto HoleLV 
-    = new G4LogicalVolume(
-                 HoleS,
-                 FindMaterial("G4_AIR"),
-                 hole_name);
-
-  auto holePV = new G4PVPlacement(0,
-                    G4ThreeVector(0., 0., 0.),
-                    HoleLV,
-                    "Hole",
-                    ScintillatorLV,
-                    false,
-                    0);
-
-
-  //--------------------------------------------------
-  // Cladding
-  //--------------------------------------------------
-
-  auto cladS
-    = new G4Tubs("Clad1",
-                 WLSfiberR,
-                 WLSfiberR + (0.042*mm/2),  // radius
-                 (ScintZSize-CoatingThickness*2)/2,   // length
-                 0.0*deg,
-                 360*deg);
-
-  auto cladLV 
-    = new G4LogicalVolume(cladS,
-                          FindMaterial("Pethylene"),
-                          "clad");
-
-  auto cladPV 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        cladLV,
-                        "clad",
-                        HoleLV,
-                        false,
-                        0);
-
-
-
-  //--------------------------------------------------
-  // WLS Fiber
-  //--------------------------------------------------
-  std::string fiber_name = "fiber_" + name;
-
-  //std::cout << "name: " << fiber_name << " Fiber size: " << WLSfiberR << " Fiber Xpos: " << xPos*cm << std::endl;
-
-
-
-  auto FiberS 
-    = new G4Tubs("WLSFiber",
-                  0.,
-                  WLSfiberR,
-                  (ScintZSize-CoatingThickness*2)/2,
-                  0.*deg,
-                  360.*deg);
-
-  auto FiberLV 
-    = new G4LogicalVolume(FiberS,
-                          FindMaterial("PMMA"),
-                          fiber_name);
-
-       //FiberLV->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,10*ms));
-                                 
-  auto FiberPV 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        FiberLV,
-                        "WLSFiber",
-                        cladLV,
-                        false,
-                        0);
-
-  auto fiberDetector = new G4MultiFunctionalDetector(fiber_name);
-  G4SDManager::GetSDMpointer()->AddNewDetector(fiberDetector);
-
-  primitive = new G4PSPopulation("Pop");
-  primitive->SetFilter(photonFilter);
-  fiberDetector->RegisterPrimitive(primitive);
-
-  primitive = new G4PSEnergyDeposit("eDep");
-  fiberDetector->RegisterPrimitive(primitive);
-
-  SetSensitiveDetector(fiber_name, fiberDetector);
-
-
-
-
-  //--------------------------------------------------
-  // Left PhotonDet (Sensitive Detector)
-  //--------------------------------------------------  
-
-  std::string sipm_name = "sipm_" + name;
-
-
-  // Physical Construction
-  auto sipmS 
-    = new G4Box("sipm",
-                3*mm/2,
-                3*mm/2,
-                1*mm/2);
-
-  auto sipmLV
-    = new G4LogicalVolume(sipmS,
-                          FindMaterial("PMMA"),
-                          sipm_name);
-
-  auto sipmPV
-    = new G4PVPlacement(0,
-                        G4ThreeVector(xPos*cm, yPos*cm, (ScintZSize/2) + 0.5*mm),
-                        sipmLV,
-                        sipm_name,
-                        worldLV,
-                        false,
-                        0);
-
-  // PhotonDet Surface Properties
-/***
-  G4OpticalSurface* photonDetSurface = new G4OpticalSurface("PhotonDetSurface",
-                                                       glisur,
-                                                       ground,
-                                                       dielectric_metal, //dielectric_metal,
-                                                       1); // Polish
-
-  G4MaterialPropertiesTable* photonDetSurfaceProperty = new G4MaterialPropertiesTable();
-
-  G4double p_mppc[] = {2.00*eV, 3.47*eV};
-  nbins = sizeof(p_mppc)/sizeof(G4double);
-  G4double refl_mppc[] = {0,0};
-  assert(sizeof(refl_mppc) == sizeof(p_mppc));
-  G4double effi_mppc[] = {1, 1};
-  assert(sizeof(effi_mppc) == sizeof(p_mppc));
-
-  photonDetSurfaceProperty->AddProperty("REFLECTIVITY",p_mppc,refl_mppc,nbins);
-  photonDetSurfaceProperty->AddProperty("EFFICIENCY",p_mppc,effi_mppc,nbins);
-
-  photonDetSurface->SetMaterialPropertiesTable(photonDetSurfaceProperty);
-
-  new G4LogicalSkinSurface("PhotonDetSurface",sipmLV,photonDetSurface);
-***/
-
-  // declare scint as Primitive Scoreer
-
-  auto sipmDetector = new G4MultiFunctionalDetector(sipm_name);
-  G4SDManager::GetSDMpointer()->AddNewDetector(sipmDetector);
-
-  primitive = new G4PSPopulation("Pop");
-  primitive->SetFilter(photonFilter);
-  sipmDetector->RegisterPrimitive(primitive);
-
-  primitive = new G4PSEnergyDeposit("eDep");
-  sipmDetector->RegisterPrimitive(primitive);
-
-  SetSensitiveDetector(sipm_name, sipmDetector);
-
-
-}
-
-
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void DetectorConstruction::ConstructSDandField()
 {
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
- 
+  // 
+  // Scorers
+  //
 
+  // declare Absorber as a MultiFunctionalDetector scorer
+  //  
+  auto absDetector = new G4MultiFunctionalDetector("Absorber");
+  G4SDManager::GetSDMpointer()->AddNewDetector(absDetector);
+
+  G4VPrimitiveScorer* primitive;
+  primitive = new G4PSEnergyDeposit("Edep");
+  absDetector->RegisterPrimitive(primitive);
+
+  primitive = new G4PSTrackLength("TrackLength");
+  auto charged = new G4SDChargedFilter("chargedFilter");
+  primitive ->SetFilter(charged);
+  absDetector->RegisterPrimitive(primitive);  
+
+  SetSensitiveDetector("AbsoLV",absDetector);
+  
+  // declare Gap as a MultiFunctionalDetector scorer
+  //  
+  auto gapDetector = new G4MultiFunctionalDetector("Gap");
+  G4SDManager::GetSDMpointer()->AddNewDetector(gapDetector);
+
+  primitive = new G4PSEnergyDeposit("Edep");
+  gapDetector->RegisterPrimitive(primitive);
+  
+  primitive = new G4PSTrackLength("TrackLength");
+  primitive ->SetFilter(charged);
+  gapDetector->RegisterPrimitive(primitive);  
+  
+  SetSensitiveDetector("GapLV",gapDetector);  
+
+  // 
+  // Magnetic field
+  //
+  // Create global magnetic field messenger.
+  // Uniform magnetic field is then created automatically if
+  // the field value is not zero.
+  G4ThreeVector fieldValue;
+  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
+  fMagFieldMessenger->SetVerboseLevel(1);
+  
+  // Register the field messenger for deleting
+  G4AutoDelete::Register(fMagFieldMessenger);
 }
 
-
-G4Material* DetectorConstruction::FindMaterial(G4String name) {
-    G4Material* material = G4Material::GetMaterial(name,true);
-    return material;
-}
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
