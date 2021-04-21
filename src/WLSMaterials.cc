@@ -296,6 +296,7 @@ void WLSMaterials::CreateMaterials()
   mptWLSfiber->AddProperty("WLSABSLENGTH",photonEnergy,absWLSfiber,nEntries);
   mptWLSfiber->AddProperty("WLSCOMPONENT",photonEnergy,emissionFib,nEntries);
   mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 0.5*ns);
+  mptWLSfiber->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
 
   fPMMA->SetMaterialPropertiesTable(mptWLSfiber);
 
@@ -409,7 +410,7 @@ void WLSMaterials::CreateMaterials()
 
 // 68% anthracene - 17400/MeV : 11832/MeV
   //mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1/MeV);
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD", 1/MeV);
 
 //  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);
@@ -421,6 +422,6 @@ void WLSMaterials::CreateMaterials()
 
   fPolystyrene->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
-  G4cout << "Scintillator Properties -------" << G4endl;
-  mptPolystyrene->DumpTable();
+//  G4cout << "Scintillator Properties -------" << G4endl;
+//  mptPolystyrene->DumpTable();
 }

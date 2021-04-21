@@ -43,10 +43,11 @@
 
 #include "G4SDManager.hh"
 #include "G4SDChargedFilter.hh"
+#include "G4SDParticleFilter.hh"
 #include "G4MultiFunctionalDetector.hh"
 #include "G4VPrimitiveScorer.hh"
 #include "G4PSEnergyDeposit.hh"
-#include "G4PSTrackLength.hh"
+#include "G4PSPopulation.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
@@ -108,12 +109,23 @@ void DetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 {
   // Geometry parameters
+
+  G4int  nofLayers = 100;
+  G4double  absoThickness = 1.*mm;
+  G4double  activeThickness =  2.*mm;
+  G4double  calorSizeXY  = 30.*cm;
+
+
+/***
   G4int  nofLayers = 10;
   G4double  absoThickness = 5.*mm;
-  G4double  gapThickness =  3.*cm;
+  G4double  activeThickness =  3.*cm;
   G4double  calorSizeXY  = 35.*cm;
+***/
 
-  auto  layerThickness = absoThickness + gapThickness;
+
+
+  auto  layerThickness = absoThickness + activeThickness;
   auto  calorThickness = nofLayers * layerThickness;
   auto  worldSizeXY = 1.2 * calorSizeXY;
   auto  worldSizeZ  = 1.2 * calorThickness; 
@@ -121,9 +133,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Get materials
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("G4_Pb");
-  auto gapMaterial = GetMaterial("PMMA");
-  
-  if ( ! defaultMaterial || ! absorberMaterial || ! gapMaterial ) {
+  //auto activeMaterial = FindMaterial("PMMA");
+  auto activeMaterial = FindMaterial("Polystyrene");
+ 
+  if ( ! defaultMaterial || ! absorberMaterial || ! activeMaterial ) {
     G4ExceptionDescription msg;
     msg << "Cannot retrieve materials already defined."; 
     G4Exception("DetectorConstruction::DefineVolumes()",
@@ -214,7 +227,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                                    
    new G4PVPlacement(
                  0,                // no rotation
-                 G4ThreeVector(0., 0., -gapThickness/2), //  its position
+                 G4ThreeVector(0., 0., -activeThickness/2), //  its position
                  absorberLV,       // its logical volume                         
                  "Abso",           // its name
                  layerLV,          // its mother  volume
@@ -223,23 +236,23 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  fCheckOverlaps);  // checking overlaps 
 
   //                               
-  // Gap
+  // Active
   //
-  auto gapS 
-    = new G4Box("Gap",             // its name
-                 calorSizeXY/2, calorSizeXY/2, gapThickness/2); // its size
+  auto activeS 
+    = new G4Box("Active",             // its name
+                 calorSizeXY/2, calorSizeXY/2, activeThickness/2); // its size
                          
-  auto gapLV
+  auto activeLV
     = new G4LogicalVolume(
-                 gapS,             // its solid
-                 gapMaterial,      // its material
-                 "GapLV");      // its name
+                 activeS,             // its solid
+                 activeMaterial,      // its material
+                 "ActiveLV");      // its name
                                    
   new G4PVPlacement(
                  0,                // no rotation
                  G4ThreeVector(0., 0., absoThickness/2), //  its position
-                 gapLV,            // its logical volume                         
-                 "Gap",            // its name
+                 activeLV,            // its logical volume                         
+                 "Active",            // its name
                  layerLV,          // its mother  volume
                  false,            // no boolean operation
                  0,                // copy number
@@ -253,6 +266,13 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   simpleBoxVisAtt->SetVisibility(true);
   calorLV->SetVisAttributes(simpleBoxVisAtt);
+
+  auto absVisAtt= new G4VisAttributes(G4Colour(.5,.5,.5));
+  simpleBoxVisAtt->SetVisibility(true);
+
+
+
+  absorberLV->SetVisAttributes(absVisAtt);
 
   //
   // Always return the physical World
@@ -275,42 +295,45 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->AddNewDetector(absDetector);
 
   G4VPrimitiveScorer* primitive;
-  primitive = new G4PSEnergyDeposit("Edep");
-  absDetector->RegisterPrimitive(primitive);
-
-  primitive = new G4PSTrackLength("TrackLength");
+  primitive = new G4PSEnergyDeposit("AbsorberPop");
+//  absDetector->RegisterPrimitive(primitive);
   auto charged = new G4SDChargedFilter("chargedFilter");
   primitive ->SetFilter(charged);
   absDetector->RegisterPrimitive(primitive);  
 
   SetSensitiveDetector("AbsoLV",absDetector);
   
-  // declare Gap as a MultiFunctionalDetector scorer
+
+//
+  // Declare Active as a MultiFunctionalDetector scorer
   //  
-  auto gapDetector = new G4MultiFunctionalDetector("Gap");
-  G4SDManager::GetSDMpointer()->AddNewDetector(gapDetector);
+  auto activeDetector = new G4MultiFunctionalDetector("Active");
+  G4SDManager::GetSDMpointer()->AddNewDetector(activeDetector);
 
-  primitive = new G4PSEnergyDeposit("Edep");
-  gapDetector->RegisterPrimitive(primitive);
+  primitive = new G4PSEnergyDeposit("eDep");
+  activeDetector->RegisterPrimitive(primitive);
   
-  primitive = new G4PSTrackLength("TrackLength");
+  primitive = new G4PSPopulation("ActivePop");
   primitive ->SetFilter(charged);
-  gapDetector->RegisterPrimitive(primitive);  
+  activeDetector->RegisterPrimitive(primitive);  
   
-  SetSensitiveDetector("GapLV",gapDetector);  
+  primitive = new G4PSPopulation("ScintPop");
+  auto photon = new G4SDParticleFilter("photonFilter");
+  photon->add("opticalphoton");
 
-  // 
-  // Magnetic field
-  //
-  // Create global magnetic field messenger.
-  // Uniform magnetic field is then created automatically if
-  // the field value is not zero.
-  G4ThreeVector fieldValue;
-  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-  fMagFieldMessenger->SetVerboseLevel(1);
-  
-  // Register the field messenger for deleting
-  G4AutoDelete::Register(fMagFieldMessenger);
+  primitive->SetFilter(photon);
+  activeDetector->RegisterPrimitive(primitive); 
+
+  SetSensitiveDetector("ActiveLV",activeDetector);  
+ 
 }
+
+G4Material* DetectorConstruction::FindMaterial(G4String name) {
+    G4Material* material = G4Material::GetMaterial(name,true);
+    return material;
+}
+
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -49,8 +49,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 
   // default particle kinematic
   // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
-  auto particleDefinition 
-    = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
+  auto particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
   fParticleGun->SetParticleDefinition(particleDefinition);
 //  fParticleGun->SetParticlePosition(G4ThreeVector(15.,0.,0.));
 //  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1.,0.,0.));
@@ -69,6 +68,11 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
+
+//  G4double worldZHalfLength = 35.*cm / 2.;
+  G4double worldZHalfLength = 30.*cm / 2.;
+  G4double gunPositionZ = -worldZHalfLength;
+ 
   //G4double worldZHalfLength = 42.*cm / 2.; // 35
   //G4double worldZHalfLength = 37.*cm / 2.; // 30
   //G4double worldZHalfLength = 32.*cm / 2.; // 25
@@ -82,8 +86,12 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
+ // fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., gunPositionZ ));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+ 
 
+  std::cout << "Gun at Z Position: " << gunPositionZ/CLHEP::cm << std::endl;
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 

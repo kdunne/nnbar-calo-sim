@@ -77,7 +77,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4String particleName =  particleDef -> GetParticleName();
 
 
-
+/***
+  if (particleName == "opticalphoton" ){
+    std::cout << particleName << std::endl;
+    std::cout << "Volume: " << track->GetVolume()->GetName() << std::endl;
+  }
+***/
 
       G4double eDep = step->GetTotalEnergyDeposit();
      
