@@ -32,14 +32,40 @@
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
-
+#include "G4GenericMessenger.hh"
 #include <iostream>
 #include <fstream>
+#include <string>
 //....
+
+extern G4int run_number; 
+extern int particle_name_file_index;
+extern G4double event_number;
+extern std::vector<std::vector<G4double>> particle_gun_record;
+extern std::vector<std::vector<G4double>> PMT_record;
+extern std::vector<std::vector<G4double>> scint_record;
+//extern std::ofstream PMT_outFile;
+extern std::ofstream Silicon_outFile;
+extern std::ofstream TPC_outFile;
+extern std::ofstream Scint_layer_outFile;
+extern std::ofstream Abs_outFile; 
+extern std::ofstream pi0_outFile;
+extern std::ofstream Tube_outFile;
+extern std::ofstream Particle_outFile; 
+extern std::ofstream Lead_glass_outFile;
+extern std::ofstream Scint_outFile;
+
+
+string particle_name_list[7] = { "", "_neutron", "_proton", "_gamma","_electron","_muon","_pion" };
 
 RunAction::RunAction()
  : G4UserRunAction()
 { 
+    fMessenger = new G4GenericMessenger(this, "/particle_generator/", "Name the particle for the file name");
+    G4GenericMessenger::Command& filenameCMD = fMessenger->DeclareProperty("Particle_index", particle_name_file_index, "Index of the particle in the order");
+    filenameCMD.SetParameterName("Particle Index", true);
+    filenameCMD.SetDefaultValue("99");
+
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);     
 
@@ -56,48 +82,11 @@ RunAction::RunAction()
   // Book histograms
 
   G4cout << "Booking histograms " << G4endl;
-// Scintillator Histograms Edeposited in individual sheets for low energy gamma backgrounds keV
-/***
-  analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 1000*keV); // 0
-  analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 1000*keV); // 1
-  analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 1000*keV); // 2
-  analysisManager->CreateH1("Scint_Bin_4", "", 100, 0, 1000*keV); // 3
-  analysisManager->CreateH1("Scint_Bin_5", "", 100, 0, 1000*keV); // 4
-  analysisManager->CreateH1("Scint_Bin_6", "", 100, 0, 1000*keV); // 5
-  analysisManager->CreateH1("Scint_Bin_7", "", 100, 0, 1000*keV); // 6
-  analysisManager->CreateH1("Scint_Bin_8", "", 100, 0, 1000*keV); // 7
-  analysisManager->CreateH1("Scint_Bin_9", "", 100, 0, 1000*keV); // 8
-  analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 1000*keV); //9
-***/
+
+  // add histogram here if needed // 
 
 
-// Scintillator Histograms Edeposited in individual sheets for Primary Particles
-  analysisManager->CreateH1("Scint_Bin_1", "Energy Deposit in Scint Bin", 100, 0, 100*MeV); // 0
-  analysisManager->CreateH1("Scint_Bin_2", "", 100, 0, 100*MeV); // 1
-  analysisManager->CreateH1("Scint_Bin_3", "", 100, 0, 100*MeV); // 2
-  analysisManager->CreateH1("Scint_Bin_4", "", 100, 0, 100*MeV); // 3
-  analysisManager->CreateH1("Scint_Bin_5", "", 100, 0, 100*MeV); // 4
-  analysisManager->CreateH1("Scint_Bin_6", "", 100, 0, 100*MeV); // 5
-  analysisManager->CreateH1("Scint_Bin_7", "", 100, 0, 100*MeV); // 6
-  analysisManager->CreateH1("Scint_Bin_8", "", 100, 0, 100*MeV); // 7
-  analysisManager->CreateH1("Scint_Bin_9", "", 100, 0, 100*MeV); // 8
-  analysisManager->CreateH1("Scint_Bin_10", "", 100, 0, 100*MeV); //9
-
-  // 1-D Histos
-  analysisManager->CreateH1("NumCerenkov", "Num Cerenkov Photons", 80, 0, 30000); 		//   	10
-  analysisManager->CreateH1("PhotonTime", "Cerenkov Photon Production", 50, 0, 10*ns); 		// 	11
-  analysisManager->CreateH1("DecayTime", "Primary Decay Time", 50, 0, 3*ns); 			//     	12 
-  analysisManager->CreateH1("Range", "Primary Particle Range", 55, 0, 55); 			//	13
-  //analysisManager->CreateH1("Range", "Primary Particle Range", 550, 0, 55); 			//	13
-  analysisManager->CreateH1("EdepScint", "Energy Deposited in Scintillators", 50, 0, 250*MeV);  //      14
-  analysisManager->CreateH1("EdepAbs", "Energy Deposited in Lead-glass", 50, 0, 250*MeV);       //      15
-  analysisManager->CreateH1("EdepTube", "Energy Deposited in Vacuum Tube", 50, 0, 250*MeV);     //      16
-
-  // 2-D Histos
-  // name, title, nxbins, xmin, xmax, nybins, ymin, ymax
-  analysisManager->CreateH2("KinE","Kinetic Energy", 550, 0, 55, 350, 0, 350); 			//	0 
-  analysisManager->CreateH2("eDepvRange", "Energy Deposited", 55, 0, 55, 50, 0, 250*MeV );      //      1
-  analysisManager->CreateH2("eDepvCerenkov", "Energy Deposited v Cerenkov", 80, 0, 30000, 50, 0, 250*MeV);     //      2
+  analysisManager->FinishNtuple();
 }
 
 //....
@@ -116,14 +105,26 @@ void RunAction::BeginOfRunAction(const G4Run*)
   
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
-  
-  G4String fileName = "../output/calo-sim.root";
-  //G4String Dir = "../output/";
-  //G4String fileName = Dir + "scint-calo-sim.root";
-  //G4String fileName = Dir + "abs-calo-sim.root";
-  //G4cout << "Printing to " << fileName << G4endl;
+  std::cout << " **** The particle file index is " << particle_name_file_index << " " << particle_name_list[particle_name_file_index] << std::endl;
 
+  G4String fileName = "./output/calo-sim" + particle_name_list[particle_name_file_index] +".root";
   analysisManager->OpenFile(fileName);
+
+  TPC_outFile.open("./output/TPC_output_"+std::to_string(run_number)+".txt");
+  Scint_layer_outFile.open("./output/Scintiilator_output_"+std::to_string(run_number)+".txt");
+  Abs_outFile.open("./output/Lead_Glass_output_"+std::to_string(run_number)+".txt");
+  Silicon_outFile.open("./output/Silicon_output_"+std::to_string(run_number)+".txt");
+  pi0_outFile.open("./output/pi0_gamma_"+std::to_string(run_number)+".txt");
+  Tube_outFile.open("./output/Tube_output"+std::to_string(run_number)+".txt");
+  Particle_outFile.open("./output/particle_output_"+std::to_string(run_number)+".txt");
+
+  Particle_outFile << "Event_ID,PID,Mass,Charge,KE,x,y,z,t,u,v,w"<< G4endl;
+  Scint_layer_outFile << "Event_ID,Track_ID,Parent_ID,Name,Proc,Group_ID,module_ID,layer,index,t,KE,eDep,photons,x,y,z"<<G4endl;
+  Abs_outFile<< "Event_ID,Track_ID,Parent_ID,Name,Proc,index,t,KE,eDep,trackl,photons,x,y,z"<<G4endl;
+  TPC_outFile << "Event_ID,module_ID,Layer,Track_ID,Parent_ID,Name,t,KE,eDep,electrons,trackl"<< G4endl; //x,y,z,
+  Silicon_outFile << "Event_ID,layer,Track_ID,Parent_ID,Name,x,y,z,t,KE,eDep,trackl" <<G4endl;
+  pi0_outFile << "Event_ID,KE,px,py,pz"<<G4endl; 
+  Tube_outFile << "Event_ID,Track_ID,Parent_ID,Name,x,y,z,t,KE,eDep,trackl" <<G4endl;
 }
 
 //....
@@ -132,10 +133,28 @@ void RunAction::EndOfRunAction(const G4Run*)
 {
   
   auto analysisManager = G4AnalysisManager::Instance();
-
   // save histograms & ntuple
   analysisManager->Write();
   analysisManager->CloseFile();
+
+  // write the PMT records 
+
+  //PMT_outFile.close();
+  Silicon_outFile.close();
+  TPC_outFile.close();
+  Scint_layer_outFile.close();
+  Abs_outFile.close();
+  Tube_outFile.close();
+  Scint_outFile.close();
+  Particle_outFile.close();
+  Lead_glass_outFile.close();
+
+  // clear all stored data 
+  G4double event_number = 0.0;
+  particle_gun_record.clear(); PMT_record.clear(); scint_record.clear();
+
+  run_number++;
+
 }
 
 //....

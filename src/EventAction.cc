@@ -31,6 +31,9 @@
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
 #include "TubeSD.hh"
+#include "PMTSD.hh"
+#include "TPCSD.hh"
+#include "Scint_DetSD.hh"
 #include "NNbarHit.hh"
 
 #include "G4VHitsCollection.hh"
@@ -45,6 +48,18 @@
 
 //....
 
+extern G4double event_number; 
+//extern G4double silicon_time_trigger;
+
+extern std::vector<std::vector<G4double>> PMT_record;
+extern std::vector<std::vector<G4double>> scint_record;
+//extern std::ofstream PMT_outFile; 
+extern std::ofstream Silicon_outFile;
+extern std::ofstream Tube_outFile;
+extern std::ofstream TPC_outFile;
+extern std::ofstream Scint_layer_outFile; 
+extern std::ofstream Abs_outFile;
+
 EventAction::EventAction(): 
     G4UserEventAction(),
     fAbsoEdepHCID(-1),
@@ -54,7 +69,10 @@ EventAction::EventAction():
     fScintTrackLengthHCID(-1),
     scintHitsCollectionID(-1),
     absHitsCollectionID(-1),
-    tubeHitsCollectionID(-1)
+    tubeHitsCollectionID(-1),
+    TPCHitsCollectionID(-1),
+    PMTHitsCollectionID(-1),
+    SiliconHitsCollectionID(-1)
 {}
 
 //....
@@ -102,10 +120,11 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
     if(scintHitsCollectionID == -1) {
        scintHitsCollectionID = pSDManager->GetCollectionID("ScintillatorHitCollection");
        absHitsCollectionID = pSDManager->GetCollectionID("AbsorberHitCollection");
-       tubeHitsCollectionID = pSDManager->GetCollectionID("TubeHitCollection");  
+       tubeHitsCollectionID = pSDManager->GetCollectionID("TubeHitCollection");
+       TPCHitsCollectionID = pSDManager->GetCollectionID("TPCHitCollection");
+       PMTHitsCollectionID = pSDManager->GetCollectionID("PMTHitCollection");
+       SiliconHitsCollectionID = pSDManager->GetCollectionID("SiliconHitCollection");
   }
-
-
 }
 
 //....
@@ -113,49 +132,59 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 void EventAction::EndOfEventAction(const G4Event* event)
 {  
  
-    if(scintHitsCollectionID  < 0) {
-        return;
-    }
+    if(scintHitsCollectionID  < 0) {return;}
+
+	G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
     int CHCID = -1;
-    if (CHCID<0) {
-        CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");
-    }
-    G4HCofThisEvent* HCE = event->GetHCofThisEvent();
-
-
+    if (CHCID<0) {CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");}
+    
     int CHCID2 = -1;
-    if (CHCID2<0) {
-        CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");
-    }
+    if (CHCID2<0) {CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");}
 
     int CHCID3 = -1;
-    if (CHCID3<0) {
-        CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");
-    }
+    if (CHCID3<0) {CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");}
+
+    int CHCID4 = -1;
+    if (CHCID4<0) {CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TPCHitCollection");}
+
+    int CHCID5 = -1;
+    if (CHCID5<0) {CHCID5 = G4SDManager::GetSDMpointer()->GetCollectionID("PMTHitCollection");}
+
+    int CHCID6 = -1;
+    if (CHCID6<0) {CHCID6 = G4SDManager::GetSDMpointer()->GetCollectionID("SiliconHitCollection");}
 
     NNbarHitsCollection* ScintHits = 0;
     NNbarHitsCollection* AbsHits   = 0;
     NNbarHitsCollection* TubeHits  = 0;
+    NNbarHitsCollection* TPCHits  = 0;
+    NNbarHitsCollection* PMTHits  = 0;
+    NNbarHitsCollection* SiliconHits  = 0;
 
     if (HCE) {
+
         G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-	G4int ltime     = 0.;
-    	G4int parentID  = 0;
-	G4String proc   = "";
-	G4String name   = "";
+
+        G4int b = 1;
+        G4int ltime     = 0.;
+        G4int parentID  = 0;
+        G4String proc   = "";
+        G4String name   = "";
         G4double time   = 0.;
         G4int trID      = 0;
-	G4int i         = 0;
-	G4double kinEn  = 0.;
-	G4double eDep   = 0.;
+        G4int i         = 0;
+        G4double kinEn  = 0.;
+        G4double eDep   = 0.;
         G4double trackl = 0.;	
         G4int hitCount  = 0;
-
-	ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
-
+        G4int org_replica = 99;
+        G4int group_ID = 999;
+        G4int module_ID = 999;
+        
         // Book vector to keep track of Edep in each Scintillator Sheet
-	G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
+        G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
+        G4int ScintPerSheet[10] = { 0,0,0,0,0,0,0,0,0,0 };
+        G4int ScintPerSheet_new[10] = { 0,0,0,0,0,0,0,0,0,0 };
         G4double totEdep   = 0.;     
         G4double eDepScint = 0.;
         G4double eDepAbs   = 0.;
@@ -167,312 +196,232 @@ void EventAction::EndOfEventAction(const G4Event* event)
         G4double eDepHadElas = 0.;
         G4double eDepPrimary = 0.;
         G4double eDepOther = 0.;
+        G4int cerenkovCounter = 0;
+        G4int scint_photons = 0;
+        G4int scint_photons_check = 0;
+        G4int PMT_photons = 0;
+
+
+
+        ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
+        
+        std::vector<G4int> Scint_Group_index;
+        std::vector<G4int> Scint_Group_index_reduced;
+        std::vector<G4int> Scint_Module_index;
+        std::vector<G4int> Scint_Module_index_reduced;
+        std::vector<G4int> Scint_Layer_index;
+        std::vector<G4int> Scint_photon_array;
+        std::vector<G4int> Scint_time_array;
+        std::vector<G4int> event_ID_array;
 
         if (ScintHits) {
-	    hitCount = ScintHits->entries();
+           hitCount = ScintHits->entries();
+           for (G4int h=0; h<hitCount; h++) { 
+               name     = ((*ScintHits)[h]) -> GetName();
+               if (name != "opticalphoton"){
+                    //ltime    = ((*ScintHits)[h]) -> GetLocalTime();
+                    parentID = ((*ScintHits)[h]) -> GetParentID();
+                    trID     = ((*ScintHits)[h]) -> GetTrackID();
+                    proc     = ((*ScintHits)[h]) -> GetProcess();
+                    x = ((*ScintHits)[h]) -> GetPosX();
+                    y = ((*ScintHits)[h]) -> GetPosY();
+                    z = ((*ScintHits)[h]) -> GetPosZ();
+                    time     = ((*ScintHits)[h]) -> GetTime();
 
-	    for (G4int h=0; h<hitCount; h++) {
+                    auto stave_ID = ((*ScintHits)[h]) -> GetStave_ID(); 
+                    i        = ((*ScintHits)[h]) -> GetXID();
+                    group_ID = ((*ScintHits)[h]) -> GetGroup_ID();
+                    module_ID = ((*ScintHits)[h]) -> GetMod_ID();
 
-                if (h==0) G4cout << "Hit eDep: " << eDep << G4endl;
-	        // In future can instead define aHit and assign like track.member[i]
-	        ltime    = ((*ScintHits)[h]) -> GetLocalTime();
-	        parentID = ((*ScintHits)[h]) -> GetParentID();
-    		proc     = ((*ScintHits)[h]) -> GetProcess();
-       	        name     = ((*ScintHits)[h]) -> GetName();
-       	        time     = ((*ScintHits)[h]) -> GetTime(); 
-	        trID     = ((*ScintHits)[h]) -> GetTrackID();
-		i        = ((*ScintHits)[h]) -> GetXID();
-	        kinEn    = ((*ScintHits)[h]) -> GetKinEn();
-	        eDep     = ((*ScintHits)[h]) -> GetEdep();
-                trackl   = ((*ScintHits)[h]) -> GetPosZ();	
+                    kinEn    = ((*ScintHits)[h]) -> GetKinEn();
+                    eDep     = ((*ScintHits)[h]) -> GetEdep();
+                    trackl   = ((*ScintHits)[h]) -> GetTrackLength();
+                    G4int scint_photons_per_hit = ((*ScintHits)[h])->GetPhotons();
+                    // writing output
+                    Scint_layer_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << ","
+                    << time <<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit << "," << x <<","<< y << ","<<z<<G4endl;
 
+                    //std::cout<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << std::endl;
 
-
-                //if(trID>1 && eDep>0){
-                  //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
-               //}
-               if (proc == "Decay") {
-                   continue;
                }
 
-               // Sum totEdep
-               eDepScint += eDep;  
-               totEdep += eDep;
-                
-
-               if (proc != "primary" & eDep > 0) {
-
-                   G4cout << " Scintillator Edep by non primary particle" << G4endl;
-                   G4cout << "----------------------------" << G4endl;
-                   G4cout << "Particle: " << name << G4endl;
-                   G4cout << "Edep: " << eDep/CLHEP::MeV << " MeV" << G4endl;
-                   G4cout << "Process: " << proc << G4endl;
-                   G4cout << "time: " << time/CLHEP::ns << " ns" << G4endl << G4endl;
-		   extraEdep += eDep;
-                   if (proc == "compt") eDepCompt += eDep;
-		   else if (proc == "pi+Inelastic") eDepInelastic += eDep;
-                   else if (proc == "hIoni") eDephIoni += eDep;
-                   else if (proc == "hadElastic") eDepHadElas += eDep;
-                   else eDepOther += eDep;
-                   continue;
-               }
-
-
-                  
-               //G4cout << "eDepScint: " << eDepScint << G4endl;
-               //G4cout << "totEdep: " << totEdep << G4endl; 
-
-               // Sum eDep for each scintillator sheet
-               EdepPerSheet[i] += eDep;
-
-               if (trID ==1) {
-                   // Sum eDep for each scintillator sheet
-                   EdepPerSheet[i] += eDep;
-	           eDepPrimary += eDep;
-
-                   //G4cout << "Kinetic Energy: " << kinEn << " " << G4endl;
-
-		   analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-	           
-                   // When primary particle stops
-                   if (kinEn == 0) {
-                       //G4cout << "Filling with position: " << trackl/CLHEP::cm << " cm" << G4endl;
-                       //G4cout << "Filling with time: " << time/CLHEP::ns << " ns" <<  G4endl;
-                       //G4cout << "Filling pos vs eDepScint with energy: " << eDepScint/CLHEP::MeV << " MeV" << G4endl;
-                       analysis->FillH1(13, trackl/CLHEP::cm);
-		       analysis->FillH1(12, time/CLHEP::ns);
-                       // Filling only when trackID==1
-                       analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
-		       
-                       //G4cout << "hit number: " << h << G4endl;
-                       //G4double prevKin = ((*ScintHits)[h-1])->GetKinEn();
-                       //G4cout << "Position: " << trackl << G4endl;
-	               //G4cout << "Previous KinEn: " << prevKin << G4endl;
-		       //G4cout << "Local Time: " << ltime << G4endl;
-		       
-		   }
-	       } 
-
-	    }
-
-	    // Fill scint bins with Energy Dep
-            for (G4int i=0; i<10; i++) {
-                if (EdepPerSheet[i]) {
-		    analysis->FillH1(i, EdepPerSheet[i]/CLHEP::MeV);
-                }
-	    }
-   
-            // Fill total Edep in Scintillator
-            analysis->FillH1(14, eDepScint/CLHEP::MeV);	
-
-                        
-//            for (G4int j=0; j<10; j++) {
-//                eDepPrimary += EdepPerSheet[j];
-//            }
-
-           // if (eDepScint > 240){
-                G4cout << "Total Edep in scint: " << eDepScint/CLHEP::MeV << G4endl;         
-                G4cout << "Sheet 1: " << EdepPerSheet[0]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 2: " << EdepPerSheet[1]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 3: " << EdepPerSheet[2]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 4: " << EdepPerSheet[3]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 5: " << EdepPerSheet[4]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 6: " << EdepPerSheet[5]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 7: " << EdepPerSheet[6]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 8: " << EdepPerSheet[7]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 9: " << EdepPerSheet[8]/CLHEP::MeV << G4endl;
-                G4cout << "Sheet 10: " << EdepPerSheet[9]/CLHEP::MeV << G4endl;
-
-            //}
-
-          }
+            }
+        }
  
+        AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+        if(AbsHits) {
+            for (G4int h=0; h<AbsHits->entries(); h++) {
+                if (name != "opticalphoton"){
+                    ltime           = ((*AbsHits)[h]) -> GetLocalTime();
+                    parentID	= ((*AbsHits)[h]) -> GetParentID();
+                    proc            = ((*AbsHits)[h]) -> GetProcess();
+                    G4String name   = ((*AbsHits)[h]) -> GetName();
+                    G4double time   = ((*AbsHits)[h]) -> GetTime();
+                    G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
+                    G4int i         = ((*AbsHits)[h]) -> GetXID();
+                    G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
+                    G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
+                    G4double trackl = ((*AbsHits)[h]) -> GetTrackLength();
+                    G4double photons_cerenkov = ((*AbsHits)[h])->GetPhotons();
+                    x = ((*AbsHits)[h]) -> GetPosX();
+                    y = ((*AbsHits)[h]) -> GetPosY();
+                    z = ((*AbsHits)[h]) -> GetPosZ();
 
-
-	AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-       
-
-	if(AbsHits) {
-	
-	    hitCount = AbsHits->entries();
-            G4int cerenkovCounter = 0;
-
-
-	    for (G4int h=0; h<hitCount; h++) {
-		ltime           = ((*AbsHits)[h]) -> GetLocalTime();
-		parentID	= ((*AbsHits)[h]) -> GetParentID();
-     	        proc            = ((*AbsHits)[h]) -> GetProcess();
-	        G4String name   = ((*AbsHits)[h]) -> GetName();
-	    	G4double time   = ((*AbsHits)[h]) -> GetTime(); 
-		G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
-		G4int i         = -99;
-	        G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
-	        G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
-                G4double trackl = ((*AbsHits)[h]) -> GetPosZ();	
-                
- 
-                //if(trID>1 && eDep>0){
-                    //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
-                //}
-                if (proc == "Decay") {
-                    continue;
+                    Abs_outFile << event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<<i<<","
+                    << time<<","<<kinEn<<","<<eDep<<","<< trackl <<","<< photons_cerenkov <<  "," << x <<","<< y << ","<<z<<G4endl;
+                    
                 }
-               
-                eDepAbs += eDep;
-                totEdep += eDep;
-           
-                if (proc != "primary" & eDep > 0) {
-                   G4cout << "Absorber Edep by non primary particle" << G4endl;
-                   G4cout << "----------------------------" << G4endl;
-                   G4cout << "Particle: " << name << G4endl;
-                   G4cout << "Edep: " << eDep/CLHEP::MeV << " MeV" << G4endl;
-                   G4cout << "Process: " << proc << G4endl;
-                   G4cout << "time: " << time/CLHEP::ns << " ns" << G4endl << G4endl;
-		   extraEdep += eDep;
-                   if (proc == "compt") eDepCompt += eDep;
-		   else if (proc == "pi+Inelastic") eDepInelastic += eDep;
-                   else if (proc == "hIoni") eDephIoni += eDep;
-                   else if (proc == "hadElastic") eDepHadElas += eDep;
-                   else eDepOther += eDep;  
-                   continue;
-               }
+                //cerenkovCounter = cerenkovCounter + photons_cerenkov;
+            }
+        }
+        
+        TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
+        if (TubeHits) {
+	    hitCount = TubeHits->entries();
+            for (G4int h=0; h<hitCount; h++) {
+                ltime    = ((*TubeHits)[h]) -> GetLocalTime();
+                parentID = ((*TubeHits)[h]) -> GetParentID();
+                proc     = ((*TubeHits)[h]) -> GetProcess();
+                name     = ((*TubeHits)[h]) -> GetName();
+                time     = ((*TubeHits)[h]) -> GetTime(); 
+                trID     = ((*TubeHits)[h]) -> GetTrackID();
+                kinEn    = ((*TubeHits)[h]) -> GetKinEn();
+                eDep     = ((*TubeHits)[h]) -> GetEdep();
+                trackl   = ((*TubeHits)[h]) -> GetTrackLength();	
+                G4double x = ((*TubeHits)[h]) -> GetPosX();
+                G4double y = ((*TubeHits)[h]) -> GetPosY();
+                G4double z = ((*TubeHits)[h]) -> GetPosZ();
+            
+                Tube_outFile << event_number << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
+                time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
+            
+            }         
+        }
 
- 	   
-               
-                if (trID == 1){
-                    eDepPrimary += eDep;
-                    analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-	            if (kinEn == 0) {
-                        analysis->FillH1(13, trackl/CLHEP::cm);
-		        analysis->FillH1(12, time/CLHEP::ns);
-                        analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
-                    }
-	        }
+        TPCHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
+        if (TPCHits) {
+            hitCount = TPCHits->entries();
+            for (G4int h=0; h<hitCount; h++) {
                 
-                // ltime == 0 ?
-                if (name == "opticalphoton" && proc == "Cerenkov"){
-                    //G4cout << "photon local time: " << ltime << G4endl;
-		    analysis->FillH1(11,time);
-		    cerenkovCounter++;
-                    //G4cout << "Cerenkov counter: " << cerenkovCounter << G4endl;
-		}
-	    
-	    }
-	    
-            if (eDepAbs>0){
-                analysis->FillH1(15, eDepAbs/CLHEP::MeV);
-                //analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);  
-                  
-                if(cerenkovCounter>0){
-                    //G4cout << "Filling ceren histos with " << cerenkovCounter << " photons and " << eDepAbs/CLHEP::MeV << " MeV deposited." << G4endl;
-                    analysis->FillH2(2, cerenkovCounter, eDepAbs/CLHEP::MeV);       
+                ltime    = ((*TPCHits)[h]) -> GetLocalTime();
+                parentID = ((*TPCHits)[h]) -> GetParentID();
+                proc     = ((*TPCHits)[h]) -> GetProcess();
+                name     = ((*TPCHits)[h]) -> GetName();
+                time     = ((*TPCHits)[h]) -> GetTime();
+                trID     = ((*TPCHits)[h]) -> GetTrackID();
+                kinEn    = ((*TPCHits)[h]) -> GetKinEn();
+                eDep     = ((*TPCHits)[h]) -> GetEdep();
+                module_ID = ((*TPCHits)[h]) -> GetMod_ID();
+                i = ((*TPCHits)[h]) -> GetXID();
+                x = ((*TPCHits)[h]) -> GetPosX();
+                y = ((*TPCHits)[h]) -> GetPosY();
+                z = ((*TPCHits)[h]) -> GetPosZ();
+                G4double electrons = ((*TPCHits)[h]) -> GetPhotons(); 
+                G4double trackl = ((*TPCHits)[h]) -> GetTrackLength();
+
+                //SD_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< "TPC"<<","<< 0 <<","<< 0 <<","<<i<<","<<x<<","<<y<<","<<z<<","<<
+                //time<<","<<kinEn<<","<<eDep<<","<< photons <<G4endl;
+                if (electrons>0){
+
+                    TPC_outFile << event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << ","  << //x <<","<<y<<","<<z<<","<<
+                    time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
+                }
+                //std::cout << " TPC hit " << module_ID << ", layer: " << i << ", " << eDep/CLHEP::MeV  << std::endl;
+            }
+        }
+
+        // PMT Sensitive volume
+        std::vector<G4int> PMT_index;
+        std::vector<G4int> PMT_index_reduced;
+        std::vector<G4double> PMT_time;
+        std::vector<G4double> PMT_KE;
+
+        PMTHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID5));
+        
+        if (PMTHits) {
+            hitCount = PMTHits->entries();
+            for (G4int h=0; h<hitCount; h++) {
+                if (((*PMTHits)[h]) -> GetName() == "opticalphoton"){ // only store photon hit
+                    G4double time = ((*PMTHits)[h]) -> GetTime(); 
+                    G4double trID = ((*PMTHits)[h]) -> GetTrackID(); 
+                    G4int i = ((*PMTHits)[h]) -> GetXID();
+                    PMT_index.push_back(i);
+                    PMT_time.push_back(time);
+                    PMT_KE.push_back(((*PMTHits)[h]) -> GetKinEn());
+                }
+            }
+        }
+
+        /**
+        PMT_index_reduced = PMT_index;
+        sort(PMT_index_reduced.begin(), PMT_index_reduced.end());
+        PMT_index_reduced.erase(unique(PMT_index_reduced.begin(), PMT_index_reduced.end()), PMT_index_reduced.end() );
+
+        // writing the PMT outputs
+        //std::cout  << PMT_index_reduced.size() << std::endl;
+        PMT_outFile << "{" << "\"Event_ID\":" << event_number << ",";
+        PMT_outFile << "\"PMT_signal\":[";
+
+        for (int i = 0; i < PMT_index_reduced.size();i++){
+            
+            if (i > 0){PMT_outFile << ',';}
+            PMT_outFile << "{\"PMT_ID\":" << PMT_index_reduced[i] << ",";
+            PMT_outFile << "\"Time\":[" ;
+            int count = 0; 
+            for (int j=0; j < PMT_index.size();j++){  //
+                if (PMT_index[j] == PMT_index_reduced[i]){
+                    if (count > 0) {PMT_outFile <<",";}
+                    PMT_outFile << PMT_time[j];
+                    count++;
+                }
+            }
+            PMT_outFile << "],";
+
+            PMT_outFile << "\"KE\":[" ;
+            count = 0;
+            for (int j=0; j < PMT_index.size();j++){  //
+                if (PMT_index[j] == PMT_index_reduced[i]){
+                    if (count > 0) {PMT_outFile <<",";}
+                    PMT_outFile << PMT_KE[j];
+                    count++;
                 }
             }
 
-            //G4cout << "Total Edep in lead-glass: " << eDepAbs/CLHEP::MeV << G4endl;
-	    //G4cout << "Cerenkov count: " << cerenkovCounter << G4endl;
-            if (cerenkovCounter>0){
-	        analysis->FillH1(10,cerenkovCounter);
-	    }
-	}  
-       
-        TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
- 
-        if (TubeHits) {
-	    hitCount = TubeHits->entries();
-            // G4cout << " in tubehits loops " << G4endl;
-	    for (G4int h=0; h<hitCount; h++) {
-	        // In future can instead define aHit and assign like track.member[i]
-	        ltime    = ((*TubeHits)[h]) -> GetLocalTime();
-	        parentID = ((*TubeHits)[h]) -> GetParentID();
-    		proc     = ((*TubeHits)[h]) -> GetProcess();
-       	        name     = ((*TubeHits)[h]) -> GetName();
-       	        time     = ((*TubeHits)[h]) -> GetTime(); 
-	        trID     = ((*TubeHits)[h]) -> GetTrackID();
-		i        = ((*TubeHits)[h]) -> GetXID();
-	        kinEn    = ((*TubeHits)[h]) -> GetKinEn();
-	        eDep     = ((*TubeHits)[h]) -> GetEdep();
-                trackl   = ((*TubeHits)[h]) -> GetPosZ();	
-
-
-  
-                //if(trID>1 && eDep>0){
-                    //G4cout << "Particle: " << name << "   Process: "<< proc << "   Deposit: " << eDep/CLHEP::MeV << G4endl;
-                //}
-                if (proc == "Decay") {
-                    continue;
-                }
-
-                // Sum totEdep
-                eDepTube += eDep;  
-                totEdep += eDep;
-
-
-
-                if (proc != "primary" & eDep > 0) {
-                   G4cout << "Tube Edep by non primary particle" << G4endl;
-                   G4cout << "----------------------------" << G4endl;
-                   G4cout << "Particle: " << name << G4endl;
-                   G4cout << "Edep: " << eDep/CLHEP::MeV << " MeV" << G4endl;
-                   G4cout << "Process: " << proc << G4endl;
-                   G4cout << "time: " << time/CLHEP::ns << " ns" << G4endl << G4endl;
-		   extraEdep += eDep;
-                   if (proc == "compt") eDepCompt += eDep;
-		   else if (proc == "pi+Inelastic") eDepInelastic += eDep;
-                   else if (proc == "hIoni") eDephIoni += eDep;
-                   else if (proc == "hadElastic") eDepHadElas += eDep;
-                   else eDepOther += eDep;
-	           continue;
-               }
-
-
-                         
-                if (trID ==1) {
-	            eDepPrimary += eDep;
-     	            analysis->FillH2(0, trackl/CLHEP::cm, kinEn/CLHEP::MeV);
-	            if (kinEn == 0) {
-             //           G4cout << "Filling with pos " << trackl << G4endl;
-                        analysis->FillH1(13, trackl/CLHEP::cm);
-		        analysis->FillH1(12, time/CLHEP::ns);
-		        analysis->FillH2(1, trackl/CLHEP::cm, totEdep/CLHEP::MeV);
-                    }
-	        }
-	    } 
-   
-            // Fill total Edep in Vacuum Tube
-            analysis->FillH1(16, eDepTube/CLHEP::MeV);	
-            //G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << G4endl;         
+            PMT_outFile << "]}";
         }
-          G4cout << G4endl;
-          G4cout << "---------Energy Depostied by Volume----------" << G4endl;
-          G4cout << "Total Edep in tube: " << eDepTube/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep in scint: " << eDepScint/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep in abs: " << eDepAbs/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Missing Energy: " << (totEdep - eDepTube - eDepScint - eDepAbs ) / CLHEP::MeV << " MeV" << G4endl << G4endl;
-          G4cout << "---------Energy Deposited by Particles--------" << G4endl;
-          G4cout << "Total Edep by non primary particles: " << extraEdep/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep by primary particle: " << eDepPrimary/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Total Edep: " << totEdep/CLHEP::MeV << " MeV" << G4endl;
-          G4cout << "Missing Energy = " << (totEdep -  extraEdep - eDepPrimary) / CLHEP::MeV << " MeV" << G4endl << G4endl; 
-          G4cout << "-------- Energy Deposited by Non-primary Process-----------" << G4endl;
-          G4cout << "compt: " << eDepCompt/CLHEP::MeV << G4endl;
-          G4cout << "pi+Inelastic: " << eDepInelastic/CLHEP::MeV << G4endl;
-          G4cout << "hIoni: " << eDephIoni/CLHEP::MeV << G4endl;
-          G4cout << "hadElastic: " << eDepHadElas/CLHEP::MeV << G4endl;
-          G4cout << "Other: " << eDepOther/CLHEP::MeV << G4endl;
-          G4cout << "Missing Energy: " << (totEdep - eDepPrimary - eDepCompt - eDepInelastic - eDephIoni - eDepHadElas - eDepOther ) / CLHEP::MeV << " MeV" << G4endl << "---------------------------------" << G4endl << G4endl;
+        PMT_outFile << "]";
+        PMT_outFile << "}" <<G4endl;
+        ***/
 
-    } else {
-        G4cout << "No HCE" << G4endl;
+        SiliconHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID6));        
+        if (SiliconHits) {
+            hitCount = SiliconHits->entries();
+            for (G4int h=0; h<hitCount; h++) {
+                G4double time = ((*SiliconHits)[h]) -> GetTime(); 
+                G4double trID = ((*SiliconHits)[h]) -> GetTrackID(); 
+                G4int i = ((*SiliconHits)[h]) -> GetXID();
+                G4String name     = ((*SiliconHits)[h]) -> GetName();
+                G4int parentID = ((*SiliconHits)[h]) -> GetParentID();
+                G4String proc = ((*SiliconHits)[h]) -> GetProcess();
+                G4double kinEn    = ((*SiliconHits)[h]) -> GetKinEn();
+                eDep     = ((*SiliconHits)[h]) -> GetEdep();
+                module_ID = ((*SiliconHits)[h]) -> GetMod_ID();
+                x = ((*SiliconHits)[h]) -> GetPosX();
+                y = ((*SiliconHits)[h]) -> GetPosY();
+                z = ((*SiliconHits)[h]) -> GetPosZ();
+                G4double trackl = ((*SiliconHits)[h]) -> GetTrackLength();
+
+                Silicon_outFile << event_number<<"," << i << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
+                time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
+            }
+        }
     }
-
-  //print per event (modulo n)
-  auto eventID = event->GetEventID();
-  auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-  if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
-    G4cout << "---> End of event: " << eventID << G4endl;     
-   // PrintEventStatistics(absoEdep, absoTrackLength, gapEdep, scintTrackLength);
-  }
+    
+    else {G4cout << "No HCE" << G4endl;}
+    auto eventID = event->GetEventID();
+    auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
+    if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {G4cout << "---> End of event: " << eventID << G4endl;}
+    
+    event_number ++;
+    
 }  
-
-//....
