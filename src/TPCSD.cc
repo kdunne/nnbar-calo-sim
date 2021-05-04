@@ -26,7 +26,7 @@
 // Hadrontherapy advanced example for Geant4
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "TubeSD.hh"
+#include "TPCSD.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -49,36 +49,45 @@
 #include "G4TransportationManager.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4SystemOfUnits.hh"
-
+#include "G4Scintillation.hh"
+#include "G4Cerenkov.hh"
 
 //.....
-TubeSD::TubeSD(G4String name):
+TPCSD::TPCSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="TubeHitCollection");
+    collectionName.insert(HCname="TPCHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
     
 }
 
 //.....
-TubeSD::~TubeSD()
+TPCSD::~TPCSD()
 {}
 
 //.....
-void TubeSD::Initialize(G4HCofThisEvent*)
+void TPCSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
-G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-    G4Track * theTrack = aStep  ->  GetTrack();
-   
+
+
+    // Get Direction
+    G4Track * theTrack = aStep  ->  GetTrack();   
+
+    G4int parentID = 0;
+    parentID = theTrack->GetParentID();
+    //if (parentID >0) {return false;}
+
+    G4String proc = "primary"; 
+
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
@@ -93,33 +102,30 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int trackID = theTrack -> GetTrackID();
    
     // Get Energy deposited
-    G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-  
+    G4double energyDeposit = 0.;
+    energyDeposit = aStep -> GetTotalEnergyDeposit();
+
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    G4StepPoint* PostStep = aStep->GetPreStepPoint();
     
     // Position
-    G4ThreeVector pos1 = PreStep->GetPosition();
-    G4ThreeVector pos2 = PostStep->GetPosition();
-    G4double x = ((pos1+pos2)/2.).getX();
-    G4double y = ((pos1+pos2)/2.).getY();
-    G4double z = ((pos1+pos2)/2.).getZ();
+    G4ThreeVector pos = PreStep->GetPosition();
+    G4double x = pos.getX();
+    G4double y = pos.getY();
+    G4double z = pos.getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();
     G4double tracklength = z - origin;
-
+    
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
-    G4int k  = touchable->GetReplicaNumber(0);
-    //G4int origin_replica = theTrack->GetOriginTouchable()->GetReplicaNumber(0); // ** I added this here !!!
+    G4int k = touchable ->GetReplicaNumber(0); // which layer it is in 
+    G4int TPC_index = touchable -> GetReplicaNumber(1); // which TPC it is in
 
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
-
-    // Get Local Time
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
 
     // Get Name
@@ -128,17 +134,19 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-    
-    G4int parentID = 0;
-    parentID = theTrack->GetParentID();
 
-    G4String proc = "primary"; 
-    if (trackID > 1){
-        parentID = theTrack->GetParentID();
-		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
-    } 
+    G4int electrons = 0;
+    G4ParticleDefinition* particle;
+    if (particleName != "opticalphoton") {
+            const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
+            for (int j = 0; j < (*secondary).size(); j++) {
+                    particle = (*secondary)[j]->GetDefinition();
+                    if (particle->GetParticleName() == "e-") {electrons++;}
+                    else {std::cout<< particle->GetParticleName() << std::endl;} // Cerenkov exists in scintillator
+            }
+    }
 
-    G4int photons = 0;
+
     // Get the pre-step kinetic energy
     G4double eKinPre = aStep -> GetPreStepPoint() -> GetKineticEnergy();
     // Get the post-step kinetic energy
@@ -154,22 +162,28 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetProcess(proc);
     detectorHit -> SetTime(time);
     detectorHit -> SetName(name);
-    detectorHit -> SetTrackLength(DX);
     detectorHit -> SetTrackID(trackID);
+    
     detectorHit -> SetXID(k);
-    detectorHit -> SetEDep(energyDeposit);
-    detectorHit -> SetKinEn(eKinPost);
+    detectorHit -> SetMod_ID(TPC_index);
+
     detectorHit -> SetPosX(x);
     detectorHit -> SetPosY(y);
     detectorHit -> SetPosZ(z);
 
+    // remarks: here it is named set photons but actually it counts the electrons in the TPC, too lazy to add one more function
+    detectorHit -> SetPhotons(electrons);
+
+    detectorHit -> SetTrackLength(DX); // not actually trackLength but lets stay in this way..
+    detectorHit -> SetEDep(energyDeposit);
+    detectorHit -> SetKinEn(eKinPost);
     HitsCollection -> insert(detectorHit);
-    //}
+    
     return true;
 }
 
 //......
-void TubeSD::EndOfEvent(G4HCofThisEvent* HCE)
+void TPCSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     
     static G4int HCID = -1;

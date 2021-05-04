@@ -26,7 +26,7 @@
 // Hadrontherapy advanced example for Geant4
 // See more at: https://twiki.cern.ch/twiki/bin/view/Geant4/AdvancedExamplesHadrontherapy
 
-#include "TubeSD.hh"
+#include "ShieldSD.hh"
 
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
@@ -49,34 +49,34 @@
 #include "G4TransportationManager.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4SystemOfUnits.hh"
-
+#include "G4Scintillation.hh"
+#include "G4Cerenkov.hh"
 
 //.....
-TubeSD::TubeSD(G4String name):
+ShieldSD::ShieldSD(G4String name):
 G4VSensitiveDetector(name)
 {
     G4String HCname;
-    collectionName.insert(HCname="TubeHitCollection");
+    collectionName.insert(HCname="ShieldHitCollection");
     HitsCollection = NULL;
     sensitiveDetectorName = name;
-    
 }
 
 //.....
-TubeSD::~TubeSD()
+ShieldSD::~ShieldSD()
 {}
 
 //.....
-void TubeSD::Initialize(G4HCofThisEvent*)
+void ShieldSD::Initialize(G4HCofThisEvent*)
 {
     
-    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,
-                                                             collectionName[0]);
+    HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
 //.....
-G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+G4bool ShieldSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
+    // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
    
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
@@ -91,14 +91,16 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Get unique track_id (in an event)
     G4int trackID = theTrack -> GetTrackID();
-   
+
+    if (trackID >1){return false;}
+
     // Get Energy deposited
     G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
   
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
-    G4StepPoint* PostStep = aStep->GetPreStepPoint();
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();
     
     // Position
     G4ThreeVector pos1 = PreStep->GetPosition();
@@ -128,7 +130,7 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4TouchableHandle touchPreStep = PreStep->GetTouchableHandle();
     G4VPhysicalVolume* volumePre = touchPreStep->GetVolume();
     G4String namePre = volumePre->GetName();
-    
+   
     G4int parentID = 0;
     parentID = theTrack->GetParentID();
 
@@ -157,6 +159,7 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetTrackLength(DX);
     detectorHit -> SetTrackID(trackID);
     detectorHit -> SetXID(k);
+    detectorHit -> SetPosZ(tracklength);
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinPost);
     detectorHit -> SetPosX(x);
@@ -166,10 +169,11 @@ G4bool TubeSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     HitsCollection -> insert(detectorHit);
     //}
     return true;
+
 }
 
 //......
-void TubeSD::EndOfEvent(G4HCofThisEvent* HCE)
+void ShieldSD::EndOfEvent(G4HCofThisEvent* HCE)
 {
     
     static G4int HCID = -1;
