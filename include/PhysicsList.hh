@@ -34,7 +34,7 @@
 #ifndef PhysicsList_h
 #define PhysicsList_h 1
 
-#include "G4VUserPhysicsList.hh"
+#include "G4VModularPhysicsList.hh"
 #include "globals.hh"
 #include "G4EmConfigurator.hh"
 
@@ -45,7 +45,7 @@ class G4OpAbsorption;
 class G4OpRayleigh;
 class G4OpBoundaryProcess;
 
-class PhysicsList: public G4VUserPhysicsList
+class PhysicsList: public G4VModularPhysicsList
 {
 public:
   PhysicsList();
@@ -53,16 +53,21 @@ public:
 
   // Construct particle and physics
   void ConstructParticle();
-  void ConstructProcess();
-  void ConstructNeutron();
+  //void ConstructProcess();
+  //void ConstructNeutron();
   void SetCuts();
    
+
+
 private:
 
   // these methods Construct physics processes and register them
-  void ConstructDecay();
-  void ConstructEM();
+  //void ConstructDecay();
+  //void ConstructEM();
   void ConstructOptical();
+  //void ConstructHadronElastic();
+  //void ConstructGammaNuclear();
+  
   void  AddPAIModel(const G4String&);
   void  NewPAIModel(const G4ParticleDefinition*, const G4String& modname, const G4String& procname);
   //void NewPAIModel(const G4ParticleDefinition* part,const G4String& modname,const G4String& procname);

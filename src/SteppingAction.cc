@@ -38,6 +38,8 @@
 #include "G4RunManager.hh"
 #include "G4DynamicParticle.hh"
 //....
+extern G4double event_number;
+extern std::ofstream pi0_outFile;
 
 SteppingAction::SteppingAction()
 : G4UserSteppingAction()
@@ -66,9 +68,15 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4int ID = track->GetTrackID();
 
   if (parentID == 0 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
-    auto momentum = track->GetDynamicParticle()->GetMomentum();
-    //G4ParticleDefinition *particleDef = track -> GetDefinition();
-    //G4String particleName =  particleDef -> GetParticleName();
-    //std::cout << momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
+    
+    const std::vector<const G4Track*>* secondary = step->GetSecondaryInCurrentStep();
+    if ((*secondary).size()>0){
+      for (int j = 0; j < (*secondary).size(); j++) {
+        G4double KE = (*secondary)[j]->GetKineticEnergy();
+        G4ThreeVector momentum = (*secondary)[j]->GetMomentumDirection();
+        //std::cout << event_number << " particle: " << j << " :: "<<momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
+        pi0_outFile << event_number << "," << KE << "," << momentum[0] << "," << momentum[1] << "," << momentum[2] <<G4endl;           
+      }
+    }  
   }
 } 

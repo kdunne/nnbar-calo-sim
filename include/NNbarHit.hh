@@ -63,6 +63,7 @@ private:
     G4double posX;
     G4double posY;
     G4double posZ;
+    G4int stave_ID_;
     G4int group_ID_;
     G4int module_ID_;
     G4int origin_rp;
@@ -77,9 +78,12 @@ public:
     inline G4String GetName(){return name;}
     inline G4double GetTime(){return time;}
     inline G4int GetTrackID(){return trackID;}
-    inline G4int GetXID(){return xHitID;} //For the replica number
+
+    inline G4int GetStave_ID(){return stave_ID_;}
+    inline G4int GetXID(){return xHitID;}
     inline G4int GetGroup_ID(){return group_ID_;}
     inline G4int GetMod_ID(){return module_ID_;}
+    
     inline G4double GetPosX(){return posX;}
     inline G4double GetPosY(){return posY;}
     inline G4double GetPosZ(){return posZ;}
@@ -95,6 +99,8 @@ public:
     inline void SetName(G4String n){name = n;}
     inline void SetTime(G4double t){time = t;}
     inline void SetTrackID(G4int track){trackID = track;}
+
+    inline void SetStave_ID(G4int stave_ID){stave_ID_ = stave_ID;}
     inline void SetXID(G4int xID){xHitID = xID;}
     inline void SetGroup_ID(G4int groupID){group_ID_=groupID;}
     inline void SetMod_ID(G4int ModID){module_ID_=ModID;}

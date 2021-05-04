@@ -102,45 +102,44 @@ void G4MCPLGenerator::GeneratePrimaries(G4Event* evt)
   G4ParticleTable * particleTable = G4ParticleTable :: GetParticleTable();
 
   assert(m_currentPDG == m_p->pdgcode && m_currentPartDef);
-  //if (m_p->pdgcode==211||m_p->pdgcode==-211){
-    m_gun->SetParticleDefinition(m_currentPartDef);
+  m_gun->SetParticleDefinition(m_currentPartDef);
 
-    G4ThreeVector pos(m_p->position[0],m_p->position[1],m_p->position[2]);
-    pos *= CLHEP::cm;
-    G4ThreeVector dir(m_p->direction[0],m_p->direction[1],m_p->direction[2]);
-    G4ThreeVector pol(m_p->polarisation[0],m_p->polarisation[1],m_p->polarisation[2]);
-    double time = m_p->time*CLHEP::millisecond;
-    double weight = m_p->weight;
-    ModifyParticle(pos,dir,pol,time,weight);
+  G4ThreeVector pos(m_p->position[0],m_p->position[1],m_p->position[2]);
+  pos *= CLHEP::cm;
+  G4ThreeVector dir(m_p->direction[0],m_p->direction[1],m_p->direction[2]);
+  G4ThreeVector pol(m_p->polarisation[0],m_p->polarisation[1],m_p->polarisation[2]);
+  double time = m_p->time*CLHEP::millisecond;
+  double weight = m_p->weight;
+  ModifyParticle(pos,dir,pol,time,weight);
 
-    Particle_outFile << event_number << ",";
-    Particle_outFile << m_p->pdgcode << ",";
-    Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ",";
-    Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge() << ",";
-    Particle_outFile << m_p->ekin << ",";
-    Particle_outFile << m_p->position[0] << ",";
-    Particle_outFile << m_p->position[1] << ",";
-    Particle_outFile << m_p->position[2] << ",";
-    Particle_outFile << m_p -> time/s << ",";
-    Particle_outFile << m_p->direction[0] << ",";
-    Particle_outFile << m_p->direction[1] << ",";
-    Particle_outFile << m_p->direction[2] << G4endl;
+  Particle_outFile << event_number << ",";
+  Particle_outFile << m_p->pdgcode << ",";
+  Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ",";
+  Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge() << ",";
+  Particle_outFile << m_p->ekin << ",";
+  Particle_outFile << m_p->position[0] << ",";
+  Particle_outFile << m_p->position[1] << ",";
+  Particle_outFile << m_p->position[2] << ",";
+  Particle_outFile << m_p -> time/s << ",";
+  Particle_outFile << m_p->direction[0] << ",";
+  Particle_outFile << m_p->direction[1] << ",";
+  Particle_outFile << m_p->direction[2] << G4endl;
 
-    std::cout << "== Event number: " << event_number << "," << m_p->pdgcode << "," << " mass : " << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ","
-    << m_p->ekin << "," << m_p->position[0] << "," << m_p->position[1] << ","     
-    << m_p->position[2] << "," << m_p -> time/s << ","  << m_p->direction[0] << "," << m_p->direction[1] << "," << m_p->direction[2] << std::endl;
+  std::cout << "== Event number: " << event_number << "," << m_p->pdgcode << "," << " mass : " << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ","
+  << m_p->ekin << "," << m_p->position[0] << "," << m_p->position[1] << ","     
+  << m_p->position[2] << "," << m_p -> time/s << ","  << m_p->direction[0] << "," << m_p->direction[1] << "," << m_p->direction[2] << std::endl;
 
-    m_gun->SetParticleMomentumDirection(dir);
-    m_gun->SetParticlePosition(pos);
-    m_gun->SetParticleEnergy(m_p->ekin);//already in MeV and CLHEP::MeV=1
-    m_gun->SetParticleTime(0); //time
-    m_gun->SetParticlePolarization(pol);
-    const G4int ivertex = evt->GetNumberOfPrimaryVertex();
-    m_gun->GeneratePrimaryVertex(evt);
-    //event_number ++ ;
+  m_gun->SetParticleMomentumDirection(dir);
+  m_gun->SetParticlePosition(pos);
+  m_gun->SetParticleEnergy(m_p->ekin);//already in MeV and CLHEP::MeV=1
+  m_gun->SetParticleTime(0); //time
+  m_gun->SetParticlePolarization(pol);
+  const G4int ivertex = evt->GetNumberOfPrimaryVertex();
+  m_gun->GeneratePrimaryVertex(evt);
 
-    if (weight!=1.0) {evt->GetPrimaryVertex(ivertex)->SetWeight(weight);}
-  //}
+  if (weight!=1.0) {evt->GetPrimaryVertex(ivertex)->SetWeight(weight);}
+  
+  
   //Prepare for next.
   FindNext();
   if (!m_p) {
