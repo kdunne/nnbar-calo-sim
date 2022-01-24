@@ -67,6 +67,11 @@ G4FieldManager* fFieldMgr;
 G4double fMinStep;
 G4ChordFinder* fChordFinder;
 
+//for the file output
+extern std::ofstream Lead_glass_outFile;
+extern std::ofstream Scint_outFile;
+
+
 // read the position of the lead glass blocks stored in csv file
 std::string filename_data_lead_glass_pos = "./lead_glass_position/lead_glass_position.csv";
 std::string filename_data_lead_glass_pos_fb = "./lead_glass_position/lead_glass_position_fb.csv";
@@ -307,7 +312,11 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto siliconS_2 = new G4Cons("siliconS_2", silicon_radius_2,silicon_radius_2+silicon_thickness,silicon_radius_2,silicon_radius_2+silicon_thickness,silicon_len,0.,silicon_angle);
   auto siliconLV_2 = new G4LogicalVolume(siliconS_2,tubeMaterial,"siliconLV_2");
   auto siliconPV_2 = new G4PVPlacement(0,G4ThreeVector(0., 0., 0.),siliconLV_2,"siliconPV_2",worldLV,false,1,fCheckOverlaps);
-
+  
+  G4Region* silicon_region = new G4Region("Silicon_region");
+  silicon_region->AddRootLogicalVolume(siliconLV_1);
+  silicon_region->AddRootLogicalVolume(siliconLV_2);
+  
   // Aluminum Tube
   G4double tube_radius = 1.0*m; G4double tube_len = 3.0*m; G4double tube_thickness = 2.0*cm; G4double tube_angle = 360. * deg;
   auto tubeS = new G4Cons("TubeS", tube_radius,tube_radius+tube_thickness,tube_radius,tube_radius+tube_thickness,tube_len,0.,tube_angle);
@@ -338,43 +347,57 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto TPCS_1 = new G4Box("TPCS_1",TPC_x_1/2.,TPC_y_1/2.,TPC_z/2.);
   auto TPCS_2 = new G4Box("TPCS_2",TPC_x_2/2.,TPC_y_2/2.,TPC_z/2.);
   
-  G4double TPC_layer_x = 1.0*cm; G4double TPC_layer_y = 1.0*cm;
+  G4double TPC_layer_x = 1.0*cm; G4double TPC_layer_y = 1.0*cm; G4double TPC_layer_z = 1.0*cm; 
 
-  auto TPCS_layer = new G4Box("TPCS_layer",TPC_layer_x/2.,TPC_layer_y/2.,TPC_z/2.);
+  auto TPCS_layer = new G4Box("TPCS_layer",TPC_layer_x/2.,TPC_layer_y/2.,TPC_z/2.); //TPC long bar
+  auto TPCS_block = new G4Box("TPCS_block",TPC_layer_x/2.,TPC_layer_y/2.,TPC_layer_z/2.); //TPC blocks along z dir in the long bar
+
   auto TPCLV_1 = new G4LogicalVolume(TPCS_1,defaultMaterial,"TPCLV_1");
   auto TPCLV_2 = new G4LogicalVolume(TPCS_2,defaultMaterial,"TPCLV_2");
-  TPCLV = new G4LogicalVolume(TPCS_layer,TPCMaterial,"TPCLV");
+  TPCLV = new G4LogicalVolume(TPCS_layer,defaultMaterial,"TPCLV_bar");
+  auto TPCLV_block = new G4LogicalVolume(TPCS_block,TPCMaterial,"TPCLV");
 
   G4Region* TPC_region = new G4Region("TPC_region");
   TPCLV->SetRegion(TPC_region);
-  TPC_region->AddRootLogicalVolume(TPCLV);
+  TPC_region->AddRootLogicalVolume(TPCLV_block);
   G4Region* TPC_Region_ = G4RegionStore::GetInstance()->GetRegion("TPC_region");
   G4ProductionCuts* TPCcut = new G4ProductionCuts();
   TPCcut->SetProductionCut(0.0001*cm,"gamma");
   TPCcut->SetProductionCut(0.00001*nm,"e-"); // 130cm -> 1.3 MeV   220cm -> 3.4 MeV 400*cm -> 50 MeV
   TPC_Region_->SetProductionCuts(TPCcut);
 
+
+  // installing the small TPC blocks in the TPC long bars
+  int TPC_z_index = 0;
+
+  int TPC_number_z = TPC_z / TPC_layer_z;
+  for (int j = 0; j<TPC_number_z;j++){
+    G4ThreeVector TPC_block_pos = G4ThreeVector(0.,0.,-TPC_z/2.+(2.*j+1.)/2.*TPC_layer_z); 
+    new G4PVPlacement(0,TPC_block_pos,TPCLV_block,"TPCPV_blocks",TPCLV,false,TPC_z_index,fCheckOverlaps);
+    std::cout << j << std::endl;
+    TPC_z_index++;
+  }
   
   // installing small TPC virtual volumes for type I TPC
   int TPC_index = 0;
   int TPC_number_x1 = TPC_x_1 / TPC_layer_x;
   int TPC_number_y1 = TPC_y_1 / TPC_layer_y;
-  for (int j = 0; j<TPC_number_y1;j++){
-    for (int i = 0; i<TPC_number_x1; i++){
+  for (int j = 0; j<TPC_number_y1;j++){ 
+    for (int i = 0; i<TPC_number_x1; i++){ 
       G4ThreeVector TPC_layer_pos = G4ThreeVector(-TPC_x_1/2.+(2.0*i+1.0)/2.*TPC_layer_x,-TPC_y_1/2.+(2.*j+1.)/2.*TPC_layer_y,0.); 
-      new G4PVPlacement(0,TPC_layer_pos,TPCLV,"TPCPV",TPCLV_1,false,TPC_index,fCheckOverlaps);
+      new G4PVPlacement(0,TPC_layer_pos,TPCLV,"TPCPV_layer",TPCLV_1,false,TPC_index,false);
       TPC_index++;
     }
   }
 
-  // installing small TPC virtual volumes for type I TPC
+  // installing small TPC virtual volumes for type II TPC
   TPC_index = 0;
   int TPC_number_x2 = TPC_x_2 / TPC_layer_x;
   int TPC_number_y2 = TPC_y_2 / TPC_layer_y;
   for (int j = 0; j<TPC_number_y2;j++){
     for (int i = 0; i<TPC_number_x2; i++){
       G4ThreeVector TPC_layer_pos = G4ThreeVector(-TPC_x_2/2.+(2.0*i+1.0)/2.*TPC_layer_x,-TPC_y_2/2.+(2.*j+1.)/2.*TPC_layer_y,0.); 
-      new G4PVPlacement(0,TPC_layer_pos,TPCLV,"TPCPV",TPCLV_2,false,TPC_index,fCheckOverlaps);
+      new G4PVPlacement(0,TPC_layer_pos,TPCLV,"TPCPV_layer",TPCLV_2,false,TPC_index,false);
       TPC_index++;
     }
   }
@@ -410,6 +433,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   new G4PVPlacement(0,TPC_pos11,TPCLV_1,"TPCPV11",worldLV,false,10,fCheckOverlaps);
   new G4PVPlacement(0,TPC_pos12,TPCLV_1,"TPCPV12",worldLV,false,11,fCheckOverlaps);
 
+
   // Scintillator
   
   G4double scint_layer_t = 3.*cm; G4double scint_layers = 10.; int nofLayers=10;
@@ -419,9 +443,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   G4double scint_light_detector_w = 1.0 *cm; G4double scint_light_detector_length = 1.0 *cm;   
   
-  auto scint_groupS = new G4Box("Scint_groupS",(3*scint_w+2*dx)/2.,scint_t/2.,(3*scint_length+2*dz)/2.);
-  auto scint_groupLV = new G4LogicalVolume(scint_groupS,defaultMaterial,"Scint_groupLV");
-
   auto scintS = new G4Box("ScintS",scint_w/2., scint_t/2., scint_length/2.);
   auto scintLV = new G4LogicalVolume(scintS,defaultMaterial,"ScintLV");
   
@@ -429,121 +450,239 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   std::vector<G4VPhysicalVolume *> scint_Module_PV_array;
   std::vector<G4VPhysicalVolume *> scint_detector_PV_array; 
 
-  auto scint_layerS = new G4Box("ScintS",scint_w/2., scint_layer_t/2., (scint_length-2*scint_light_detector_length)/2.);
-  auto scint_layerLV = new G4LogicalVolume(scint_layerS,scintMaterial,"Scint_layerLV");
-  
-  G4Region* scint_region = new G4Region("Scint_region");
-  scint_region->AddRootLogicalVolume(scint_layerLV); 
-  G4Region* scint_Region = G4RegionStore::GetInstance()->GetRegion("Scint_region");
-  G4ProductionCuts* scintcut = new G4ProductionCuts();
-  scintcut->SetProductionCut(130.0*cm,"gamma"); // 130cm -> 1.3 MeV   220cm -> 3.4 MeV 400*cm -> 50 MeV
-  scintcut->SetProductionCut(100.0*cm,"e-");
-  scintcut->SetProductionCut(100.0*cm,"proton");
-  scint_Region->SetProductionCuts(scintcut);
+  // scintillator layers 
+  // layer 1 and 2: (1 = horizontal, 2 = vertical staves)
 
-  auto scint_detectorS = new G4Box("Scint_DetectorS",scint_w/2., scint_layer_t/2., (scint_light_detector_length)/2.);
-  auto scint_detectorLV = new G4LogicalVolume(scint_detectorS,defaultMaterial,"Scint_detectorLV");
+  auto scint_layerH_S = new G4Box("ScintS",scint_w/2., scint_layer_t/2., scint_length/2.);
+  auto scint_layerH_LV = new G4LogicalVolume(scint_layerH_S, defaultMaterial,"Scint_layerH_LV");
   
-  for (int i; i<10; i++){scint_PV_array.push_back(new G4PVPlacement(0, G4ThreeVector(0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t,0.),scint_layerLV,"Scint_layerPV",scintLV,false,i,fCheckOverlaps));}
+  auto scint_layerV_S = new G4Box("Scint2S",scint_w/2., scint_layer_t/2., scint_length/2.);
+  auto scint_layerV_LV = new G4LogicalVolume(scint_layerV_S, defaultMaterial,"Scint_layerV_LV");
+  
+  // Two types of staves here, horizontal and vertical
+  // --- horizontal staves (along x)
+  auto scint_StaveH_x = scint_w/8.;
+  auto scint_StaveH_z = scint_length;
+  auto scint_StaveH_S = new G4Box("Scint_StaveS",scint_StaveH_x/2., scint_layer_t/2., scint_StaveH_z/2.);
+  auto scint_StaveH_LV = new G4LogicalVolume(scint_StaveH_S,scintMaterial,"Scint_StaveH_LV");
+  
+  //--- vertical staves (divided along z)
+  auto scint_StaveV_x = scint_w;
+  auto scint_StaveV_z = scint_length/8.;
+  auto scint_StaveV_S = new G4Box("Scint_StaveS",scint_StaveV_x/2., scint_layer_t/2.,scint_StaveV_z/2.);
+  auto scint_StaveV_LV = new G4LogicalVolume(scint_StaveV_S,scintMaterial,"Scint_StaveV_LV");
+ 
   for (int i; i<10; i++){
-    scint_detector_PV_array.push_back(new G4PVPlacement(0, G4ThreeVector(0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t,(scint_length-scint_light_detector_length)/2.),scint_detectorLV,"Scint_detectorPV",scintLV,false,i,fCheckOverlaps));
-    scint_detector_PV_array.push_back(new G4PVPlacement(0, G4ThreeVector(0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t,-(scint_length-scint_light_detector_length)/2.),scint_detectorLV,"Scint_detectorPV",scintLV,false,i,fCheckOverlaps));
+    if (i%2==0){new G4PVPlacement(0, G4ThreeVector(0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t,0.),scint_layerH_LV,"Scint_layerPV",scintLV,false,i,fCheckOverlaps);}
+    else{new G4PVPlacement(0, G4ThreeVector(0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t,0.),scint_layerV_LV,"Scint_layerPV",scintLV,false,i,fCheckOverlaps);}
   }
-  
-  //std::cout << " -- scintillator width " << scint_w << " scintillator length " << scint_length << std::endl;
 
-  auto scint_pos1 = G4ThreeVector(-(3*scint_w+2*dx)/2. + scint_w/2., 0. , -(3*scint_length+2*dz)/2.+scint_length/2.);
-  auto scint_pos2 = scint_pos1 + G4ThreeVector(dx + scint_w,0.,0.);
-  auto scint_pos3 = scint_pos2 + G4ThreeVector(dx + scint_w,0.,0.);
-  auto scint_pos4 = scint_pos1 + G4ThreeVector(0.,0., dz + scint_length);
-  auto scint_pos5 = scint_pos4 + G4ThreeVector(dx + scint_w,0.,0.);
-  auto scint_pos6 = scint_pos5 + G4ThreeVector(dx + scint_w,0.,0.);
-  auto scint_pos7 = scint_pos4 + G4ThreeVector(0.,0., dz + scint_length);
-  auto scint_pos8 = scint_pos7 + G4ThreeVector(dx + scint_w,0.,0.);
-  auto scint_pos9 = scint_pos8 + G4ThreeVector(dx + scint_w,0.,0.);
-  
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos1,scintLV,"ScintPV1",scint_groupLV,false,0,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos2,scintLV,"ScintPV2",scint_groupLV,false,1,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos3,scintLV,"ScintPV3",scint_groupLV,false,2,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos4,scintLV,"ScintPV4",scint_groupLV,false,3,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos5,scintLV,"ScintPV5",scint_groupLV,false,4,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos6,scintLV,"ScintPV6",scint_groupLV,false,5,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos7,scintLV,"ScintPV7",scint_groupLV,false,6,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos8,scintLV,"ScintPV8",scint_groupLV,false,7,fCheckOverlaps));
-  scint_Module_PV_array.push_back(new G4PVPlacement(0,scint_pos9,scintLV,"ScintPV9",scint_groupLV,false,8,fCheckOverlaps));
+  // placing the staves 
+  for (int i; i<8; i++){
+    new G4PVPlacement(0,G4ThreeVector(-scint_w/2.+(2*i+1)/2.*scint_StaveH_x,0.,0.),scint_StaveH_LV,"Scint_layerPV",scint_layerH_LV,false,i,fCheckOverlaps);
+    new G4PVPlacement(0,G4ThreeVector(0.,0.,-scint_length/2.+(2*i+1)/2.*scint_StaveV_z),scint_StaveV_LV,"Scint_layerPV",scint_layerV_LV,false,i,fCheckOverlaps);
+  }
 
+  // scint_PV_array.push_back(new G4PVPlacement(0, G4ThreeVector(0.,0.,-scint_Stave_2_w/2.+(2*i+1)/2.*scint_Stave_2_w),scint_layer2S,"Scint_layerPV",scint_layer2LV,false,i,fCheckOverlaps));
+
+  auto scint_pos11 = G4ThreeVector(-(3*scint_w+2*dx)/2. + scint_w/2., 0. , -(3*scint_length+2*dz)/2.+scint_length/2.);
+  auto scint_pos21 = scint_pos11 + G4ThreeVector(dx + scint_w,0.,0.);
+  auto scint_pos31 = scint_pos21 + G4ThreeVector(dx + scint_w,0.,0.);
+  auto scint_pos41 = scint_pos11 + G4ThreeVector(0.,0., dz + scint_length);
+  auto scint_pos51 = scint_pos41 + G4ThreeVector(dx + scint_w,0.,0.);
+  auto scint_pos61 = scint_pos51 + G4ThreeVector(dx + scint_w,0.,0.);
+  auto scint_pos71 = scint_pos41 + G4ThreeVector(0.,0., dz + scint_length);
+  auto scint_pos81 = scint_pos71 + G4ThreeVector(dx + scint_w,0.,0.);
+  auto scint_pos91 = scint_pos81 + G4ThreeVector(dx + scint_w,0.,0.);
+
+
+  auto scint_pos12 = G4ThreeVector(0.,-(3*scint_w+2*dx)/2. + scint_w/2., -(3*scint_length+2*dz)/2.+scint_length/2.);
+  auto scint_pos22 = scint_pos12 + G4ThreeVector(0.,dx + scint_w,0.);
+  auto scint_pos32 = scint_pos22 + G4ThreeVector(0.,dx + scint_w,0.);
+  auto scint_pos42 = scint_pos12 + G4ThreeVector(0.,0., dz + scint_length);
+  auto scint_pos52 = scint_pos42 + G4ThreeVector(0.,dx + scint_w,0.);
+  auto scint_pos62 = scint_pos52 + G4ThreeVector(0.,dx + scint_w,0.);
+  auto scint_pos72 = scint_pos42 + G4ThreeVector(0.,0., dz + scint_length);
+  auto scint_pos82 = scint_pos72 + G4ThreeVector(0.,dx + scint_w,0.);
+  auto scint_pos92 = scint_pos82 + G4ThreeVector(0.,dx + scint_w,0.);
+
+  std::vector<G4ThreeVector> scint_pos_array;
   auto scint_group_pos1 = G4ThreeVector((3.*scint_w+2.*dx-1.0*TPC_total_length)/2.,TPC_total_length/2.+scint_t/2.+dy,0.);
-  auto scint_group_pos2 = G4ThreeVector((scint_t/2.+dy+TPC_total_length/2.),-(-TPC_total_length/2.+(3.*scint_w+2.*dx)/2.),0.);
+  auto scint_group_pos2 = G4ThreeVector(-(scint_t/2.+dy+TPC_total_length/2.),(-TPC_total_length/2.+(3.*scint_w+2.*dx)/2.),0.);
   auto scint_group_pos3 = G4ThreeVector(-(3.*scint_w+2*dx-1.0*TPC_total_length)/2.,-(TPC_total_length/2.+scint_t/2.+dy),0.);
-  auto scint_group_pos4 = G4ThreeVector(-(scint_t/2.+dy+TPC_total_length/2.),(-TPC_total_length/2.+(3.*scint_w+2.*dx)/2.),0.);
-
-  G4RotationMatrix* zRot2 = new G4RotationMatrix; zRot2 -> rotateZ(90.*deg);
-  G4RotationMatrix* zRot3 = new G4RotationMatrix; zRot3 -> rotateZ(180.*deg);
-  G4RotationMatrix* zRot4 = new G4RotationMatrix; zRot4 -> rotateZ(270.*deg);
-
-  // (disabled)
+  auto scint_group_pos4 = G4ThreeVector((scint_t/2.+dy+TPC_total_length/2.),-(-TPC_total_length/2.+(3.*scint_w+2.*dx)/2.),0.);
   
-  auto scintPV1 = new G4PVPlacement(0,scint_group_pos1,scint_groupLV,"ScintPV_Group1",worldLV,false,0,fCheckOverlaps);
-  auto scintPV2 = new G4PVPlacement(zRot2,scint_group_pos2,scint_groupLV,"ScintPV_Group2",worldLV,false,1,fCheckOverlaps);
-  auto scintPV3 = new G4PVPlacement(zRot3,scint_group_pos3,scint_groupLV,"ScintPV_Group3",worldLV,false,2,fCheckOverlaps);
-  auto scintPV4 = new G4PVPlacement(zRot4,scint_group_pos4,scint_groupLV,"ScintPV_Group4",worldLV,false,3,fCheckOverlaps);
+  
+  scint_pos_array.push_back(scint_group_pos1);
+  scint_pos_array.push_back(scint_group_pos2);
+  scint_pos_array.push_back(scint_group_pos3);
+  scint_pos_array.push_back(scint_group_pos4);
+
+  std::vector<G4RotationMatrix *> scint_rot_array;
+  G4RotationMatrix* zRot1 = new G4RotationMatrix; zRot1 -> rotateZ(0.*deg);
+  G4RotationMatrix* zRot2 = new G4RotationMatrix; zRot2 -> rotateZ(270.*deg);
+  G4RotationMatrix* zRot3 = new G4RotationMatrix; zRot3 -> rotateZ(180.*deg);
+  G4RotationMatrix* zRot4 = new G4RotationMatrix; zRot4 -> rotateZ(90.*deg);
+
+  scint_rot_array.push_back(zRot1);
+  scint_rot_array.push_back(zRot2);
+  scint_rot_array.push_back(zRot3);
+  scint_rot_array.push_back(zRot4);
+
+  int scint_mod_index_count = 0;
+
+  for (int i = 0; i<4;i++){
+    std::cout << "in the loop!" << std::endl;
+    if (i%2 == 0){ // if it is the 
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos11+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+0,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos21+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+1,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos31+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+2,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos41+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+3,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos51+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+4,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos61+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+5,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos71+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+6,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos81+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+7,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos91+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+8,fCheckOverlaps));
+    }
+    else{
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos12+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+0,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos22+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+1,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos32+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+2,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos42+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+3,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos52+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+4,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos62+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+5,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos72+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+6,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos82+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+7,fCheckOverlaps));
+      scint_Module_PV_array.push_back(new G4PVPlacement(scint_rot_array[i],scint_pos92+scint_pos_array[i],scintLV,"ScintPV",worldLV,false,scint_mod_index_count+8,fCheckOverlaps));
+    }
+    scint_mod_index_count = scint_mod_index_count+9;
+  }
+
   
   // - - - front and back scintillators
-  G4double scint_w_fb = TPC_total_length/2. + dy + scint_t;
-  G4double scint_h_fb = scint_w_fb - tube_thickness - tube_radius;
-  G4double scint_w_fb2 = 2.*scint_w_fb - 2*scint_h_fb;
-  
-  //std::cout << "FB scintillator width: " << scint_w_fb << " horizontal ones width: " << scint_w_fb2 << std::endl;
-  //std::cout << "FB scintillator height: " << scint_h_fb << " horizontal ones height: " << scint_h_fb << std::endl;
+  // Type I dimensions
+  G4double scint_x_fb1 = TPC_total_length/2. + dy + scint_t;
+  G4double scint_y_fb1 = scint_x_fb1 - tube_thickness - tube_radius;
+  // Type II dimensions
+  G4double scint_x_fb2 = scint_y_fb1; // not sure why they are the same but it works 
+  G4double scint_y_fb2 = 2.*scint_x_fb1 - 2.*scint_y_fb1;
 
   // virtual volume for the layers
-  auto scint_fb_S = new G4Box("ScintS",scint_w_fb/2.,scint_h_fb/2.,scint_t/2.);
-  auto scint_fb_LV = new G4LogicalVolume(scint_fb_S,defaultMaterial,"ScintLV1");
-  auto scint_fb_S2 = new G4Box("ScintS",scint_h_fb/2.,scint_w_fb2/2.,scint_t/2.);
-  auto scint_fb_LV2 = new G4LogicalVolume(scint_fb_S2,defaultMaterial,"ScintLV2");
+  auto scint_fb1_S = new G4Box("ScintS",scint_x_fb1/2.,scint_y_fb1/2.,scint_t/2.);
+  auto scint_fb1_LV = new G4LogicalVolume(scint_fb1_S,defaultMaterial,"Scint_fb_LV1");
+  
+  auto scint_fb2_S = new G4Box("ScintS",scint_x_fb2/2.,scint_y_fb2/2.,scint_t/2.);
+  auto scint_fb2_LV = new G4LogicalVolume(scint_fb2_S,defaultMaterial,"Scint_fb_LV2");
   
   // defining the layers
-  auto scint_layer_fb_S = new G4Box("ScintS", scint_w_fb/2.,scint_h_fb/2., scint_layer_t/2.);
-  auto scint_layer_fb_LV = new G4LogicalVolume(scint_layer_fb_S,scintMaterial,"Scint_layerLV1");
-  auto scint_layer_fb_S2 = new G4Box("ScintS", scint_h_fb/2.,scint_w_fb2/2., scint_layer_t/2.);
-  auto scint_layer_fb_LV2 = new G4LogicalVolume(scint_layer_fb_S2,scintMaterial,"Scint_layerLV2");
+  // type 1 layer 1 and 2: (1 = horizontal, 2 = vertical staves)
+  auto scint_layer_fb11_S = new G4Box("ScintS", scint_x_fb1/2.,scint_y_fb1/2., scint_layer_t/2.);
+  auto scint_layer_fb11_LV = new G4LogicalVolume(scint_layer_fb11_S,defaultMaterial,"Scint_Stave_LV11");
+  auto scint_layer_fb12_S= new G4Box("ScintS", scint_x_fb1/2.,scint_y_fb1/2., scint_layer_t/2.);
+  auto scint_layer_fb12_LV = new G4LogicalVolume(scint_layer_fb12_S,defaultMaterial,"Scint_Stave_LV12");
+  
+  auto scint_layer_fb21_S = new G4Box("ScintS", scint_x_fb2/2.,scint_y_fb2/2., scint_layer_t/2.);
+  auto scint_layer_fb21_LV = new G4LogicalVolume(scint_layer_fb21_S,defaultMaterial,"Scint_Stave_LV21");
+  auto scint_layer_fb22_S = new G4Box("ScintS", scint_x_fb2/2.,scint_y_fb2/2., scint_layer_t/2.);
+  auto scint_layer_fb22_LV = new G4LogicalVolume(scint_layer_fb22_S,defaultMaterial,"Scint_Stave_LV22");
 
-  auto scint_layer_fb_PV1 = new G4PVReplica("Scint_layerPV",scint_layer_fb_LV,scint_fb_LV,kZAxis,nofLayers,scint_layer_t);
-  auto scint_layer_fb_PV2 = new G4PVReplica("Scint_layerPV",scint_layer_fb_LV2,scint_fb_LV2,kZAxis,nofLayers,scint_layer_t);
+  // // staves for the front and back layers
+  // Staves for type 1 fb scint
+  // --- vertical staves (divide x)
+  G4double scint_stave_xV_fb1 = scint_x_fb1/8.; 
+  G4double scint_stave_yV_fb1 = scint_y_fb1;
+  auto scint_stave_fb1V_S = new G4Box("ScintS", scint_stave_xV_fb1/2.,scint_stave_yV_fb1/2., scint_layer_t/2.);
+  auto scint_stave_fb1V_LV = new G4LogicalVolume(scint_stave_fb1V_S,scintMaterial,"Scint_fb_Stave1V_LV");
+
+ // --- horizontal staves (divide y)
+  G4double scint_stave_xH_fb1 = scint_x_fb1;
+  G4double scint_stave_yH_fb1 = scint_y_fb1/8.;
+  auto scint_stave_fb1H_S = new G4Box("ScintS", scint_stave_xH_fb1/2.,scint_stave_yH_fb1/2., scint_layer_t/2.);
+  auto scint_stave_fb1H_LV = new G4LogicalVolume(scint_stave_fb1H_S,scintMaterial,"Scint_fb_Stave1H_LV");
+  
+  // Staves for type 2 fb scint
+  // --- vertical staves (divide x)
+  G4double scint_stave_xV_fb2 = scint_x_fb2/8.; 
+  G4double scint_stave_yV_fb2 = scint_y_fb2;
+  auto scint_stave_fb2V_S = new G4Box("ScintS", scint_stave_xV_fb2/2.,scint_stave_yV_fb2/2., scint_layer_t/2.);
+  auto scint_stave_fb2V_LV = new G4LogicalVolume(scint_stave_fb2V_S,scintMaterial,"Scint_fb_Stave2V_LV");
+
+  // --- horizontal staves (divide y)
+  G4double scint_stave_xH_fb2 = scint_x_fb2;
+  G4double scint_stave_yH_fb2 = scint_y_fb2/8.;
+  auto scint_stave_fb2H_S = new G4Box("ScintS", scint_stave_xH_fb2/2.,scint_stave_yH_fb2/2., scint_layer_t/2.);
+  auto scint_stave_fb2H_LV = new G4LogicalVolume(scint_stave_fb2H_S,scintMaterial,"Scint_fb_Stave2H_LV");
+
+  for (int i; i<10; i++){
+    if (i%2==0){new G4PVPlacement(0, G4ThreeVector(0.,0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t),scint_layer_fb11_LV,"Scint_layerPV",scint_fb1_LV,false,i,fCheckOverlaps);}
+    else{new G4PVPlacement(0, G4ThreeVector(0.,0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t),scint_layer_fb12_LV,"Scint_layerPV",scint_fb1_LV,false,i,fCheckOverlaps);}
+    
+    if (i%2==0){new G4PVPlacement(0, G4ThreeVector(0.,0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t),scint_layer_fb21_LV,"Scint_layerPV",scint_fb2_LV,false,i,fCheckOverlaps);}
+    else{new G4PVPlacement(0, G4ThreeVector(0.,0.,-scint_t/2.+(2*i+1)/2.*scint_layer_t),scint_layer_fb22_LV,"Scint_layerPV",scint_fb2_LV,false,i,fCheckOverlaps);}
+  }
+
+  // placing the staves 
+  for (int i; i<8; i++){
+    // Type I scintillator 
+    // --- horizontal ones for odd number layers
+    new G4PVPlacement(0,G4ThreeVector(0.,-scint_y_fb1/2.+(2*i+1)/2.*scint_stave_yH_fb1,0.),scint_stave_fb1H_LV,"Scint_layerPV",scint_layer_fb11_LV,false,i,fCheckOverlaps);
+    // --- vertical ones for even number layers
+    new G4PVPlacement(0,G4ThreeVector(-scint_x_fb1/2.+(2*i+1)/2.*scint_stave_xV_fb1,0.,0.),scint_stave_fb1V_LV,"Scint_layerPV",scint_layer_fb12_LV,false,i,fCheckOverlaps);
+    
+    // Type II scintillator 
+    // --- horizontal ones for odd number layers
+    new G4PVPlacement(0,G4ThreeVector(0.,-scint_y_fb2/2.+(2*i+1)/2.*scint_stave_yH_fb2,0.),scint_stave_fb2H_LV,"Scint_layerPV",scint_layer_fb21_LV,false,i,fCheckOverlaps);
+    // --- vertical ones for even number layers
+    new G4PVPlacement(0,G4ThreeVector(-scint_x_fb2/2.+(2*i+1)/2.*scint_stave_xV_fb2,0.,0.),scint_stave_fb2V_LV,"Scint_layerPV",scint_layer_fb22_LV,false,i,fCheckOverlaps); 
+  }
   
   // rotation is introduced to make a better indexing of the layers
   G4RotationMatrix * scint_fb_rot =  new G4RotationMatrix; scint_fb_rot -> rotateX(180.0*deg);
   
-
-
-  auto scint_fb_pos1 = G4ThreeVector(scint_w_fb/2.,tube_radius+tube_thickness+scint_h_fb/2.,-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos2 = G4ThreeVector(-scint_w_fb/2.,tube_radius+tube_thickness+scint_h_fb/2.,-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos3 = G4ThreeVector(scint_w_fb/2.,-(tube_radius+tube_thickness+scint_h_fb/2.),-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos4 = G4ThreeVector(-scint_w_fb/2.,-(tube_radius+tube_thickness+scint_h_fb/2.),-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos5 = G4ThreeVector(-(tube_radius+tube_thickness+scint_h_fb/2.),0.,-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos6 = G4ThreeVector((tube_radius+tube_thickness+scint_h_fb/2.),0.,-(3*scint_length+2*dz)/2.-scint_t/2.);
-  auto scint_fb_pos7 = G4ThreeVector(scint_w_fb/2.,tube_radius+tube_thickness+scint_h_fb/2.,(3*scint_length+2*dz)/2.+scint_t/2.);
-  auto scint_fb_pos8 = G4ThreeVector(-scint_w_fb/2.,tube_radius+tube_thickness+scint_h_fb/2.,(3*scint_length+2*dz)/2.+scint_t/2.);
-  auto scint_fb_pos9 = G4ThreeVector(scint_w_fb/2.,-(tube_radius+tube_thickness+scint_h_fb/2.),(3*scint_length+2*dz)/2.+scint_t/2.);
-  auto scint_fb_pos10 = G4ThreeVector(-scint_w_fb/2.,-(tube_radius+tube_thickness+scint_h_fb/2.),(3*scint_length+2*dz)/2.+scint_t/2.);
-  auto scint_fb_pos11 = G4ThreeVector(-(tube_radius+tube_thickness+scint_h_fb/2.),0.,(3*scint_length+2*dz)/2.+scint_t/2.);
-  auto scint_fb_pos12 = G4ThreeVector((tube_radius+tube_thickness+scint_h_fb/2.),0.,(3*scint_length+2*dz)/2.+scint_t/2.);
-  
-
-  auto scint_fb_PV1 = new G4PVPlacement(scint_fb_rot,scint_fb_pos1,scint_fb_LV,"ScintPVfb_Group1",worldLV,false,1,fCheckOverlaps);
-  auto scint_fb_PV2 = new G4PVPlacement(scint_fb_rot,scint_fb_pos2,scint_fb_LV,"ScintPVfb_Group2",worldLV,false,2,fCheckOverlaps);
-  auto scint_fb_PV3 = new G4PVPlacement(scint_fb_rot,scint_fb_pos3,scint_fb_LV,"ScintPVfb_Group3",worldLV,false,3,fCheckOverlaps);
-  auto scint_fb_PV4 = new G4PVPlacement(scint_fb_rot,scint_fb_pos4,scint_fb_LV,"ScintPVfb_Group4",worldLV,false,4,fCheckOverlaps);
-  auto scint_fb_PV5 = new G4PVPlacement(scint_fb_rot,scint_fb_pos5,scint_fb_LV2,"ScintPVfb_Group5",worldLV,false,5,fCheckOverlaps);
-  auto scint_fb_PV6 = new G4PVPlacement(scint_fb_rot,scint_fb_pos6,scint_fb_LV2,"ScintPVfb_Group6",worldLV,false,6,fCheckOverlaps);
-  auto scint_fb_PV7 = new G4PVPlacement(0,scint_fb_pos7,scint_fb_LV,"ScintPVfb_Group7",worldLV,false,7,fCheckOverlaps);
-  auto scint_fb_PV8 = new G4PVPlacement(0,scint_fb_pos8,scint_fb_LV,"ScintPVfb_Group8",worldLV,false,8,fCheckOverlaps);
-  auto scint_fb_PV9 = new G4PVPlacement(0,scint_fb_pos9,scint_fb_LV,"ScintPVfb_Group9",worldLV,false,9,fCheckOverlaps);
-  auto scint_fb_PV10 = new G4PVPlacement(0,scint_fb_pos10,scint_fb_LV,"ScintPVfb_Group10",worldLV,false,10,fCheckOverlaps);
-  auto scint_fb_PV11 = new G4PVPlacement(0,scint_fb_pos11,scint_fb_LV2,"ScintPVfb_Group11",worldLV,false,11,fCheckOverlaps);
-  auto scint_fb_PV12 = new G4PVPlacement(0,scint_fb_pos12,scint_fb_LV2,"ScintPVfb_Group12",worldLV,false,12,fCheckOverlaps);
+  auto scint_fb_pos1 = G4ThreeVector(scint_x_fb1/2.,tube_radius+tube_thickness+scint_y_fb1/2.,-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos2 = G4ThreeVector(-scint_x_fb1/2.,tube_radius+tube_thickness+scint_y_fb1/2.,-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos3 = G4ThreeVector(scint_x_fb1/2.,-(tube_radius+tube_thickness+scint_y_fb1/2.),-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos4 = G4ThreeVector(-scint_x_fb1/2.,-(tube_radius+tube_thickness+scint_y_fb1/2.),-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos5 = G4ThreeVector(-(tube_radius+tube_thickness+scint_y_fb1/2.),0.,-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos6 = G4ThreeVector((tube_radius+tube_thickness+scint_y_fb1/2.),0.,-(3*scint_length+2*dz)/2.-scint_t/2.);
+  auto scint_fb_pos7 = G4ThreeVector(scint_x_fb1/2.,tube_radius+tube_thickness+scint_y_fb1/2.,(3*scint_length+2*dz)/2.+scint_t/2.);
+  auto scint_fb_pos8 = G4ThreeVector(-scint_x_fb1/2.,tube_radius+tube_thickness+scint_y_fb1/2.,(3*scint_length+2*dz)/2.+scint_t/2.);
+  auto scint_fb_pos9 = G4ThreeVector(scint_x_fb1/2.,-(tube_radius+tube_thickness+scint_y_fb1/2.),(3*scint_length+2*dz)/2.+scint_t/2.);
+  auto scint_fb_pos10 = G4ThreeVector(-scint_x_fb1/2.,-(tube_radius+tube_thickness+scint_y_fb1/2.),(3*scint_length+2*dz)/2.+scint_t/2.);
+  auto scint_fb_pos11 = G4ThreeVector(-(tube_radius+tube_thickness+scint_y_fb1/2.),0.,(3*scint_length+2*dz)/2.+scint_t/2.);
+  auto scint_fb_pos12 = G4ThreeVector((tube_radius+tube_thickness+scint_y_fb1/2.),0.,(3*scint_length+2*dz)/2.+scint_t/2.);
   
   
+  auto scint_fb_PV1 = new G4PVPlacement(scint_fb_rot,scint_fb_pos2,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+0,fCheckOverlaps); 
+  auto scint_fb_PV2 = new G4PVPlacement(scint_fb_rot,scint_fb_pos5,scint_fb2_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+1,fCheckOverlaps); 
+  auto scint_fb_PV3 = new G4PVPlacement(scint_fb_rot,scint_fb_pos4,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+2,fCheckOverlaps); 
+  auto scint_fb_PV4 = new G4PVPlacement(scint_fb_rot,scint_fb_pos3,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+3,fCheckOverlaps); 
+  auto scint_fb_PV5 = new G4PVPlacement(scint_fb_rot,scint_fb_pos6,scint_fb2_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+4,fCheckOverlaps); 
+  auto scint_fb_PV6 = new G4PVPlacement(scint_fb_rot,scint_fb_pos1,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+5,fCheckOverlaps); 
+
+  auto scint_fb_PV7 = new G4PVPlacement(0,scint_fb_pos7,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+6,fCheckOverlaps);
+  auto scint_fb_PV8 = new G4PVPlacement(0,scint_fb_pos12,scint_fb2_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+7,fCheckOverlaps);
+  auto scint_fb_PV9 = new G4PVPlacement(0,scint_fb_pos10,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+8,fCheckOverlaps);
+  auto scint_fb_PV10 = new G4PVPlacement(0,scint_fb_pos9,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+9,fCheckOverlaps);
+  auto scint_fb_PV11 = new G4PVPlacement(0,scint_fb_pos11,scint_fb2_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+10,fCheckOverlaps);
+  auto scint_fb_PV12 = new G4PVPlacement(0,scint_fb_pos8,scint_fb1_LV,"ScintPVfb",worldLV,false,scint_mod_index_count+11,fCheckOverlaps);
+  
+  // cuts for scintillator
+  G4Region* scint_region = new G4Region("Scint_region");
+  scint_region->AddRootLogicalVolume(scint_StaveH_LV);
+  scint_region->AddRootLogicalVolume(scint_StaveV_LV);
+  scint_region->AddRootLogicalVolume(scint_stave_fb1V_LV);
+  scint_region->AddRootLogicalVolume(scint_stave_fb1H_LV);
+  scint_region->AddRootLogicalVolume(scint_stave_fb2V_LV);
+  scint_region->AddRootLogicalVolume(scint_stave_fb2H_LV); 
+  G4Region* scint_Region = G4RegionStore::GetInstance()->GetRegion("Scint_region");
+  G4ProductionCuts* scintcut = new G4ProductionCuts();
+  scintcut->SetProductionCut(130.0*cm,"gamma"); // 130cm -> 1.3 MeV   220cm -> 3.4 MeV 400*cm -> 50 MeV
+  scintcut->SetProductionCut(1.0*mm,"e-");
+  scintcut->SetProductionCut(1.0*mm,"e+");
+  scintcut->SetProductionCut(1.0*mm,"proton");
+  scint_Region->SetProductionCuts(scintcut);
+
   // Lead Glass
   G4double lead_glass_xy = 8.*cm; G4double lead_glass_z = 25.*cm;
   G4double coating_thickness = 0.2*mm;
@@ -558,14 +697,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   abs_region->AddRootLogicalVolume(absorberLV); 
   G4Region* absRegion = G4RegionStore::GetInstance()->GetRegion("Abs_region");
   G4ProductionCuts* abscut = new G4ProductionCuts();
-  abscut->SetProductionCut(10035.0 *cm,"gamma"); 
-  abscut->SetProductionCut(35 *cm,"e-");
-  abscut->SetProductionCut(35 *cm,"e+");
-  abscut->SetProductionCut(130 *cm,"proton"); // 0.25cm ? 30 cm -> 1.8 MeV ;; 33cm -> 2.55 MeV ;; 34cm -> 2.97 MeV ;; 34.1cm -> 3.0MeV ;; 34.3, 34.6cm, 34.9cm, 35cm -> 10 GeV
+  abscut->SetProductionCut(35.0 *cm,"gamma"); 
+  abscut->SetProductionCut(1 *mm,"e-");
+  abscut->SetProductionCut(1 *mm,"e+");
+  abscut->SetProductionCut(1 *mm,"proton");
   absRegion->SetProductionCuts(abscut);
 
-
-  
   ///***calculate the position directly from python
   
   std::cout << " Constructing the lead glass blocks from data" << std::endl;
@@ -594,15 +731,16 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
       rot_array_dir[i][j]->rotate(-data_lead_glass_pos[j][3]*deg, G4ThreeVector(cos(i*rot_angle),sin(i*rot_angle),0.));
       rot_array_dir[i][j]-> rotateZ(data_lead_glass_pos[j][5]*deg -i*rot_angle); //data_lead_glass_pos[i][5]*deg 
       lg_PV_array[i].push_back(new G4PVPlacement(rot_array_dir[i][j],G4ThreeVector(lead_x, lead_y,data_lead_glass_pos[j][2]*cm) ,absorberLV,"AbsoPV",worldLV,false,lead_index,fCheckOverlaps));
+      
+      Lead_glass_outFile << lead_index << "," << lead_x/cm << "," << lead_y/cm << "," << data_lead_glass_pos[j][2] << G4endl;
+      //std::cout << lead_index << "," << lead_x/cm << "," << lead_y/cm << "," << data_lead_glass_pos[j][2] << std::endl; 
       lead_index ++ ;
     }
   }
- /***
-  ***/
-
+  
   // for the Front and back lead glass
   G4double lead_glass_y_level_fb = (3*scint_length+2*dz)/2.+scint_t;
-  
+  std::cout << "Full Detector half length " << lead_glass_y_level_fb << std::endl;
   std::vector<G4RotationMatrix *> rot_array_dir111;
   std::vector<G4RotationMatrix *> rot_array_dir211;
 
@@ -625,7 +763,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
         lead_index ++ ;        
   }
 
-  /***
   // PMT virtual volume
   std::cout << " Constructing the PMTs from data" << std::endl;
   std::vector<std::vector<G4VPhysicalVolume *>> PMT_PV_array;
@@ -640,8 +777,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   double sign_1[] = {-1.0, -1.0,-1.0,-1.0};
   double sign_2[] = {-1.0, 1.0,-1.0,1.0};
 
-  // (disabled) 
- /***
+  // (disabled)
+ 
+  /***
   for (int i = 0; i < 4; i++){ 
     std::vector<G4RotationMatrix *>temp_rot_array_dir;
     std::vector<G4VPhysicalVolume*>temp_PV_array;
@@ -663,8 +801,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
       pmt_index ++ ;
     }
   }
-  
-  
+
   ***/
 
   // **************************************************
@@ -690,13 +827,28 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   op_glass_world ->SetMaterialPropertiesTable(GlassWorldProperty);
   
   //new G4LogicalSkinSurface("name",PMTLV,op_glass_world);
+  
+  //scintillators
   new G4LogicalSkinSurface("name",scintLV,op_glass_world);
-  new G4LogicalSkinSurface("name",scint_fb_LV,op_glass_world);
-  new G4LogicalSkinSurface("name",scint_fb_LV2,op_glass_world);
- 
-  new G4LogicalSkinSurface("name",scint_layerLV,op_glass_world);
-  new G4LogicalSkinSurface("name",scint_layer_fb_LV,op_glass_world);
-  new G4LogicalSkinSurface("name",scint_layer_fb_LV2,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_layerH_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_layerV_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_StaveH_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_StaveV_LV,op_glass_world);
+
+  // scintillators front and back
+  new G4LogicalSkinSurface("name",scint_fb1_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_fb2_LV,op_glass_world);
+
+  new G4LogicalSkinSurface("name",scint_layer_fb11_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_layer_fb12_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_layer_fb21_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_layer_fb22_LV,op_glass_world);
+  
+  new G4LogicalSkinSurface("name",scint_stave_fb1H_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_stave_fb1V_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_stave_fb2H_LV,op_glass_world);
+  new G4LogicalSkinSurface("name",scint_stave_fb2V_LV,op_glass_world);
+
   new G4LogicalSkinSurface("name",absorberLV,op_glass_world);
   new G4LogicalSkinSurface("name",worldLV,op_glass_world);
   
@@ -817,12 +969,26 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
   TPCLV->SetVisAttributes (G4VisAttributes::GetInvisible());
+  TPCLV_block->SetVisAttributes (G4VisAttributes::GetInvisible());
   auto grey_color= new G4VisAttributes(G4Colour(0.533333,0.541176,0.521569)); grey_color->SetVisibility(true);
-  auto green_color= new G4VisAttributes(G4Colour(0.517647,0.772549,0.556863)); green_color->SetVisibility(true);
-  
+  auto green_color= new G4VisAttributes(G4Colour(0.788235,0.890196,0.741176)); green_color->SetVisibility(true);
+  // original green: 0.517647,0.772549,0.556863
+  auto orange_color= new G4VisAttributes(G4Colour(0.988235,0.686275,0.243137)); orange_color->SetVisibility(true);
+  auto red_color= new G4VisAttributes(G4Colour(0.956863,0.0901961,0.494118)); red_color->SetVisibility(true); 
+  auto blue_color= new G4VisAttributes(G4Colour(0.447059,0.623529,0.811765)); blue_color->SetVisibility(true);
+  auto black_color = new G4VisAttributes(G4Colour(0.333333,0.341176,0.32549)); black_color->SetVisibility(true);
 
-  //absorberLV->SetVisAttributes(green_color);
-  //PMTLV->SetVisAttributes(grey_color);
+  absorberLV->SetVisAttributes(green_color); // green
+  scint_StaveH_LV->SetVisAttributes(blue_color); //blue
+  scint_StaveV_LV->SetVisAttributes(blue_color); //blue
+  scint_stave_fb1V_LV->SetVisAttributes(blue_color); //blue
+  scint_stave_fb1H_LV->SetVisAttributes(blue_color); //blue
+  scint_stave_fb2V_LV->SetVisAttributes(blue_color); //blue
+  scint_stave_fb2H_LV->SetVisAttributes(blue_color); //blue
+  TPCLV_1->SetVisAttributes(red_color); // red
+  TPCLV_2->SetVisAttributes(red_color); // red
+  siliconLV_1->SetVisAttributes(orange_color); //orange
+  siliconLV_2->SetVisAttributes(orange_color);
   tubeLV -> SetVisAttributes(grey_color);
   return worldPV;
 }
@@ -838,9 +1004,12 @@ void DetectorConstruction::ConstructSDandField()
   G4String scintDetectorName = "ScintLV" ;
   ScintillatorSD* scintDetector = new ScintillatorSD(scintDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-  SetSensitiveDetector("Scint_layerLV", scintDetector);
-  SetSensitiveDetector("Scint_layerLV1", scintDetector);
-  SetSensitiveDetector("Scint_layerLV2", scintDetector);
+  SetSensitiveDetector("Scint_StaveV_LV", scintDetector);
+  SetSensitiveDetector("Scint_StaveH_LV", scintDetector);
+  SetSensitiveDetector("Scint_fb_Stave1H_LV", scintDetector);
+  SetSensitiveDetector("Scint_fb_Stave1V_LV", scintDetector);
+  SetSensitiveDetector("Scint_fb_Stave2H_LV", scintDetector);
+  SetSensitiveDetector("Scint_fb_Stave2V_LV", scintDetector);
   
   // declare absorber as AbsorberSD
   G4String absorberDetectorName = "AbsoLV" ;
@@ -852,7 +1021,7 @@ void DetectorConstruction::ConstructSDandField()
   G4String tubeDetectorName = "TubeLV" ;
   TubeSD* tubeDetector = new TubeSD(tubeDetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(tubeDetector);
-  //SetSensitiveDetector("TubeLV", tubeDetector);
+  SetSensitiveDetector("TubeLV", tubeDetector);
   
   // declare vacuum as TPCSD
   G4String TPCDetectorName = "TPCLV" ;
@@ -868,8 +1037,8 @@ void DetectorConstruction::ConstructSDandField()
   G4String Silicon_DetectorName = "siliconLV";
   SiliconSD* Silicon_Detector = new SiliconSD(Silicon_DetectorName);
   G4SDManager::GetSDMpointer()->AddNewDetector(Silicon_Detector);
-  //SetSensitiveDetector("siliconLV_1", Silicon_Detector);
-  //SetSensitiveDetector("siliconLV_2", Silicon_Detector);
+  SetSensitiveDetector("siliconLV_1", Silicon_Detector);
+  SetSensitiveDetector("siliconLV_2", Silicon_Detector);
 
   auto fElectricField = new ElectricField(); //new G4UniformElectricField(G4ThreeVector(0.0,0.0,400*volt/cm));
 	G4EqMagElectricField*fEquation = new G4EqMagElectricField(fElectricField);  //fEMfield<->fElectricField

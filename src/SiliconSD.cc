@@ -104,12 +104,14 @@ G4bool SiliconSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     // Get step length  
     G4double DX = aStep -> GetStepLength();
     G4StepPoint* PreStep = aStep->GetPreStepPoint();
+    G4StepPoint* PostStep = aStep->GetPostStepPoint();
     
     // Position
-    G4ThreeVector pos = PreStep->GetPosition();
-    G4double x = pos.getX();
-    G4double y = pos.getY();
-    G4double z = pos.getZ();
+    G4ThreeVector pos1 = PreStep->GetPosition();
+    G4ThreeVector pos2 = PostStep->GetPosition();
+    G4double x = ((pos1+pos2)/2.).getX();
+    G4double y = ((pos1+pos2)/2.).getY();
+    G4double z = ((pos1+pos2)/2.).getZ();
 
     G4ThreeVector vertex = theTrack->GetVertexPosition();
     G4double origin = vertex.getZ();

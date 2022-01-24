@@ -35,6 +35,7 @@
 #include "G4ParticleGun.hh"
 #include "Randomize.hh"
 #include "globals.hh"
+#include "RNGWrapper.hh"
 #include "PrimaryGeneratorMessenger.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4GenericMessenger.hh"

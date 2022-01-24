@@ -53,9 +53,12 @@ extern G4double event_number;
 
 extern std::vector<std::vector<G4double>> PMT_record;
 extern std::vector<std::vector<G4double>> scint_record;
-extern std::ofstream PMT_outFile; extern std::ofstream scint_outFile;
-extern std::ofstream SD_outFile; extern std::ofstream TPC_outFile;
+//extern std::ofstream PMT_outFile; 
 extern std::ofstream Silicon_outFile;
+extern std::ofstream Tube_outFile;
+extern std::ofstream TPC_outFile;
+extern std::ofstream Scint_layer_outFile; 
+extern std::ofstream Abs_outFile;
 
 EventAction::EventAction(): 
     G4UserEventAction(),
@@ -223,17 +226,28 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     x = ((*ScintHits)[h]) -> GetPosX();
                     y = ((*ScintHits)[h]) -> GetPosY();
                     z = ((*ScintHits)[h]) -> GetPosZ();
+                    
+                    G4double particle_x = ((*ScintHits)[h]) -> GetPosX_particle();
+                    G4double particle_y = ((*ScintHits)[h]) -> GetPosY_particle();
+                    G4double particle_z = ((*ScintHits)[h]) -> GetPosZ_particle();
+                    
                     time     = ((*ScintHits)[h]) -> GetTime();
+
+                    auto stave_ID = ((*ScintHits)[h]) -> GetStave_ID(); 
                     i        = ((*ScintHits)[h]) -> GetXID();
-                    group_ID = ((*ScintHits)[h]) -> GetGroup_ID();
+                    //group_ID = ((*ScintHits)[h]) -> GetGroup_ID();
                     module_ID = ((*ScintHits)[h]) -> GetMod_ID();
+
                     kinEn    = ((*ScintHits)[h]) -> GetKinEn();
                     eDep     = ((*ScintHits)[h]) -> GetEdep();
                     trackl   = ((*ScintHits)[h]) -> GetTrackLength();
                     G4int scint_photons_per_hit = ((*ScintHits)[h])->GetPhotons();
                     // writing output
-                    SD_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< "Scint"<<","<< group_ID<<","<<module_ID<<","<<i<<","<<x<<","<<y<<","<<z<<","<<
-                    time<<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit <<G4endl;
+                    Scint_layer_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< module_ID<<","<<i<< "," << stave_ID << ","
+                    << time <<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit << "," << x <<","<< y << ","<< z << "," << particle_x << "," << particle_y << "," << particle_z  <<G4endl;
+
+                    //std::cout<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << std::endl;
+
                }
 
             }
@@ -258,8 +272,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     y = ((*AbsHits)[h]) -> GetPosY();
                     z = ((*AbsHits)[h]) -> GetPosZ();
 
-                    SD_outFile << event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<< "Abs"<<","<< 0 <<","<< 0 <<","<<i<<","<<x<<","<<y<<","<<z<<","<<
-                    time<<","<<kinEn<<","<<eDep<<","<< photons_cerenkov <<G4endl;
+                    Abs_outFile << event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<<i<<","
+                    << time<<","<<kinEn<<","<<eDep<<","<< trackl <<","<< photons_cerenkov <<  "," << x <<","<< y << ","<<z<<G4endl;
                     
                 }
                 //cerenkovCounter = cerenkovCounter + photons_cerenkov;
@@ -282,6 +296,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 G4double x = ((*TubeHits)[h]) -> GetPosX();
                 G4double y = ((*TubeHits)[h]) -> GetPosY();
                 G4double z = ((*TubeHits)[h]) -> GetPosZ();
+            
+                Tube_outFile << event_number << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
+                time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
+            
             }         
         }
 
@@ -308,13 +326,13 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
                 //SD_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< "TPC"<<","<< 0 <<","<< 0 <<","<<i<<","<<x<<","<<y<<","<<z<<","<<
                 //time<<","<<kinEn<<","<<eDep<<","<< photons <<G4endl;
-
-                TPC_outFile << event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
-                time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
-            
+                if (electrons>0){
+                    if (proc !="eIoni" && proc!= "hIoni") // dont want to see the electrons ... 
+                    TPC_outFile << event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << ","<< proc <<","  << x <<","<<y<<","<<z<<","<<
+                    time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
+                }
                 //std::cout << " TPC hit " << module_ID << ", layer: " << i << ", " << eDep/CLHEP::MeV  << std::endl;
             }
-
         }
 
         // PMT Sensitive volume
@@ -339,6 +357,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
             }
         }
 
+        /**
         PMT_index_reduced = PMT_index;
         sort(PMT_index_reduced.begin(), PMT_index_reduced.end());
         PMT_index_reduced.erase(unique(PMT_index_reduced.begin(), PMT_index_reduced.end()), PMT_index_reduced.end() );
@@ -377,6 +396,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
         }
         PMT_outFile << "]";
         PMT_outFile << "}" <<G4endl;
+        ***/
 
         SiliconHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID6));        
         if (SiliconHits) {

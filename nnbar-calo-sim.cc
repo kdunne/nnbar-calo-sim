@@ -42,10 +42,17 @@
 #include <G4RegionStore.hh>
 #include "G4UImanager.hh"
 #include "FTFP_BERT.hh"
+#include "QGSP_BERT.hh"
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4MCPLGenerator.hh"
+#include "G4MCPLWriter.hh"
+#include  "mcpl.h"
+
+#include "G4PAIModel.hh"
+#include "G4PAIPhotModel.hh"
 
 //.........
 
@@ -53,25 +60,23 @@ std::vector<std::vector<G4double>> PMT_record;
 std::vector<std::vector<G4double>> particle_gun_record;
 std::vector<std::vector<G4double>> scint_record;
 G4double event_number = 0;
+G4int run_number = 0;
+// define sensitive volume readout :
+std::ofstream Silicon_outFile;
+std::ofstream TPC_outFile;
+std::ofstream Scint_layer_outFile;
+std::ofstream Abs_outFile; 
+std::ofstream Tube_outFile;
+std::ofstream Particle_outFile; 
+std::ofstream pi0_outFile;
 
-std::ofstream PMT_outFile("./output/PMT_output_signal.txt");
-std::ofstream Particle_outFile("./output/particle_output_signal.txt");
-std::ofstream scint_outFile("./output/Scintillator_output_signal.txt");
-std::ofstream SD_outFile("./output/All_SD_output_signal.txt");
-std::ofstream TPC_outFile("./output/TPC_output_signal.txt");
-
-std::ofstream Silicon_outFile("./output/Silicon_output_signal.txt");
+// the light detector readout// 
+// std::ofstream Scint_layer_outFile("./output/Scintiilator_output_signal.txt");
+// std::ofstream PMT_outFile("./output/PMT_output.txt");
 
 //For the scintillator and lead glass position
 std::ofstream Lead_glass_outFile("./output/Lead_glass_index.txt");
 std::ofstream Scint_outFile("./output/Scint_index.txt");
-
-/*** for gamma bkg 
-std::ofstream PMT_outFile("./output/PMT_output_gamma_bkg.txt");
-std::ofstream Particle_outFile("./output/particle_output_gamma_bkg.txt");
-std::ofstream scint_outFile("./output/Scintillator_output_gamma_bkg.txt");
-std::ofstream SD_outFile("./output/All_SD_output_gamma_bkg.txt");
-***/ 
 
 namespace {
   void PrintUsage() {
@@ -87,13 +92,9 @@ namespace {
 int main(int argc, char** argv)
 {  
 
-  scint_outFile << "Event_ID,group_ID,module_ID,Layer,Time,KE" << G4endl;
-  Particle_outFile << "Event_ID,PID,Mass,KE,x,y,z,t,u,v,w"<< G4endl;
-  SD_outFile<< "Event_ID,Track_ID,Parent_ID,Name,Proc,Volume,Group_ID,module_ID,index,x,y,z,t,KE,eDep,photons"<<G4endl;
-  TPC_outFile << "Event_ID,module_ID,Layer,Track_ID,Parent_ID,Name,x,y,z,t,KE,eDep,electrons,trackl"<< G4endl;
+  //scint_outFile << "Event_ID,group_ID,module_ID,Layer,Time,KE" << G4endl;
   Lead_glass_outFile << "index,x,y,z" <<G4endl;
   Scint_outFile << "index,x,y,z" <<G4endl;
-  Silicon_outFile << "Event_ID,layer,Track_ID,Parent_ID,Name,x,y,z,t,KE,eDep,trackl" <<G4endl;
 
   // Evaluate arguments
   if ( argc > 7 ) {
@@ -145,31 +146,24 @@ int main(int argc, char** argv)
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
  
-  //G4VUserPhysicsList* physicsList = new PhysicsList();
-  
- 
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
-  G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
-  opticalPhysics->SetWLSTimeProfile("delta");
-  opticalPhysics->SetScintillationYieldFactor(1.0);
-  opticalPhysics->SetScintillationExcitationRatio(0.0);
-  opticalPhysics->SetMaxNumPhotonsPerStep(2000);
-  opticalPhysics->SetMaxBetaChangePerStep(100.0);
-  opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
-  opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
-  physicsList->RegisterPhysics(opticalPhysics); 
-   /***
-  ***/
-  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(1.0*MeV, 10.0*TeV);
+  G4VModularPhysicsList* physicsList = new PhysicsList();
 
+  G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(30.0*eV, 10.0*TeV);
   
+
 
   runManager->SetUserInitialization(physicsList);
+  
 
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
+
+  // MCPL file
+  //runManager->SetUserAction(new G4MCPLGenerator("nbar_C_dat_100k_McStas_converted_corrected.mcpl"));
+  
   runManager->Initialize();
+  //runManager->BeamOn(std::numeric_limits<G4int>::max());  // crashes  
+  //runManager->BeamOn(10000);  // total particles: 804968
   
   // Initialize visualization
   auto visManager = new G4VisExecutive;

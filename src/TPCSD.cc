@@ -84,10 +84,11 @@ G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
     G4int parentID = 0;
     parentID = theTrack->GetParentID();
-    if (parentID >0) {return false;}
+    //if (parentID >0) {return false;}
 
     G4String proc = "primary"; 
-
+    if (parentID > 0) { proc = theTrack->GetCreatorProcess()->GetProcessName();}
+    
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
     G4double direction = stepDelta.getZ();
 
@@ -121,9 +122,14 @@ G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     // Read voxel indexes: i is the x index, k is the z index
     const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
-    G4int k = touchable ->GetReplicaNumber(0); // which layer it is in 
-    G4int TPC_index = touchable -> GetReplicaNumber(1); // which TPC it is in
-
+    G4int k = touchable ->GetReplicaNumber(1); // which layer it is in // which bar it is in
+    G4int TPC_index = touchable -> GetReplicaNumber(2); // which TPC it is in
+    
+    G4ThreeVector TPC_pos = touchable->GetTranslation(0);
+    G4double TPC_x = TPC_pos.getX()/cm;
+    G4double TPC_y = TPC_pos.getY()/cm;
+    G4double TPC_z = TPC_pos.getZ()/cm;
+    
     // Get Time
     G4double time = theTrack->GetGlobalTime() / CLHEP::ns;
     G4double localTime = theTrack->GetLocalTime() / CLHEP::ns;
@@ -141,7 +147,8 @@ G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
             const std::vector<const G4Track*>* secondary = aStep->GetSecondaryInCurrentStep();
             for (int j = 0; j < (*secondary).size(); j++) {
                     particle = (*secondary)[j]->GetDefinition();
-                    if (particle->GetParticleName() == "e-") { electrons++; } // Cerenkov exists in scintillator
+                    if (particle->GetParticleName() == "e-") {electrons++;}
+                    else {std::cout<< particle->GetParticleName() << std::endl;} // Cerenkov exists in scintillator
             }
     }
 
@@ -166,9 +173,10 @@ G4bool TPCSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     detectorHit -> SetXID(k);
     detectorHit -> SetMod_ID(TPC_index);
 
-    detectorHit -> SetPosX(x);
-    detectorHit -> SetPosY(y);
-    detectorHit -> SetPosZ(z);
+    //return the position of the TPC long bar! 
+    detectorHit -> SetPosX(TPC_x);
+    detectorHit -> SetPosY(TPC_y);
+    detectorHit -> SetPosZ(TPC_z);
 
     // remarks: here it is named set photons but actually it counts the electrons in the TPC, too lazy to add one more function
     detectorHit -> SetPhotons(electrons);

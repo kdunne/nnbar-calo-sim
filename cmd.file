@@ -11,8 +11,8 @@
 /CRY/input date 9-16-2020
 /CRY/input latitude 59.33
 /CRY/input altitude 0
-/CRY/input subboxLength 5
+/CRY/input subboxLength 0.5
 /CRY/update
 
-/run/beamOn 50
+/run/beamOn 5
 
