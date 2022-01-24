@@ -1,0 +1,6 @@
+/run/initialize
+#/tracking/verbose 0
+#/run/beamOn 14
+/tracking/verbose 2
+/run/beamOn 1
+
