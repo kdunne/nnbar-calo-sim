@@ -63,6 +63,9 @@ private:
     G4double posX;
     G4double posY;
     G4double posZ;
+    G4double px;
+    G4double py;
+    G4double pz;
     G4double posX_particle;
     G4double posY_particle;
     G4double posZ_particle;
@@ -74,6 +77,9 @@ private:
     G4double kinEnergy;
     G4int photons;
     G4double TrackLength;
+    G4String vol_name;
+    
+    
 public:
     inline G4double GetLocalTime(){return localTime;}
     inline G4int GetParentID(){return parentID;}
@@ -90,6 +96,9 @@ public:
     inline G4double GetPosX(){return posX;}
     inline G4double GetPosY(){return posY;}
     inline G4double GetPosZ(){return posZ;}
+    inline G4double GetPX(){return px;}
+    inline G4double GetPY(){return py;}
+    inline G4double GetPZ(){return pz;}
 
     inline G4double GetPosX_particle(){return posX_particle;}
     inline G4double GetPosY_particle(){return posY_particle;}
@@ -100,6 +109,7 @@ public:
     inline G4double GetKinEn(){return kinEnergy;}
     inline G4double GetOrigin(){return origin_rp;} // get which layer this hit particle is from
     inline G4int GetPhotons(){return photons;}
+    inline G4String GetVolName(){return vol_name;}
 
     inline void SetLocalTime(G4double ltime){localTime = ltime;}
     inline void SetParentID(G4int parent){parentID = parent;}
@@ -116,6 +126,10 @@ public:
     inline void SetPosX(G4double x){posX = x;}
     inline void SetPosY(G4double y){posY = y;}
     inline void SetPosZ(G4double z){posZ = z;}
+
+    inline void SetPX(G4double pX){px = pX;}
+    inline void SetPY(G4double pY){py = pY;}
+    inline void SetPZ(G4double pZ){pz = pZ;}
     
     inline void SetPosX_particle(G4double x_particle){posX_particle = x_particle;}
     inline void SetPosY_particle(G4double y_particle){posY_particle = y_particle;}
@@ -126,6 +140,7 @@ public:
     inline void SetKinEn(G4double kinEn){kinEnergy = kinEn;}
     inline void SetOrigin(G4int origin) {origin_rp = origin;}
     inline void SetPhotons(G4int photon) {photons = photon;}
+    inline void SetVolName(G4String name){vol_name=name;}
 
 };
 

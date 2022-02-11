@@ -61,6 +61,7 @@ private:
   G4int  tubeHitsCollectionID;
   G4int  TPCHitsCollectionID;
   G4int  PMTHitsCollectionID;
+  G4int  ShieldHitsCollectionID;
   G4int  SiliconHitsCollectionID;
   
   G4int b = 1;
