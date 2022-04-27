@@ -70,12 +70,19 @@ NNbarHit::NNbarHit(const NNbarHit& right)
     stave_ID_ = right.stave_ID_;
     group_ID_ = right.group_ID_;
     module_ID_= right.module_ID_;
+    vol_name = right.vol_name;
     posX = right.posX;
     posY = right.posY;
     posZ = right.posZ;
     posX_particle = right.posX_particle;
     posY_particle = right.posY_particle;
     posZ_particle = right.posZ_particle;
+    px = right.px;
+    py = right.py;
+    pz = right.pz;
+
+
+
     TrackLength = right.TrackLength;
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;
@@ -98,10 +105,14 @@ const NNbarHit& NNbarHit::operator=(const NNbarHit& right)
     posX = right.posX;
     posY = right.posY;
     posZ = right.posZ;
+    px = right.px;
+    py = right.py;
+    pz = right.pz;
     posX_particle = right.posX_particle;
     posY_particle = right.posY_particle;
     posZ_particle = right.posZ_particle;
     TrackLength = right.TrackLength;
+    vol_name = right.vol_name;
     energyDeposit = right.energyDeposit;
     kinEnergy = right.kinEnergy;
     photons = right.photons;

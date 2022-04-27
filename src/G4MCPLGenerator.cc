@@ -14,8 +14,12 @@ using namespace std;
 extern std::ofstream Particle_outFile;
 extern std::vector<std::vector<G4double>> particle_gun_record;
 extern G4double event_number;
+extern G4int run_number;
 
-std::string filename_event = "./event_number.csv";
+//std::string filename_event = "./mcpl_files/HIBEAM_tsol_signal_GBL_jbar_100k_9000_event_length_info.csv";
+//std::string filename_event =./mcpl_filesHIBEAM_tsol_signal_GBL_jbar_100k_9000_event_length_info.csv";
+std::string filename_event = "./mcpl_files/NNBAR_mfro_signal_GBL_jbar_50k_9001_event_length_info.csv";
+
 std::vector<int> data_event_num;
 
 void import_event_num(std::string file_name, std::vector<int>& data) {
@@ -50,7 +54,7 @@ G4MCPLGenerator::G4MCPLGenerator(const G4String& inputFile)
     m_inputFile(inputFile)
 {
   m_mcplfile.internal = 0;
-  //import_event_num(filename_event,data_event_num);
+  import_event_num(filename_event,data_event_num);
 }
 
 G4MCPLGenerator::~G4MCPLGenerator()
@@ -100,53 +104,59 @@ void G4MCPLGenerator::GeneratePrimaries(G4Event* evt)
 
   //Transfer m_p info to gun and shoot:
   G4ParticleTable * particleTable = G4ParticleTable :: GetParticleTable();
+  int event_count = data_event_num[int(event_number)];
 
-  assert(m_currentPDG == m_p->pdgcode && m_currentPartDef);
-  m_gun->SetParticleDefinition(m_currentPartDef);
+  for (int i=0; i<event_count; i++){
+  //if (m_p->pdgcode==111){
+    assert(m_currentPDG == m_p->pdgcode && m_currentPartDef);
+    m_gun->SetParticleDefinition(m_currentPartDef);
+    G4ThreeVector pos(m_p->position[0],m_p->position[1],-1.0); //m_p->position[2] 
+    pos *= CLHEP::cm;
+    G4ThreeVector dir(m_p->direction[0],m_p->direction[1],m_p->direction[2]);
+    G4ThreeVector pol(m_p->polarisation[0],m_p->polarisation[1],m_p->polarisation[2]);
+    double time = m_p->time*CLHEP::millisecond;
+    double weight = m_p->weight;
+    ModifyParticle(pos,dir,pol,time,weight);
 
-  G4ThreeVector pos(m_p->position[0],m_p->position[1],m_p->position[2]);
-  pos *= CLHEP::cm;
-  G4ThreeVector dir(m_p->direction[0],m_p->direction[1],m_p->direction[2]);
-  G4ThreeVector pol(m_p->polarisation[0],m_p->polarisation[1],m_p->polarisation[2]);
-  double time = m_p->time*CLHEP::millisecond;
-  double weight = m_p->weight;
-  ModifyParticle(pos,dir,pol,time,weight);
+    m_gun->SetParticleMomentumDirection(dir);
+    m_gun->SetParticlePosition(pos);
+    m_gun->SetParticleEnergy(m_p->ekin);//already in MeV and CLHEP::MeV=1
+    m_gun->SetParticleTime(0); //time
+    m_gun->SetParticlePolarization(pol);
+    const G4int ivertex = evt->GetNumberOfPrimaryVertex();
+    
+    if (sqrt(pow(m_p->position[0],2) + pow(m_p->position[1],2))<80.0){
 
-  Particle_outFile << event_number << ",";
-  Particle_outFile << m_p->pdgcode << ",";
-  Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ",";
-  Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge() << ",";
-  Particle_outFile << m_p->ekin << ",";
-  Particle_outFile << m_p->position[0] << ",";
-  Particle_outFile << m_p->position[1] << ",";
-  Particle_outFile << m_p->position[2] << ",";
-  Particle_outFile << m_p -> time/s << ",";
-  Particle_outFile << m_p->direction[0] << ",";
-  Particle_outFile << m_p->direction[1] << ",";
-  Particle_outFile << m_p->direction[2] << G4endl;
+      Particle_outFile << event_number << ",";
+      Particle_outFile << m_p->userflags<< ",";
+      Particle_outFile << m_p->pdgcode << ",";
+      Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ",";
+      Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge() << ",";
+      Particle_outFile << m_p->ekin << ",";
+      Particle_outFile << m_p->position[0] << ",";
+      Particle_outFile << m_p->position[1] << ",";
+      Particle_outFile << m_p->position[2] << ",";
+      Particle_outFile << m_p -> time/s << ",";
+      Particle_outFile << m_p->direction[0] << ",";
+      Particle_outFile << m_p->direction[1] << ",";
+      Particle_outFile << m_p->direction[2] << G4endl;
 
-  std::cout << "== Event number: " << event_number << "," << m_p->pdgcode << "," << " mass : " << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ","
-  << m_p->ekin << "," << m_p->position[0] << "," << m_p->position[1] << ","     
-  << m_p->position[2] << "," << m_p -> time/s << ","  << m_p->direction[0] << "," << m_p->direction[1] << "," << m_p->direction[2] << std::endl;
+      m_gun->GeneratePrimaryVertex(evt);
+      std::cout << "== Seq number: " << event_number << ", Event_number: " << m_p->userflags << "," << m_p->pdgcode << "," << " mass : " << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ","
+      << m_p->ekin << "," << m_p->position[0] << "," << m_p->position[1] << ","     
+      << m_p->position[2] << ", d^2:" << sqrt(pow(m_p->position[0],2) + pow(m_p->position[1],2)+pow(m_p->position[2],2))<< " , time: " << m_p -> time/s << ","  << m_p->direction[0] << "," << m_p->direction[1] << "," << m_p->direction[2] << std::endl;
+    //}
+    
+    if (weight!=1.0) {evt->GetPrimaryVertex(ivertex)->SetWeight(weight);}}
+  //}
 
-  m_gun->SetParticleMomentumDirection(dir);
-  m_gun->SetParticlePosition(pos);
-  m_gun->SetParticleEnergy(m_p->ekin);//already in MeV and CLHEP::MeV=1
-  m_gun->SetParticleTime(0); //time
-  m_gun->SetParticlePolarization(pol);
-  const G4int ivertex = evt->GetNumberOfPrimaryVertex();
-  m_gun->GeneratePrimaryVertex(evt);
-
-  if (weight!=1.0) {evt->GetPrimaryVertex(ivertex)->SetWeight(weight);}
-  
-  
-  //Prepare for next.
-  FindNext();
-  if (!m_p) {
-    G4cout << "G4MCPLGenerator: No more particles to use from input file after this event. Requesting soft abort of run." << G4endl;
-    G4RunManager::GetRunManager()->AbortRun(true);//soft abort
-  }
-
+    //Prepare for next.
+    FindNext();
+    if (!m_p) {
+      G4cout << "G4MCPLGenerator: No more particles to use from input file after this event. Requesting soft abort of run." << G4endl;
+      G4RunManager::GetRunManager()->AbortRun(true);//soft abort
+    }
+  } // end bracket for loop
 }
 
 void G4MCPLGenerator::FindNext()

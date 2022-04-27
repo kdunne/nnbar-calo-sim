@@ -60,23 +60,23 @@ SteppingAction::~SteppingAction()
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
  
-  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+  // G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 
   
-  G4Track* track = step->GetTrack();
-  G4int parentID = track->GetParentID();
-  G4int ID = track->GetTrackID();
+  // G4Track* track = step->GetTrack();
+  // G4int parentID = track->GetParentID();
+  // G4int ID = track->GetTrackID();
 
-  if (parentID == 1 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
+  // if (parentID == 0 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
     
-    //const std::vector<const G4Track*>* secondary = step->GetSecondaryInCurrentStep();
-    //if ((*secondary).size()>0){
-      //for (int j = 0; j < (*secondary).size(); j++) {
-        G4double KE = track->GetKineticEnergy();
-        G4ThreeVector momentum = track->GetMomentumDirection();
-        G4int trackID = track->GetTrackID();
-        pi0_outFile << event_number <<","<< trackID << "," << KE << "," << momentum[0] << "," << momentum[1] << "," << momentum[2] <<G4endl;           
-    //  }
-   // }  
-  }
+  //   const std::vector<const G4Track*>* secondary = step->GetSecondaryInCurrentStep();
+  //   if ((*secondary).size()>0){
+  //     for (int j = 0; j < (*secondary).size(); j++) {
+  //       G4double KE = (*secondary)[j]->GetKineticEnergy();
+  //       G4ThreeVector momentum = (*secondary)[j]->GetMomentumDirection();
+  //       //std::cout << event_number << " particle: " << j << " :: "<<momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
+  //       pi0_outFile << event_number << "," << KE << "," << momentum[0] << "," << momentum[1] << "," << momentum[2] <<G4endl;           
+  //     }
+  //   }  
+  // }
 } 

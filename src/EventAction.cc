@@ -34,6 +34,7 @@
 #include "PMTSD.hh"
 #include "TPCSD.hh"
 #include "Scint_DetSD.hh"
+#include "ShieldSD.hh"
 #include "NNbarHit.hh"
 
 #include "G4VHitsCollection.hh"
@@ -45,7 +46,7 @@
 
 #include "Randomize.hh"
 #include <iomanip>
-
+#include "config.h"
 //....
 
 extern G4double event_number; 
@@ -60,6 +61,10 @@ extern std::ofstream TPC_outFile;
 extern std::ofstream Scint_layer_outFile; 
 extern std::ofstream Abs_outFile;
 
+#if VERSION_SHIELD==1
+    extern std::ofstream Shield_outFile;
+#endif
+
 EventAction::EventAction(): 
     G4UserEventAction(),
     fAbsoEdepHCID(-1),
@@ -72,6 +77,7 @@ EventAction::EventAction():
     tubeHitsCollectionID(-1),
     TPCHitsCollectionID(-1),
     PMTHitsCollectionID(-1),
+    ShieldHitsCollectionID(-1),
     SiliconHitsCollectionID(-1)
 {}
 
@@ -124,6 +130,9 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
        TPCHitsCollectionID = pSDManager->GetCollectionID("TPCHitCollection");
        PMTHitsCollectionID = pSDManager->GetCollectionID("PMTHitCollection");
        SiliconHitsCollectionID = pSDManager->GetCollectionID("SiliconHitCollection");
+       #if VERSION_SHIELD==1
+           ShieldHitsCollectionID = pSDManager->GetCollectionID("ShieldHitCollection");
+       #endif
   }
 }
 
@@ -138,28 +147,33 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
     int CHCID = -1;
     if (CHCID<0) {CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");}
-    
+    NNbarHitsCollection* ScintHits = 0;
+
     int CHCID2 = -1;
     if (CHCID2<0) {CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");}
-
+    NNbarHitsCollection* AbsHits   = 0;
+    
     int CHCID3 = -1;
     if (CHCID3<0) {CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");}
-
+    NNbarHitsCollection* TubeHits  = 0;
+    
     int CHCID4 = -1;
     if (CHCID4<0) {CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TPCHitCollection");}
-
+    NNbarHitsCollection* TPCHits  = 0;
+    
     int CHCID5 = -1;
     if (CHCID5<0) {CHCID5 = G4SDManager::GetSDMpointer()->GetCollectionID("PMTHitCollection");}
-
+    NNbarHitsCollection* PMTHits  = 0;
+    
     int CHCID6 = -1;
     if (CHCID6<0) {CHCID6 = G4SDManager::GetSDMpointer()->GetCollectionID("SiliconHitCollection");}
-
-    NNbarHitsCollection* ScintHits = 0;
-    NNbarHitsCollection* AbsHits   = 0;
-    NNbarHitsCollection* TubeHits  = 0;
-    NNbarHitsCollection* TPCHits  = 0;
-    NNbarHitsCollection* PMTHits  = 0;
     NNbarHitsCollection* SiliconHits  = 0;
+    
+    #if VERSION_SHIELD==1    
+        int CHCID7 = -1;
+        if (CHCID7<0) {CHCID7 = G4SDManager::GetSDMpointer()->GetCollectionID("ShieldHitCollection");}
+        NNbarHitsCollection* ShieldHits  = 0;
+    #endif
 
     if (HCE) {
 
@@ -243,9 +257,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     trackl   = ((*ScintHits)[h]) -> GetTrackLength();
                     G4int scint_photons_per_hit = ((*ScintHits)[h])->GetPhotons();
                     // writing output
+
+                    if (scint_photons_per_hit>0){
                     Scint_layer_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< module_ID<<","<<i<< "," << stave_ID << ","
                     << time <<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit << "," << x <<","<< y << ","<< z << "," << particle_x << "," << particle_y << "," << particle_z  <<G4endl;
-
+                    }
                     //std::cout<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << std::endl;
 
                }
@@ -256,6 +272,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
         AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
         if(AbsHits) {
             for (G4int h=0; h<AbsHits->entries(); h++) {
+                name     = ((*AbsHits)[h]) -> GetName();
                 if (name != "opticalphoton"){
                     ltime           = ((*AbsHits)[h]) -> GetLocalTime();
                     parentID	= ((*AbsHits)[h]) -> GetParentID();
@@ -272,9 +289,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     y = ((*AbsHits)[h]) -> GetPosY();
                     z = ((*AbsHits)[h]) -> GetPosZ();
 
+                    if (photons_cerenkov>0){
                     Abs_outFile << event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<<i<<","
                     << time<<","<<kinEn<<","<<eDep<<","<< trackl <<","<< photons_cerenkov <<  "," << x <<","<< y << ","<<z<<G4endl;
-                    
+                    }
                 }
                 //cerenkovCounter = cerenkovCounter + photons_cerenkov;
             }
@@ -330,6 +348,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
                     if (proc !="eIoni" && proc!= "hIoni") // dont want to see the electrons ... 
                     TPC_outFile << event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << ","<< proc <<","  << x <<","<<y<<","<<z<<","<<
                     time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
+                    
                 }
                 //std::cout << " TPC hit " << module_ID << ", layer: " << i << ", " << eDep/CLHEP::MeV  << std::endl;
             }
@@ -356,6 +375,39 @@ void EventAction::EndOfEventAction(const G4Event* event)
                 }
             }
         }
+
+        #if VERSION_SHIELD==1    
+            ShieldHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID7));
+            if (ShieldHits) {
+            hitCount = ShieldHits->entries();
+                for (G4int h=0; h<hitCount; h++) {
+                    name     = ((*ShieldHits)[h]) -> GetName();
+                    if (name != "opticalphoton"){
+                        ltime    = ((*ShieldHits)[h]) -> GetLocalTime();
+                        parentID = ((*ShieldHits)[h]) -> GetParentID();
+                        proc     = ((*ShieldHits)[h]) -> GetProcess();
+                        name     = ((*ShieldHits)[h]) -> GetName();
+                        time     = ((*ShieldHits)[h]) -> GetTime(); 
+                        trID     = ((*ShieldHits)[h]) -> GetTrackID();
+                        kinEn    = ((*ShieldHits)[h]) -> GetKinEn();
+                        eDep     = ((*ShieldHits)[h]) -> GetEdep();
+                        trackl   = ((*ShieldHits)[h]) -> GetTrackLength();	
+                        G4double x = ((*ShieldHits)[h]) -> GetPosX();
+                        G4double y = ((*ShieldHits)[h]) -> GetPosY();
+                        G4double z = ((*ShieldHits)[h]) -> GetPosZ();
+                        G4String vol_name = ((*ShieldHits)[h]) -> GetVolName();
+                        G4double pX = ((*ShieldHits)[h]) -> GetPX();
+                        G4double pY = ((*ShieldHits)[h]) -> GetPY();
+                        G4double pZ = ((*ShieldHits)[h]) -> GetPZ();
+                        
+                        if (vol_name != "LeadShield"){
+                        Shield_outFile << event_number << "," << trID << "," << parentID << "," << name << "," << proc << "," << vol_name << "," << x <<","<<y<<","<<z<<","
+                        <<time<< "," <<kinEn<<","<< pX <<","<< pY <<","<< pZ <<","<< eDep << "," << trackl <<G4endl;
+                        }
+                    }
+                }         
+            }
+        #endif
 
         /**
         PMT_index_reduced = PMT_index;
