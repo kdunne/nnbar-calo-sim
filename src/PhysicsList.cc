@@ -42,6 +42,7 @@
 #include "PhysicsList.hh"
 
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 
 PhysicsList::PhysicsList(): G4VModularPhysicsList()
@@ -66,15 +67,17 @@ PhysicsList::PhysicsList(): G4VModularPhysicsList()
   AddPAIModel("pai");
 
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
-  opticalPhysics->SetWLSTimeProfile("delta");
-  opticalPhysics->SetScintillationYieldFactor(1.0);
-  opticalPhysics->SetScintillationExcitationRatio(0.0);
-  opticalPhysics->SetMaxNumPhotonsPerStep(2000);
-  opticalPhysics->SetMaxBetaChangePerStep(100.0);
-  opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
-  opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
-  RegisterPhysics(opticalPhysics); 
   
+  auto opticalParams = G4OpticalParameters::Instance();
+  opticalParams->SetWLSTimeProfile("delta");
+  //opticalParams->SetScintillationYieldFactor(1.0);
+  //opticalParams->SetScintillationExcitationRatio(0.0);
+  opticalParams->SetCerenkovMaxPhotonsPerStep(2000);
+  opticalParams->SetCerenkovMaxBetaChange(100.0);
+  opticalParams->SetCerenkovTrackSecondariesFirst(true);
+  opticalParams->SetScintTrackSecondariesFirst(true);
+  RegisterPhysics(opticalPhysics); 
+ 
   
 }
 

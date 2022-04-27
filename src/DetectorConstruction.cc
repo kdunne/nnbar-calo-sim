@@ -248,7 +248,7 @@ void DetectorConstruction::DefineMaterials()
           1.71069, 1.73056};
 
   G4MaterialPropertiesTable* absMPT = new G4MaterialPropertiesTable();
-  absMPT->AddProperty("RINDEX", PhotonEnergy, refractiveIndex, nEntries)->SetSpline(true);
+  absMPT->AddProperty("RINDEX", PhotonEnergy, refractiveIndex, nEntries,false,true);
   Abs->SetMaterialPropertiesTable(absMPT);
   //G4cout << "Absorber Properties -------" << G4endl;
   //G4cout << *(G4Material::GetMaterialTable()) << G4endl;
@@ -278,16 +278,17 @@ void DetectorConstruction::DefineMaterials()
   G4double scintilSlow[nEntries2] = {.04, .07, .20, .49, .84, 1.0, .83, .55, .40, .17,.03, 0.};
 
   G4MaterialPropertiesTable *scintMPT = new G4MaterialPropertiesTable();
-  scintMPT->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint, nEntries2)->SetSpline(true);
-  scintMPT->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint, nEntries2)->SetSpline(true);
-  scintMPT->AddProperty("FASTCOMPONENT", ScintPhotonEnergy, scintilFast, nEntries2)->SetSpline(true);
-  scintMPT->AddProperty("SLOWCOMPONENT", ScintPhotonEnergy, scintilSlow, nEntries2)->SetSpline(true);
+  scintMPT->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint, nEntries2,false,true);
+  scintMPT->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint, nEntries2,false,true);
+  scintMPT->AddProperty("SCINTILLATIONCOMPONENT1", ScintPhotonEnergy, scintilFast, nEntries2,false,true);
+  scintMPT->AddProperty("SCINTILLATIONCOMPONENT2", ScintPhotonEnergy, scintilSlow, nEntries2,false,true);
   // 64% of Antracene: 17400
   scintMPT->AddConstProperty("SCINTILLATIONYIELD", 100./ MeV); //original 11136000.
   scintMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
-  scintMPT->AddConstProperty("FASTTIMECONSTANT", 1.0*ns); // org: 0.9
-  scintMPT->AddConstProperty("SLOWTIMECONSTANT", 1.0*ns); // org: 2.1
-  scintMPT->AddConstProperty("YIELDRATIO", 1.);
+  scintMPT->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 1.0*ns); // org: 0.9
+  scintMPT->AddConstProperty("SCINTILLATIONTIMECONSTANT2", 1.0*ns); // org: 2.1
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD1", 1.);
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD2", 0.);
   Scint->SetMaterialPropertiesTable(scintMPT);
   scintMPT->DumpTable();
 }

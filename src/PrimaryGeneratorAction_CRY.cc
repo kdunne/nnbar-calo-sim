@@ -63,7 +63,7 @@ PrimaryGeneratorAction_CRY::PrimaryGeneratorAction_CRY():fParticleGun(nullptr)
 			setupString.append(" ");
 		}
 
-		CRYSetup* setup = new CRYSetup(setupString, "/home/billy/nnbar/cry_v1.7/data");
+		CRYSetup* setup = new CRYSetup(setupString, "cry_data");
 
 		gen = new CRYGenerator(setup);
 
@@ -96,7 +96,7 @@ void PrimaryGeneratorAction_CRY::InputCRY()
 //----------------------------------------------------------------------------//
 void PrimaryGeneratorAction_CRY::UpdateCRY(std::string * MessInput)
 {
-	CRYSetup* setup = new CRYSetup(*MessInput, "/home/billy/nnbar/cry_v1.7/data");
+	CRYSetup* setup = new CRYSetup(*MessInput, "cry_data");
 
 	gen = new CRYGenerator(setup);
 
@@ -127,7 +127,7 @@ void PrimaryGeneratorAction_CRY::CRYFromFile(G4String newValue)
 			setupString.append(" ");
 		}
 
-		CRYSetup* setup = new CRYSetup(setupString, "/home/billy/nnbar/cry_v1.7/data");
+		CRYSetup* setup = new CRYSetup(setupString, "cry_data");
 
 		gen = new CRYGenerator(setup);
 
