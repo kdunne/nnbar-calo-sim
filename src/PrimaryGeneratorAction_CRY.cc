@@ -79,6 +79,9 @@ PrimaryGeneratorAction_CRY::PrimaryGeneratorAction_CRY():fParticleGun(nullptr)
 	gunMessenger = new PrimaryGeneratorMessenger_CRY(this);
 	std::cerr << "Input state: " << InputState << std::endl;
 	std::cerr << "particle table: " << particleTable << std::endl;
+  
+	//Particle_outFile.open("./output/particle_output_"+std::to_string(run_number)+".txt");
+  	//Particle_outFile << "Event_ID,Run_ID,PID,Mass,Charge,KE,x,y,z,t,u,v,w"<< G4endl;
 }
 
 //....
@@ -209,12 +212,17 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 
 		
 
-		if (run_number>=518){
+		//if (run_number>=518){
+	//	if (Particle_outFile.is_open()==false){
+  	//		Particle_outFile.open("./output/particle_output_"+std::to_string(run_number)+".txt");
+	//		std::cout <<"Opening output file ./output/particle_output_"<<run_number+".txt"<< std::endl;
+  	//		Particle_outFile << "Event_ID,Run_ID,PID,Mass,Charge,KE,x,y,z,t,u,v,w"<< G4endl;
+	//	}
 
 			Particle_outFile <<  event_number << ",";
 			Particle_outFile <<  event_number << ",";
 			Particle_outFile <<  (*vect)[j]->PDGid() << ","; //PID
-			Particle_outFile << particleTable->FindParticle((*vect)[j]->PDGid())-> GetPDGMass() << ",";
+			Particle_outFile <<  particleTable->FindParticle((*vect)[j]->PDGid())-> GetPDGMass() << ",";
 			Particle_outFile <<  particleTable -> FindParticle((*vect)[j]->PDGid())->  GetPDGCharge()  << ","; // charge 
 			Particle_outFile <<  KE << ","; // 100+n*10 
 			Particle_outFile <<  x << ",";
@@ -226,7 +234,7 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 			Particle_outFile <<  pz << G4endl;
 
 			fParticleGun->GeneratePrimaryVertex(anEvent);
-		}
+		//}
 
 		delete (*vect)[j];
 	
