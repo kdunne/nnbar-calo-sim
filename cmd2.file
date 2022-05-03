@@ -1,4 +1,4 @@
 /CRY/file setup.file
 
-/tracking/verbose 1
+# /tracking/verbose 1
 /run/beamOn 100

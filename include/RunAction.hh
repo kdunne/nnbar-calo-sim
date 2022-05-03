@@ -44,7 +44,8 @@ class RunAction : public G4UserRunAction
     RunAction();
     virtual ~RunAction();
 	std::vector<string> particle_name{ "Neutron","Proton","Gamma","Electron","Muon","Pion","Kaon" };
-    virtual void BeginOfRunAction(const G4Run*);
+  	G4Run* GenerateRun();
+	virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
 
     private:
