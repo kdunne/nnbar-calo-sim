@@ -16,6 +16,7 @@
 #include "G4IonConstructor.hh"
 
 
+#include "G4OpticalParameters.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4Cerenkov.hh"
 #include "G4Scintillation.hh"
@@ -75,9 +76,10 @@ PhysicsList::PhysicsList(): G4VModularPhysicsList()
   opticalParams->SetCerenkovMaxPhotonsPerStep(2000);
   opticalParams->SetCerenkovMaxBetaChange(100.0);
   opticalParams->SetCerenkovTrackSecondariesFirst(true);
+  opticalParams->SetScintTrackInfo(true);
   opticalParams->SetScintTrackSecondariesFirst(true);
   RegisterPhysics(opticalPhysics); 
- 
+  opticalParams->Dump(); 
   
 }
 

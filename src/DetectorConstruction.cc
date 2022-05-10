@@ -115,7 +115,7 @@ void import_lead_glass_pos(std::string file_name, std::vector<std::vector<double
 }
 
 DetectorConstruction::DetectorConstruction()
- : G4VUserDetectorConstruction(), fCheckOverlaps(true)
+ : G4VUserDetectorConstruction(), fCheckOverlaps(false)
 {
   import_lead_glass_pos(filename_data_lead_glass_pos, data_lead_glass_pos);
   import_lead_glass_pos(filename_data_lead_glass_pos_fb, data_lead_glass_pos_fb);
@@ -287,8 +287,8 @@ void DetectorConstruction::DefineMaterials()
   scintMPT->AddConstProperty("RESOLUTIONSCALE", 1.0);
   scintMPT->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 1.0*ns); // org: 0.9
   scintMPT->AddConstProperty("SCINTILLATIONTIMECONSTANT2", 1.0*ns); // org: 2.1
-  scintMPT->AddConstProperty("SCINTILLATIONYIELD1", 1.);
-  scintMPT->AddConstProperty("SCINTILLATIONYIELD2", 0.);
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD1", 0.5);
+  scintMPT->AddConstProperty("SCINTILLATIONYIELD2", 0.5);
   Scint->SetMaterialPropertiesTable(scintMPT);
   scintMPT->DumpTable();
 }
@@ -769,7 +769,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
       lead_y = lead_x0*sin(i_angle*rot_angle) + (lead_y0)*cos(i_angle*rot_angle);
       rot_array_dir[i][j]->rotate(-data_lead_glass_pos[j][3]*deg, G4ThreeVector(cos(i_angle*rot_angle),sin(i_angle*rot_angle),0.));
       rot_array_dir[i][j]-> rotateZ(data_lead_glass_pos[j][5]*deg -i_angle*rot_angle); //data_lead_glass_pos[i][5]*deg 
-      lg_PV_array[i].push_back(new G4PVPlacement(rot_array_dir[i][j],G4ThreeVector(lead_x, lead_y,data_lead_glass_pos[j][2]*cm) ,absorberLV,"AbsoPV",worldLV,false,lead_index,1));
+      lg_PV_array[i].push_back(new G4PVPlacement(rot_array_dir[i][j],G4ThreeVector(lead_x, lead_y,data_lead_glass_pos[j][2]*cm) ,absorberLV,"AbsoPV",worldLV,false,lead_index,fCheckOverlaps));
       
       Lead_glass_outFile << lead_index << "," << lead_x/cm << "," << lead_y/cm << "," << data_lead_glass_pos[j][2] << G4endl;
       //std::cout << lead_index << "," << lead_x/cm << "," << lead_y/cm << "," << data_lead_glass_pos[j][2] << std::endl; 
@@ -790,7 +790,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
         rot_array_dir111[i]-> rotateX(-data_lead_glass_pos_fb[i][3]*deg+90.*deg); rot_array_dir111[i]-> rotateZ(data_lead_glass_pos_fb[i][5]*deg); //rot_array_dir111[i]-> rotateY(-data_lead_glass_pos_fb[i][5]*deg);
         new G4PVPlacement(rot_array_dir111[i],
         G4ThreeVector(data_lead_glass_pos_fb[i][0]*cm,data_lead_glass_pos_fb[i][2]*cm,-(data_lead_glass_pos_fb[i][1]*cm))
-        ,absorberLV,"AbsoPV",worldLV,false,lead_index,0);
+        ,absorberLV,"AbsoPV",worldLV,false,lead_index,fCheckOverlaps);
         lead_index ++ ;        
   }
   
@@ -798,7 +798,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
         rot_array_dir211[i]-> rotateX(data_lead_glass_pos_fb[i][3]*deg-90.*deg); rot_array_dir211[i]-> rotateZ(data_lead_glass_pos_fb[i][5]*deg); //rot_array_dir111[i]-> rotateY(-data_lead_glass_pos_fb[i][5]*deg);
         new G4PVPlacement(rot_array_dir211[i],
         G4ThreeVector(data_lead_glass_pos_fb[i][0]*cm,data_lead_glass_pos_fb[i][2]*cm,(data_lead_glass_pos_fb[i][1]*cm))
-        ,absorberLV,"AbsoPV",worldLV,false,lead_index,0);
+        ,absorberLV,"AbsoPV",worldLV,false,lead_index,fCheckOverlaps);
         lead_index ++ ;        
   }
 

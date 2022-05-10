@@ -32,26 +32,24 @@
 #include "globals.hh"
 #include <string>
 #include <vector>
-#include "PrimaryGeneratorAction.hh"
+//#include "PrimaryGeneratorAction.hh"
 #include "G4GenericMessenger.hh"
 
-class G4Run;
-
+class NNbarRun;
 
 class RunAction : public G4UserRunAction
 {
   public:
     RunAction();
     virtual ~RunAction();
-	std::vector<string> particle_name{ "Neutron","Proton","Gamma","Electron","Muon","Pion","Kaon" };
+	//std::vector<string> particle_name{ "Neutron","Proton","Gamma","Electron","Muon","Pion","Kaon" };
   	G4Run* GenerateRun();
 	virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
 
     private:
         G4GenericMessenger* fMessenger;
-
-
+		NNbarRun* fRun;
 };
 
 //....

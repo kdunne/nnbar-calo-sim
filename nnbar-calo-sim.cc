@@ -93,7 +93,7 @@ int main(int argc, char** argv)
   G4String session;
 
   #ifdef G4MULTITHREADED
-    G4int nThreads = 0;
+    G4int nThreads = 4;
   #endif
     for ( G4int i=1; i<argc; i=i+2 ) {
       if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
@@ -142,10 +142,10 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(actionInitialization);
 
   // MCPL file => This will override the particle generator class 
-  #if VERSION_MCPL ==1
-    std::cout<< "Build with MCPL option, particles will be loaded from the MCPL file" << std::endl;
-    runManager->SetUserAction(new G4MCPLGenerator("./mcpl_files/NNBAR@ESS_rkol_NNBAR_PHITS_bmei_107K_8001.mcpl"));
-  #endif
+//  #if VERSION_MCPL ==1
+//    std::cout<< "Build with MCPL option, particles will be loaded from the MCPL file" << std::endl;
+//    runManager->SetUserAction(new G4MCPLGenerator("./mcpl_files/NNBAR@ESS_rkol_NNBAR_PHITS_bmei_107K_8001.mcpl"));
+//  #endif
   // nbar_C_dat_100k_McStas_converted_corrected.mcpl
 
   runManager->Initialize();

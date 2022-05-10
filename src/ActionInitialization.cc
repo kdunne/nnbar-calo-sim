@@ -1,11 +1,9 @@
 #include "ActionInitialization.hh"
 #include "config.h"
 
-#if CRY_BUILD==0
-  #include "PrimaryGeneratorAction.hh"
-#else 
-  #include "PrimaryGeneratorAction_CRY.hh"   //CRY is not specified => we will use the normal particle gun :)
-#endif
+#include "PrimaryGeneratorAction.hh"
+#include "G4MCPLGenerator.hh"
+#include "PrimaryGeneratorAction_CRY.hh"   //CRY is not specified => we will use the normal particle gun :)
 
 #include "RunAction.hh"
 #include "EventAction.hh"
@@ -14,7 +12,7 @@
 //....
 
 ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
+	: G4VUserActionInitialization()
 {}
 
 //....
@@ -26,7 +24,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new RunAction);
+	SetUserAction(new RunAction);
 }
 
 //....
@@ -34,19 +32,22 @@ void ActionInitialization::BuildForMaster() const
 void ActionInitialization::Build() const
 { 
 
-  #if CRY_BUILD==1
-  std::cout << "check .... CRY build is activated "<<std::endl;
-    SetUserAction(new PrimaryGeneratorAction_CRY);
-  #else
-  std::cout << "check .... CRY build is activated "<<std::endl;
-    SetUserAction(new PrimaryGeneratorAction);  
-  #endif
+	SetUserAction(new PrimaryGeneratorAction);  
 
-  SetUserAction(new RunAction);
-  EventAction* eventAction = new EventAction();
-  SetUserAction(eventAction);
-  SetUserAction(new SteppingAction());
-  
+#if CRY_BUILD==1
+	std::cout << "check .... CRY build is activated "<<std::endl;
+	SetUserAction(new PrimaryGeneratorAction_CRY);
+#endif
+
+#if VERSION_MCPL ==1
+	std::cout << " (((((( ****** ((()))))))  version MCPL" << std::endl;
+	SetUserAction(new G4MCPLGenerator("./mcpl_files/NNBAR_mfro_signal_GBL_jbar_50k_9001.mcpl"));
+#endif
+
+	SetUserAction(new RunAction);
+	EventAction* eventAction = new EventAction();
+	SetUserAction(eventAction);
+	SetUserAction(new SteppingAction());
 }  
 
 //....

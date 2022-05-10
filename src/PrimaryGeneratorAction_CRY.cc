@@ -15,7 +15,9 @@
 #include <iostream>
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
-
+#include "G4Threading.hh"
+#include "G4AutoLock.hh"
+#include "config.h"
 using namespace std;
 
 extern std::ofstream Particle_outFile;
@@ -23,6 +25,11 @@ extern std::vector<std::vector<G4double>> particle_gun_record;
 extern G4double event_number;
 extern G4int run_number;
 
+#if CRY_BUILD==1
+extern G4ThreadLocal G4int local_event_number;
+#endif
+
+namespace {G4Mutex PrimaryGeneratorMutex = G4MUTEX_INITIALIZER;}
 
 std::vector<std::vector<double>> Energy_range
 {
@@ -144,6 +151,10 @@ void PrimaryGeneratorAction_CRY::CRYFromFile(G4String newValue)
 
 void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 {
+#if CRY_BUILD==1
+	local_event_number = event_number;
+	event_number++;
+
 
 	if (InputState != 0) {
 		G4String* str = new G4String("CRY library was not successfully initialized");
@@ -151,6 +162,8 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 		G4Exception("PrimaryGeneratorAction", "1", RunMustBeAborted, *str);
 	}
 
+	G4int pid;
+	G4double mass; G4double charge;
 	G4double x; G4double y; G4double z;
 	G4double t; G4double px; G4double py; G4double pz;
 	G4double KE;
@@ -159,16 +172,17 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 	vect->clear();
 	gen->genEvent(vect);
 
-	int index_ = std::floor(run_number/100);
+	int index_ = std::floor(run_number);
 	if (index_ > 5){index_=5;}
 
 	std::vector<double> Energy_range_run = Energy_range[index_];
 	boost::random::uniform_int_distribution<> KE_generator(Energy_range_run[0],Energy_range_run[1]); //std::floor(i/b)
 
 	//std::cout <<  " = = = = " << Energy_range_run[0] << "," << Energy_range_run[1] << " :: " << run_number << " " << std::floor(run_number/20) <<std::endl; 
+	G4AutoLock lock(&PrimaryGeneratorMutex);
 
 	for (unsigned j = 0; j < vect->size(); j++) {
-		
+
 
 		std::vector<G4double> particle_gun_record_row;
 
@@ -176,7 +190,7 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 		//(*vect)[j]->x()
 		x = (*vect)[j]->x()* m;
 		y = 5.0*m;
-		
+
 		z = (*vect)[j]->y()* m; // (*vect)[j]->z() * m
 
 
@@ -187,17 +201,21 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 		pz = (*vect)[j]->v(); //(*vect)[j]->w();
 		t = (*vect)[j]->t();
 
+		pid = (*vect)[j]->PDGid();
+		mass = particleTable->FindParticle(pid)-> GetPDGMass();
+		charge = particleTable->FindParticle(pid)-> GetPDGCharge();
+
 		G4String all_type[7] = { "neutron","proton","gamma","electron","muon","pion","kaon" };
 		G4double name_ID = 99;
 
 		//for (int i = 0; i <= 6; i++) { if (particleName == all_type[i]) { name_ID = i; break; } }
-		fParticleGun->SetParticleDefinition(particleTable->FindParticle((*vect)[j]->PDGid()));
+		fParticleGun->SetParticleDefinition(particleTable->FindParticle(pid));
 		fParticleGun->SetParticleEnergy(KE);
 		fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
 		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px, py, pz)); //(*vect)[j]->w())
-		fParticleGun->SetParticleTime((*vect)[j]->t());
-		
-		std::cout << std::fixed << (int)event_number << "  " << particleName << " ID: " << (*vect)[j]->PDGid() << " charge= " << (*vect)[j]->charge() << " "
+		fParticleGun->SetParticleTime(t);
+
+		std::cout << std::fixed << (int)event_number << "  " << particleName << " ID: " << pid << " charge= " << (*vect)[j]->charge() << " "
 			<< setprecision(4)
 			<< " energy (MeV)=" << KE << " "
 			<< " pos (m)"
@@ -205,13 +223,13 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 			<< " " << "direction cosines "
 			<< G4ThreeVector((*vect)[j]->u(), (*vect)[j]->w(), (*vect)[j]->v())
 			<< " " << "Particle Time: " << (*vect)[j]->t() 
-		<< std::endl;
+			<< std::endl;
 
-		Particle_outFile <<  event_number << ",";
-		Particle_outFile <<  event_number << ",";
-		Particle_outFile <<  (*vect)[j]->PDGid() << ","; //PID
-		Particle_outFile <<  particleTable->FindParticle((*vect)[j]->PDGid())-> GetPDGMass() << ",";
-		Particle_outFile <<  particleTable -> FindParticle((*vect)[j]->PDGid())->  GetPDGCharge()  << ","; // charge 
+		Particle_outFile <<  local_event_number << ",";
+		Particle_outFile <<  local_event_number << ",";
+		Particle_outFile <<  pid << ","; //PID
+		Particle_outFile <<  mass << ",";
+		Particle_outFile <<  charge << ","; // charge 
 		Particle_outFile <<  KE << ","; // 100+n*10 
 		Particle_outFile <<  x << ",";
 		Particle_outFile <<  y << ",";
@@ -222,10 +240,11 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 		Particle_outFile <<  pz << G4endl;
 
 		fParticleGun->GeneratePrimaryVertex(anEvent);
-
+			
 		delete (*vect)[j];
-	
+
 	}
+#endif
 }
 
 //....
