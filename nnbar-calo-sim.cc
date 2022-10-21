@@ -1,6 +1,6 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
-#include "Analysis.hh"
+//#include "Analysis.hh"
 #include "G4Types.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4EmStandardPhysics_option4.hh"

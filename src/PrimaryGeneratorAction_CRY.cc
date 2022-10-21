@@ -11,7 +11,9 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 #include "G4GenericMessenger.hh"
-#include "Analysis.hh"
+//#include "Analysis.hh"
+#include "RunAction.hh"
+#include "HistoManager.hh"
 #include <iostream>
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
@@ -43,7 +45,7 @@ std::vector<std::vector<double>> Energy_range
 
 boost::random::mt19937 rng;
 
-PrimaryGeneratorAction_CRY::PrimaryGeneratorAction_CRY():fParticleGun(nullptr)
+PrimaryGeneratorAction_CRY::PrimaryGeneratorAction_CRY(HistoManager *histo):fParticleGun(nullptr),fHistoManager(histo)
 {
 	const char* inputfile = "setup.file";
 	fMessenger = new G4GenericMessenger(this, "/particle_generator/", "Name the particle for the file name");
@@ -181,6 +183,7 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 	//std::cout <<  " = = = = " << Energy_range_run[0] << "," << Energy_range_run[1] << " :: " << run_number << " " << std::floor(run_number/20) <<std::endl; 
 	G4AutoLock lock(&PrimaryGeneratorMutex);
 
+	fHistoManager->ClearCryVectors();
 	for (unsigned j = 0; j < vect->size(); j++) {
 
 
@@ -240,6 +243,7 @@ void PrimaryGeneratorAction_CRY::GeneratePrimaries(G4Event * anEvent)
 		Particle_outFile <<  pz << G4endl;
 
 		fParticleGun->GeneratePrimaryVertex(anEvent);
+		fHistoManager->FillCryVectors(local_event_number,pid,mass,charge,KE,x,y,z,t,px,py,pz);
 			
 		delete (*vect)[j];
 

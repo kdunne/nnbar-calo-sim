@@ -24,11 +24,12 @@ using namespace std;
 
 class G4ParticleGun;
 class G4Event;
+class HistoManager;
 
 class PrimaryGeneratorAction_CRY : public G4VUserPrimaryGeneratorAction
 {
   public:
-  PrimaryGeneratorAction_CRY();
+  PrimaryGeneratorAction_CRY(HistoManager *histo);
   virtual ~PrimaryGeneratorAction_CRY();
 
   public:
@@ -52,6 +53,7 @@ class PrimaryGeneratorAction_CRY : public G4VUserPrimaryGeneratorAction
 	G4int InputState;
 	
 	PrimaryGeneratorMessenger_CRY* gunMessenger;
+    HistoManager* fHistoManager;
 };
 
 //....

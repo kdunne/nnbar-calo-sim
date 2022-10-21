@@ -1,5 +1,6 @@
 #include "RunAction.hh"
-#include "Analysis.hh"
+//#include "Analysis.hh"
+#include "HistoManager.hh"
 #include "NNbarRun.hh"
 
 #include "G4Run.hh"
@@ -34,8 +35,8 @@ extern std::ofstream Scint_outFile;
 
 //string particle_name_list[7] = { "", "_neutron", "_proton", "_gamma","_electron","_muon","_pion" };
 
-RunAction::RunAction()
- : G4UserRunAction(), fRun(0)
+RunAction::RunAction(HistoManager *histo)
+ : G4UserRunAction(), fHistoManager(histo), fRun(0)
 { 
     fMessenger = new G4GenericMessenger(this, "/particle_generator/", "Name the particle for the file name");
 }
@@ -43,15 +44,15 @@ RunAction::RunAction()
 //....
 
 RunAction::~RunAction()
-{
- // delete G4AnalysisManager::Instance();  
-}
+{}
 
 //.....
 
 G4Run* RunAction::GenerateRun()
-{ G4cout << "Generating run "<< G4endl; 
-	return new NNbarRun; }
+{ 
+	G4cout << "Generating run "<< G4endl; 
+	return new NNbarRun(fHistoManager); 
+}
 
 
 void RunAction::BeginOfRunAction(const G4Run* aRun)
@@ -59,17 +60,7 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 	//inform the runManager to save random number seed
 	//G4RunManager::GetRunManager()->SetRandomNumberStore(true);
 
-	// Get analysis manager
-//	auto analysisManager = G4AnalysisManager::Instance();
-//
-//	G4String fileName = "./output/calo-sim.root";
-//	analysisManager->SetFileName(fileName);
-//	G4bool fileOpen = analysisManager->OpenFile();
-//	if (! fileOpen) {
-//		G4cerr << "\n---> RunAction::BeginOfRunAction(): cannot open " << analysisManager->GetFileName() << G4endl;
-//		return;
-//	}
-
+	fHistoManager->Book();
 	if(IsMaster())
 	{
 		TPC_outFile.open("./output/TPC_output_"+std::to_string(run_number)+".txt");
@@ -95,19 +86,15 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 #if VERSION_SHIELD==1    
 		Shield_outFile<<"Event_ID,Track_ID,Parent_ID,Name,proc,Volume,x,y,z,t,KE,px,py,pz,eDep,trackl"<<G4endl;
 #endif
+
 	}
 }
 
-//....
+
 
 void RunAction::EndOfRunAction(const G4Run* run)
 {
-	//const NNbarRun* localrun = dynamic_cast<const NNbarRun*>(run);  
-//	auto analysisManager = G4AnalysisManager::Instance();
-//	// save histograms & ntuple
-//	analysisManager->Write();
-//	analysisManager->CloseFile();
-
+	fHistoManager->Save();
 	// write the PMT records 
 
 	if(IsMaster())
@@ -126,7 +113,7 @@ void RunAction::EndOfRunAction(const G4Run* run)
 #if VERSION_SHIELD==1    
 		Shield_outFile.close();
 #endif
-
+	
 		// clear all stored data 
 		G4double event_number = 0.0;
 		particle_gun_record.clear(); PMT_record.clear(); scint_record.clear();

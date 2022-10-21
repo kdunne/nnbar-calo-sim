@@ -2,16 +2,16 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(nnbar-calo-sim)
 
 set(PROGRAM_PERMISSIONS_DEFAULT
-    OWNER_WRITE OWNER_READ OWNER_EXECUTE
-    GROUP_WRITE GROUP_READ GROUP_EXECUTE
-    WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-    
+	OWNER_WRITE OWNER_READ OWNER_EXECUTE
+	GROUP_WRITE GROUP_READ GROUP_EXECUTE
+	WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+
 option(WITH_GEANT4_UIVIS "Build nnbar-calo-sim with Geant4 UI and Vis drivers" ON)
 
 if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
+	find_package(Geant4 REQUIRED ui_all vis_all)
 else()
-  find_package(Geant4 REQUIRED)
+	find_package(Geant4 REQUIRED)
 endif()
 
 include(${Geant4_USE_FILE})
@@ -19,18 +19,18 @@ include(${Geant4_USE_FILE})
 # NNBAR full detector configuration variables
 
 if(NOT DEFINED VERSION_SHIELD)
-set (VERSION_SHIELD 0)
-message("--Shield build not specified -- Set default value 0 (No shield)")
+	set (VERSION_SHIELD 0)
+	message("--Shield build not specified -- Set default value 0 (No shield)")
 endif()
 
 if(NOT DEFINED VERSION_MCPL)
-set (VERSION_MCPL 0)
-message("--Option MCPL not specified -- Set default value 0 (No MCPL generator)")
+	set (VERSION_MCPL 0)
+	message("--Option MCPL not specified -- Set default value 0 (No MCPL generator)")
 endif()
 
 if(NOT DEFINED CRY_BUILD)
-set (CRY_BUILD 0)
-message("--Option CRY not specified -- Set default value 0 (No CRY generator)")
+	set (CRY_BUILD 0)
+	message("--Option CRY not specified -- Set default value 0 (No CRY generator)")
 endif()
 
 message("= = = = = = = = = = = = = = = = = =")
@@ -44,15 +44,15 @@ configure_file (config.h.in config.h) #exporting the config !!
 
 # - - - - - - - - Setup CRY - - - - - - - - - -
 if(CRY_BUILD)
-MESSAGE ("Setting up Cry")
+	MESSAGE ("Setting up Cry")
 endif()
 
 find_library(CRY NAMES CRY PATHS $ENV{CRYHOME}/lib NO_DEFAULT_PATH)
 
 if(NOT DEFINED CRY_PATH)
-message("WARNING:: Specify the path to folder -- example: CMake ... -DCRY_PATH=/home/billy/nnbar/cry_v1.7 ...")
-message("CMake will use the example path since it is not specified")
-set(CRY_PATH "/home/billy/nnbar/cry_v1.7")
+	message("WARNING:: Specify the path to folder -- example: CMake ... -DCRY_PATH=/home/billy/nnbar/cry_v1.7 ...")
+	message("CMake will use the example path since it is not specified")
+	set(CRY_PATH "/home/billy/nnbar/cry_v1.7")
 endif()
 
 set(CRY_INCLUDE_DIRS "${CRY_PATH}/src")
@@ -70,9 +70,9 @@ message(${CRY_LIBRARIES})
 #
 
 include_directories(${PROJECT_SOURCE_DIR}/include 
-		    ${CRY_INCLUDE_DIRS}
-		    ${CMAKE_CURRENT_BINARY_DIR}
-		   )
+	${CRY_INCLUDE_DIRS}
+	${CMAKE_CURRENT_BINARY_DIR}
+	)
 
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*)
@@ -97,19 +97,19 @@ file(COPY ${CRY_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/cry_data
 	FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 set(SCRIPTS
-  nnbar-calo-sim.in
-  gui.mac
-  init_vis.mac
-  vis.mac
-  setup.file
-  )
+	nnbar-calo-sim.in
+	gui.mac
+	init_vis.mac
+	vis.mac
+	setup.file
+	)
 
 foreach(_script ${SCRIPTS})
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/${_script}
-    ${PROJECT_BINARY_DIR}/${_script}
-    COPYONLY
-    )
+	configure_file(
+		${PROJECT_SOURCE_DIR}/${_script}
+		${PROJECT_BINARY_DIR}/${_script}
+		COPYONLY
+		)
 endforeach()
 
 #----------------------------------------------------------------------------
@@ -119,5 +119,5 @@ install(TARGETS nnbar-calo-sim DESTINATION bin)
 install(
 	DIRECTORY
 	DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/output"
-     	DIRECTORY_PERMISSIONS ${PROGRAM_PERMISSIONS_DEFAULT}
-     )
+	DIRECTORY_PERMISSIONS ${PROGRAM_PERMISSIONS_DEFAULT}
+	)

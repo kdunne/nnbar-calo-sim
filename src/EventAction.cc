@@ -27,7 +27,9 @@
 
 
 #include "EventAction.hh"
-#include "Analysis.hh"
+#include "RunAction.hh"
+//#include "Analysis.hh"
+#include "HistoManager.hh"
 #include "ScintillatorSD.hh"
 #include "AbsorberSD.hh"
 #include "TubeSD.hh"
@@ -70,8 +72,9 @@ extern std::ofstream Abs_outFile;
 
 namespace {G4Mutex RunActionMutex = G4MUTEX_INITIALIZER;}
 
-EventAction::EventAction(): 
+EventAction::EventAction(HistoManager *histo): 
     G4UserEventAction(),
+	fHistoManager(histo),
     fAbsoEdepHCID(-1),
     fGapEdepHCID(-1),
     fAbsoTrackLengthHCID(-1),
@@ -145,348 +148,362 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 
 void EventAction::EndOfEventAction(const G4Event* event)
 {  
-    if(scintHitsCollectionID  < 0) {return;}
+	if(scintHitsCollectionID  < 0) {return;}
 
 	G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
-    int CHCID = -1;
-    if (CHCID<0) {CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");}
-    NNbarHitsCollection* ScintHits = 0;
+	int CHCID = -1;
+	if (CHCID<0) {CHCID = G4SDManager::GetSDMpointer()->GetCollectionID("ScintillatorHitCollection");}
+	NNbarHitsCollection* ScintHits = 0;
 
-    int CHCID2 = -1;
-    if (CHCID2<0) {CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");}
-    NNbarHitsCollection* AbsHits   = 0;
-    
-    int CHCID3 = -1;
-    if (CHCID3<0) {CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");}
-    NNbarHitsCollection* TubeHits  = 0;
-    
-    int CHCID4 = -1;
-    if (CHCID4<0) {CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TPCHitCollection");}
-    NNbarHitsCollection* TPCHits  = 0;
-    
-    int CHCID5 = -1;
-    if (CHCID5<0) {CHCID5 = G4SDManager::GetSDMpointer()->GetCollectionID("PMTHitCollection");}
-    NNbarHitsCollection* PMTHits  = 0;
-    
-    int CHCID6 = -1;
-    if (CHCID6<0) {CHCID6 = G4SDManager::GetSDMpointer()->GetCollectionID("SiliconHitCollection");}
-    NNbarHitsCollection* SiliconHits  = 0;
-    
-    #if VERSION_SHIELD==1    
-        int CHCID7 = -1;
-        if (CHCID7<0) {CHCID7 = G4SDManager::GetSDMpointer()->GetCollectionID("ShieldHitCollection");}
-        NNbarHitsCollection* ShieldHits  = 0;
-    #endif
+	int CHCID2 = -1;
+	if (CHCID2<0) {CHCID2 = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitCollection");}
+	NNbarHitsCollection* AbsHits   = 0;
 
-    if (HCE) {
+	int CHCID3 = -1;
+	if (CHCID3<0) {CHCID3 = G4SDManager::GetSDMpointer()->GetCollectionID("TubeHitCollection");}
+	NNbarHitsCollection* TubeHits  = 0;
 
-        //G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+	int CHCID4 = -1;
+	if (CHCID4<0) {CHCID4 = G4SDManager::GetSDMpointer()->GetCollectionID("TPCHitCollection");}
+	NNbarHitsCollection* TPCHits  = 0;
 
-        G4int b = 1;
-        G4int ltime     = 0.;
-        G4int parentID  = 0;
-        G4String proc   = "";
-        G4String name   = "";
-        G4double time   = 0.;
-        G4int trID      = 0;
-        G4int i         = 0;
-        G4double kinEn  = 0.;
-        G4double eDep   = 0.;
-        G4double trackl = 0.;	
-        G4int hitCount  = 0;
-        G4int org_replica = 99;
-        G4int group_ID = 999;
-        G4int module_ID = 999;
-        
-        // Book vector to keep track of Edep in each Scintillator Sheet
-        G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
-        G4int ScintPerSheet[10] = { 0,0,0,0,0,0,0,0,0,0 };
-        G4int ScintPerSheet_new[10] = { 0,0,0,0,0,0,0,0,0,0 };
-        G4double totEdep   = 0.;     
-        G4double eDepScint = 0.;
-        G4double eDepAbs   = 0.;
-        G4double eDepTube  = 0.; 
-        G4double extraEdep = 0.;
-        G4double eDepCompt = 0.;
-        G4double eDepInelastic= 0.;
-        G4double eDephIoni = 0.;
-        G4double eDepHadElas = 0.;
-        G4double eDepPrimary = 0.;
-        G4double eDepOther = 0.;
-        G4int cerenkovCounter = 0;
-        G4int scint_photons = 0;
-        G4int scint_photons_check = 0;
-        G4int PMT_photons = 0;
+	int CHCID5 = -1;
+	if (CHCID5<0) {CHCID5 = G4SDManager::GetSDMpointer()->GetCollectionID("PMTHitCollection");}
+	NNbarHitsCollection* PMTHits  = 0;
+
+	int CHCID6 = -1;
+	if (CHCID6<0) {CHCID6 = G4SDManager::GetSDMpointer()->GetCollectionID("SiliconHitCollection");}
+	NNbarHitsCollection* SiliconHits  = 0;
+
+#if VERSION_SHIELD==1    
+	int CHCID7 = -1;
+	if (CHCID7<0) {CHCID7 = G4SDManager::GetSDMpointer()->GetCollectionID("ShieldHitCollection");}
+	NNbarHitsCollection* ShieldHits  = 0;
+#endif
+
+	if (HCE) {
+
+		//G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+
+		G4int b = 1;
+		G4int ltime     = 0.;
+		G4int parentID  = 0;
+		G4String proc   = "";
+		G4String name   = "";
+		G4double time   = 0.;
+		G4int trID      = 0;
+		G4int i         = 0;
+		G4double kinEn  = 0.;
+		G4double eDep   = 0.;
+		G4double trackl = 0.;	
+		G4int hitCount  = 0;
+		G4int org_replica = 99;
+		G4int group_ID = 999;
+		G4int module_ID = 999;
+
+		// Book vector to keep track of Edep in each Scintillator Sheet
+		G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
+		G4int ScintPerSheet[10] = { 0,0,0,0,0,0,0,0,0,0 };
+		G4int ScintPerSheet_new[10] = { 0,0,0,0,0,0,0,0,0,0 };
+		G4double totEdep   = 0.;     
+		G4double eDepScint = 0.;
+		G4double eDepAbs   = 0.;
+		G4double eDepTube  = 0.; 
+		G4double extraEdep = 0.;
+		G4double eDepCompt = 0.;
+		G4double eDepInelastic= 0.;
+		G4double eDephIoni = 0.;
+		G4double eDepHadElas = 0.;
+		G4double eDepPrimary = 0.;
+		G4double eDepOther = 0.;
+		G4int cerenkovCounter = 0;
+		G4int scint_photons = 0;
+		G4int scint_photons_check = 0;
+		G4int PMT_photons = 0;
 
 
 
-        ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
-        
-        std::vector<G4int> Scint_Group_index;
-        std::vector<G4int> Scint_Group_index_reduced;
-        std::vector<G4int> Scint_Module_index;
-        std::vector<G4int> Scint_Module_index_reduced;
-        std::vector<G4int> Scint_Layer_index;
-        std::vector<G4int> Scint_photon_array;
-        std::vector<G4int> Scint_time_array;
-        std::vector<G4int> event_ID_array;
+		ScintHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID));
 
-        G4AutoLock lock(&RunActionMutex);
-        
-        std::cout<< "Thread ID " << G4Threading::G4GetThreadId() << ":: after run  " << local_event_number << std::endl;
-        
+		std::vector<G4int> Scint_Group_index;
+		std::vector<G4int> Scint_Group_index_reduced;
+		std::vector<G4int> Scint_Module_index;
+		std::vector<G4int> Scint_Module_index_reduced;
+		std::vector<G4int> Scint_Layer_index;
+		std::vector<G4int> Scint_photon_array;
+		std::vector<G4int> Scint_time_array;
+		std::vector<G4int> event_ID_array;
+
+		G4AutoLock lock(&RunActionMutex);
+
+		std::cout<< "Thread ID " << G4Threading::G4GetThreadId() << ":: after run  " << local_event_number << std::endl;
+
+		fHistoManager->ClearEventVectors();
+
 		if (ScintHits) {
-           hitCount = ScintHits->entries();
-           for (G4int h=0; h<hitCount; h++) { 
-               name     = ((*ScintHits)[h]) -> GetName();
-               if (name != "opticalphoton"){
-                    //ltime    = ((*ScintHits)[h]) -> GetLocalTime();
-                    parentID = ((*ScintHits)[h]) -> GetParentID();
-                    trID     = ((*ScintHits)[h]) -> GetTrackID();
-                    proc     = ((*ScintHits)[h]) -> GetProcess();
-                    x = ((*ScintHits)[h]) -> GetPosX();
-                    y = ((*ScintHits)[h]) -> GetPosY();
-                    z = ((*ScintHits)[h]) -> GetPosZ();
-                    
-                    G4double particle_x = ((*ScintHits)[h]) -> GetPosX_particle();
-                    G4double particle_y = ((*ScintHits)[h]) -> GetPosY_particle();
-                    G4double particle_z = ((*ScintHits)[h]) -> GetPosZ_particle();
-                    
-                    time     = ((*ScintHits)[h]) -> GetTime();
+			hitCount = ScintHits->entries();
+			for (G4int h=0; h<hitCount; h++) { 
+				name     = ((*ScintHits)[h]) -> GetName();
+				if (name != "opticalphoton"){
+					//ltime    = ((*ScintHits)[h]) -> GetLocalTime();
+					parentID = ((*ScintHits)[h]) -> GetParentID();
+					trID     = ((*ScintHits)[h]) -> GetTrackID();
+					proc     = ((*ScintHits)[h]) -> GetProcess();
+					x = ((*ScintHits)[h]) -> GetPosX();
+					y = ((*ScintHits)[h]) -> GetPosY();
+					z = ((*ScintHits)[h]) -> GetPosZ();
 
-                    auto stave_ID = ((*ScintHits)[h]) -> GetStave_ID(); 
-                    i        = ((*ScintHits)[h]) -> GetXID();
-                    //group_ID = ((*ScintHits)[h]) -> GetGroup_ID();
-                    module_ID = ((*ScintHits)[h]) -> GetMod_ID();
+					G4double particle_x = ((*ScintHits)[h]) -> GetPosX_particle();
+					G4double particle_y = ((*ScintHits)[h]) -> GetPosY_particle();
+					G4double particle_z = ((*ScintHits)[h]) -> GetPosZ_particle();
 
-                    kinEn    = ((*ScintHits)[h]) -> GetKinEn();
-                    eDep     = ((*ScintHits)[h]) -> GetEdep();
-                    trackl   = ((*ScintHits)[h]) -> GetTrackLength();
-                    G4int scint_photons_per_hit = ((*ScintHits)[h])->GetPhotons();
-                    // writing output
+					time     = ((*ScintHits)[h]) -> GetTime();
 
-                    if (scint_photons_per_hit>0){
-                    Scint_layer_outFile << local_event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< module_ID<<","<<i<< "," << stave_ID << ","
-                    << time <<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit << "," << x <<","<< y << ","<< z << "," << particle_x << "," << particle_y << "," << particle_z  <<G4endl;
-                    }
-                    //std::cout<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << std::endl;
+					auto stave_ID = ((*ScintHits)[h]) -> GetStave_ID(); 
+					i        = ((*ScintHits)[h]) -> GetXID();
+					//group_ID = ((*ScintHits)[h]) -> GetGroup_ID();
+					module_ID = ((*ScintHits)[h]) -> GetMod_ID();
 
-               }
+					kinEn    = ((*ScintHits)[h]) -> GetKinEn();
+					eDep     = ((*ScintHits)[h]) -> GetEdep();
+					trackl   = ((*ScintHits)[h]) -> GetTrackLength();
+					G4int scint_photons_per_hit = ((*ScintHits)[h])->GetPhotons();
+					// writing output
 
-            }
-        }
- 
-        AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
-        if(AbsHits) {
-            for (G4int h=0; h<AbsHits->entries(); h++) {
-                name     = ((*AbsHits)[h]) -> GetName();
-                if (name != "opticalphoton"){
-                    ltime           = ((*AbsHits)[h]) -> GetLocalTime();
-                    parentID	= ((*AbsHits)[h]) -> GetParentID();
-                    proc            = ((*AbsHits)[h]) -> GetProcess();
-                    G4String name   = ((*AbsHits)[h]) -> GetName();
-                    G4double time   = ((*AbsHits)[h]) -> GetTime();
-                    G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
-                    G4int i         = ((*AbsHits)[h]) -> GetXID();
-                    G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
-                    G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
-                    G4double trackl = ((*AbsHits)[h]) -> GetTrackLength();
-                    G4double photons_cerenkov = ((*AbsHits)[h])->GetPhotons();
-                    x = ((*AbsHits)[h]) -> GetPosX();
-                    y = ((*AbsHits)[h]) -> GetPosY();
-                    z = ((*AbsHits)[h]) -> GetPosZ();
+					if (scint_photons_per_hit>0){
+						Scint_layer_outFile << local_event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< module_ID<<","<<i<< "," << stave_ID << ","
+							<< time <<","<<kinEn<<","<<eDep<<","<< scint_photons_per_hit << "," << x <<","<< y << ","<< z << "," << particle_x << "," << particle_y << "," << particle_z  <<G4endl;
+						fHistoManager->FillScintVectors(local_event_number, trID, parentID, module_ID, i, stave_ID, 
+								time, kinEn, eDep, scint_photons_per_hit, x, y, z,particle_x, particle_y, particle_z);
+					}
+					//std::cout<< group_ID<<","<<module_ID<<","<<i<< "," << stave_ID << std::endl;
 
-                    if (photons_cerenkov>0){
-                    Abs_outFile << local_event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<<i<<","
-                    << time<<","<<kinEn<<","<<eDep<<","<< trackl <<","<< photons_cerenkov <<  "," << x <<","<< y << ","<<z<<G4endl;
-                    }
-                }
-                //cerenkovCounter = cerenkovCounter + photons_cerenkov;
-            }
-        }
-        
-        TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
-        if (TubeHits) {
-	    hitCount = TubeHits->entries();
-            for (G4int h=0; h<hitCount; h++) {
-                ltime    = ((*TubeHits)[h]) -> GetLocalTime();
-                parentID = ((*TubeHits)[h]) -> GetParentID();
-                proc     = ((*TubeHits)[h]) -> GetProcess();
-                name     = ((*TubeHits)[h]) -> GetName();
-                time     = ((*TubeHits)[h]) -> GetTime(); 
-                trID     = ((*TubeHits)[h]) -> GetTrackID();
-                kinEn    = ((*TubeHits)[h]) -> GetKinEn();
-                eDep     = ((*TubeHits)[h]) -> GetEdep();
-                trackl   = ((*TubeHits)[h]) -> GetTrackLength();	
-                G4double x = ((*TubeHits)[h]) -> GetPosX();
-                G4double y = ((*TubeHits)[h]) -> GetPosY();
-                G4double z = ((*TubeHits)[h]) -> GetPosZ();
-            
-                Tube_outFile << local_event_number << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
-                time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
-            
-            }         
-        }
+				}
 
-        TPCHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
-        if (TPCHits) {
-            hitCount = TPCHits->entries();
-            for (G4int h=0; h<hitCount; h++) {
-                
-                ltime    = ((*TPCHits)[h]) -> GetLocalTime();
-                parentID = ((*TPCHits)[h]) -> GetParentID();
-                proc     = ((*TPCHits)[h]) -> GetProcess();
-                name     = ((*TPCHits)[h]) -> GetName();
-                time     = ((*TPCHits)[h]) -> GetTime();
-                trID     = ((*TPCHits)[h]) -> GetTrackID();
-                kinEn    = ((*TPCHits)[h]) -> GetKinEn();
-                eDep     = ((*TPCHits)[h]) -> GetEdep();
-                module_ID = ((*TPCHits)[h]) -> GetMod_ID();
-                i = ((*TPCHits)[h]) -> GetXID();
-                x = ((*TPCHits)[h]) -> GetPosX();
-                y = ((*TPCHits)[h]) -> GetPosY();
-                z = ((*TPCHits)[h]) -> GetPosZ();
-                G4double electrons = ((*TPCHits)[h]) -> GetPhotons(); 
-                G4double trackl = ((*TPCHits)[h]) -> GetTrackLength();
+			}
+		}
 
-                //SD_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< "TPC"<<","<< 0 <<","<< 0 <<","<<i<<","<<x<<","<<y<<","<<z<<","<<
-                //time<<","<<kinEn<<","<<eDep<<","<< photons <<G4endl;
-                if (electrons>0){
-                    if (proc !="eIoni" && proc!= "hIoni") // dont want to see the electrons ... 
-                    TPC_outFile << local_event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << ","<< proc <<","  << x <<","<<y<<","<<z<<","<<
-                    time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
-                    
-                }
-                //std::cout << " TPC hit " << module_ID << ", layer: " << i << ", " << eDep/CLHEP::MeV  << std::endl;
-            }
-        }
+		AbsHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID2));
+		if(AbsHits) {
+			for (G4int h=0; h<AbsHits->entries(); h++) {
+				name     = ((*AbsHits)[h]) -> GetName();
+				if (name != "opticalphoton"){
+					ltime           = ((*AbsHits)[h]) -> GetLocalTime();
+					parentID	= ((*AbsHits)[h]) -> GetParentID();
+					proc            = ((*AbsHits)[h]) -> GetProcess();
+					G4String name   = ((*AbsHits)[h]) -> GetName();
+					G4double time   = ((*AbsHits)[h]) -> GetTime();
+					G4int trID      = ((*AbsHits)[h]) -> GetTrackID();
+					G4int i         = ((*AbsHits)[h]) -> GetXID();
+					G4double kinEn  = ((*AbsHits)[h]) -> GetKinEn();
+					G4double eDep   = ((*AbsHits)[h]) -> GetEdep();
+					G4double trackl = ((*AbsHits)[h]) -> GetTrackLength();
+					G4double photons_cerenkov = ((*AbsHits)[h])->GetPhotons();
+					x = ((*AbsHits)[h]) -> GetPosX();
+					y = ((*AbsHits)[h]) -> GetPosY();
+					z = ((*AbsHits)[h]) -> GetPosZ();
 
-        // PMT Sensitive volume
-        std::vector<G4int> PMT_index;
-        std::vector<G4int> PMT_index_reduced;
-        std::vector<G4double> PMT_time;
-        std::vector<G4double> PMT_KE;
+					if (photons_cerenkov>0){
+						Abs_outFile << local_event_number<<","<<trID << ","<<parentID<<","<<name<<","<<proc<<","<<i<<","
+							<< time<<","<<kinEn<<","<<eDep<<","<< trackl <<","<< photons_cerenkov <<  "," << x <<","<< y << ","<<z<<G4endl;
+						fHistoManager->FillAbsVectors(local_event_number, trID, parentID, i, 
+								time, kinEn, eDep, trackl, photons_cerenkov, x, y, z);
+					}
+				}
+				//cerenkovCounter = cerenkovCounter + photons_cerenkov;
+			}
+		}
 
-        PMTHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID5));
-        
-        if (PMTHits) {
-            hitCount = PMTHits->entries();
-            for (G4int h=0; h<hitCount; h++) {
-                if (((*PMTHits)[h]) -> GetName() == "opticalphoton"){ // only store photon hit
-                    G4double time = ((*PMTHits)[h]) -> GetTime(); 
-                    G4double trID = ((*PMTHits)[h]) -> GetTrackID(); 
-                    G4int i = ((*PMTHits)[h]) -> GetXID();
-                    PMT_index.push_back(i);
-                    PMT_time.push_back(time);
-                    PMT_KE.push_back(((*PMTHits)[h]) -> GetKinEn());
-                }
-            }
-        }
+		TubeHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID3));
+		if (TubeHits) {
+			hitCount = TubeHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
+				ltime    = ((*TubeHits)[h]) -> GetLocalTime();
+				parentID = ((*TubeHits)[h]) -> GetParentID();
+				proc     = ((*TubeHits)[h]) -> GetProcess();
+				name     = ((*TubeHits)[h]) -> GetName();
+				time     = ((*TubeHits)[h]) -> GetTime(); 
+				trID     = ((*TubeHits)[h]) -> GetTrackID();
+				kinEn    = ((*TubeHits)[h]) -> GetKinEn();
+				eDep     = ((*TubeHits)[h]) -> GetEdep();
+				trackl   = ((*TubeHits)[h]) -> GetTrackLength();	
+				G4double x = ((*TubeHits)[h]) -> GetPosX();
+				G4double y = ((*TubeHits)[h]) -> GetPosY();
+				G4double z = ((*TubeHits)[h]) -> GetPosZ();
 
-        #if VERSION_SHIELD==1    
-            ShieldHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID7));
-            if (ShieldHits) {
-            hitCount = ShieldHits->entries();
-                for (G4int h=0; h<hitCount; h++) {
-                    name     = ((*ShieldHits)[h]) -> GetName();
-                    if (name != "opticalphoton"){
-                        ltime    = ((*ShieldHits)[h]) -> GetLocalTime();
-                        parentID = ((*ShieldHits)[h]) -> GetParentID();
-                        proc     = ((*ShieldHits)[h]) -> GetProcess();
-                        name     = ((*ShieldHits)[h]) -> GetName();
-                        time     = ((*ShieldHits)[h]) -> GetTime(); 
-                        trID     = ((*ShieldHits)[h]) -> GetTrackID();
-                        kinEn    = ((*ShieldHits)[h]) -> GetKinEn();
-                        eDep     = ((*ShieldHits)[h]) -> GetEdep();
-                        trackl   = ((*ShieldHits)[h]) -> GetTrackLength();	
-                        G4double x = ((*ShieldHits)[h]) -> GetPosX();
-                        G4double y = ((*ShieldHits)[h]) -> GetPosY();
-                        G4double z = ((*ShieldHits)[h]) -> GetPosZ();
-                        G4String vol_name = ((*ShieldHits)[h]) -> GetVolName();
-                        G4double pX = ((*ShieldHits)[h]) -> GetPX();
-                        G4double pY = ((*ShieldHits)[h]) -> GetPY();
-                        G4double pZ = ((*ShieldHits)[h]) -> GetPZ();
-                        
-                        if (vol_name != "LeadShield"){
-                        Shield_outFile << local_event_number << "," << trID << "," << parentID << "," << name << "," << proc << "," << vol_name << "," << x <<","<<y<<","<<z<<","
-                        <<time<< "," <<kinEn<<","<< pX <<","<< pY <<","<< pZ <<","<< eDep << "," << trackl <<G4endl;
-                        }
-                    }
-                }         
-            }
-        #endif
+				Tube_outFile << local_event_number << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
+					time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
+				fHistoManager->FillTubeVectors(local_event_number, trID, parentID, 
+						time, kinEn, eDep, trackl, x, y, z);
 
-        /**
-        PMT_index_reduced = PMT_index;
-        sort(PMT_index_reduced.begin(), PMT_index_reduced.end());
-        PMT_index_reduced.erase(unique(PMT_index_reduced.begin(), PMT_index_reduced.end()), PMT_index_reduced.end() );
+			}         
+		}
 
-        // writing the PMT outputs
-        //std::cout  << PMT_index_reduced.size() << std::endl;
-        PMT_outFile << "{" << "\"Event_ID\":" << event_number << ",";
-        PMT_outFile << "\"PMT_signal\":[";
+		TPCHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID4));
+		if (TPCHits) {
+			hitCount = TPCHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
 
-        for (int i = 0; i < PMT_index_reduced.size();i++){
-            
-            if (i > 0){PMT_outFile << ',';}
-            PMT_outFile << "{\"PMT_ID\":" << PMT_index_reduced[i] << ",";
-            PMT_outFile << "\"Time\":[" ;
-            int count = 0; 
-            for (int j=0; j < PMT_index.size();j++){  //
-                if (PMT_index[j] == PMT_index_reduced[i]){
-                    if (count > 0) {PMT_outFile <<",";}
-                    PMT_outFile << PMT_time[j];
-                    count++;
-                }
-            }
-            PMT_outFile << "],";
+				ltime    = ((*TPCHits)[h]) -> GetLocalTime();
+				parentID = ((*TPCHits)[h]) -> GetParentID();
+				proc     = ((*TPCHits)[h]) -> GetProcess();
+				name     = ((*TPCHits)[h]) -> GetName();
+				time     = ((*TPCHits)[h]) -> GetTime();
+				trID     = ((*TPCHits)[h]) -> GetTrackID();
+				kinEn    = ((*TPCHits)[h]) -> GetKinEn();
+				eDep     = ((*TPCHits)[h]) -> GetEdep();
+				module_ID = ((*TPCHits)[h]) -> GetMod_ID();
+				i = ((*TPCHits)[h]) -> GetXID();
+				x = ((*TPCHits)[h]) -> GetPosX();
+				y = ((*TPCHits)[h]) -> GetPosY();
+				z = ((*TPCHits)[h]) -> GetPosZ();
+				G4double electrons = ((*TPCHits)[h]) -> GetPhotons(); 
+				G4double trackl = ((*TPCHits)[h]) -> GetTrackLength();
 
-            PMT_outFile << "\"KE\":[" ;
-            count = 0;
-            for (int j=0; j < PMT_index.size();j++){  //
-                if (PMT_index[j] == PMT_index_reduced[i]){
-                    if (count > 0) {PMT_outFile <<",";}
-                    PMT_outFile << PMT_KE[j];
-                    count++;
-                }
-            }
+				//SD_outFile << event_number<<","<<trID<<","<<parentID<<","<<name<<","<<proc<<","<< "TPC"<<","<< 0 <<","<< 0 <<","<<i<<","<<x<<","<<y<<","<<z<<","<<
+				//time<<","<<kinEn<<","<<eDep<<","<< photons <<G4endl;
+				if (electrons>0){
+					if (proc !="eIoni" && proc!= "hIoni") // dont want to see the electrons ... 
+						TPC_outFile << local_event_number<< "," << module_ID << "," << i << "," << trID << "," << parentID << "," << name << ","<< proc <<","  << x <<","<<y<<","<<z<<","<<
+							time<< "," <<kinEn<<","<<eDep << "," << electrons << "," << trackl <<G4endl;
+					fHistoManager->FillTPCVectors(local_event_number, trID, parentID, module_ID, i, 
+							time, kinEn, eDep, trackl, electrons, x, y, z);
 
-            PMT_outFile << "]}";
-        }
-        PMT_outFile << "]";
-        PMT_outFile << "}" <<G4endl;
-        ***/
+				}
+				//std::cout << " TPC hit " << module_ID << ", layer: " << i << ", " << eDep/CLHEP::MeV  << std::endl;
+			}
+		}
 
-        SiliconHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID6));        
-        if (SiliconHits) {
-            hitCount = SiliconHits->entries();
-            for (G4int h=0; h<hitCount; h++) {
-                G4double time = ((*SiliconHits)[h]) -> GetTime(); 
-                G4double trID = ((*SiliconHits)[h]) -> GetTrackID(); 
-                G4int i = ((*SiliconHits)[h]) -> GetXID();
-                G4String name     = ((*SiliconHits)[h]) -> GetName();
-                G4int parentID = ((*SiliconHits)[h]) -> GetParentID();
-                G4String proc = ((*SiliconHits)[h]) -> GetProcess();
-                G4double kinEn    = ((*SiliconHits)[h]) -> GetKinEn();
-                eDep     = ((*SiliconHits)[h]) -> GetEdep();
-                module_ID = ((*SiliconHits)[h]) -> GetMod_ID();
-                x = ((*SiliconHits)[h]) -> GetPosX();
-                y = ((*SiliconHits)[h]) -> GetPosY();
-                z = ((*SiliconHits)[h]) -> GetPosZ();
-                G4double trackl = ((*SiliconHits)[h]) -> GetTrackLength();
+		// PMT Sensitive volume
+		std::vector<G4int> PMT_index;
+		std::vector<G4int> PMT_index_reduced;
+		std::vector<G4double> PMT_time;
+		std::vector<G4double> PMT_KE;
 
-                Silicon_outFile << local_event_number<<"," << i << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
-                time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
-            }
-        }
-    }
-    
-    else {G4cout << "No HCE" << G4endl;}
-    auto eventID = event->GetEventID();
-    auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-    if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {G4cout << "---> End of event: " << eventID << G4endl;}
-    
-    //event_number ++;
-    
+		PMTHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID5));
+
+		if (PMTHits) {
+			hitCount = PMTHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
+				if (((*PMTHits)[h]) -> GetName() == "opticalphoton"){ // only store photon hit
+					G4double time = ((*PMTHits)[h]) -> GetTime(); 
+					G4double trID = ((*PMTHits)[h]) -> GetTrackID(); 
+					G4int i = ((*PMTHits)[h]) -> GetXID();
+					PMT_index.push_back(i);
+					PMT_time.push_back(time);
+					PMT_KE.push_back(((*PMTHits)[h]) -> GetKinEn());
+				}
+			}
+		}
+
+#if VERSION_SHIELD==1    
+		ShieldHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID7));
+		if (ShieldHits) {
+			hitCount = ShieldHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
+				name     = ((*ShieldHits)[h]) -> GetName();
+				if (name != "opticalphoton"){
+					ltime    = ((*ShieldHits)[h]) -> GetLocalTime();
+					parentID = ((*ShieldHits)[h]) -> GetParentID();
+					proc     = ((*ShieldHits)[h]) -> GetProcess();
+					name     = ((*ShieldHits)[h]) -> GetName();
+					time     = ((*ShieldHits)[h]) -> GetTime(); 
+					trID     = ((*ShieldHits)[h]) -> GetTrackID();
+					kinEn    = ((*ShieldHits)[h]) -> GetKinEn();
+					eDep     = ((*ShieldHits)[h]) -> GetEdep();
+					trackl   = ((*ShieldHits)[h]) -> GetTrackLength();	
+					G4double x = ((*ShieldHits)[h]) -> GetPosX();
+					G4double y = ((*ShieldHits)[h]) -> GetPosY();
+					G4double z = ((*ShieldHits)[h]) -> GetPosZ();
+					G4String vol_name = ((*ShieldHits)[h]) -> GetVolName();
+					G4double pX = ((*ShieldHits)[h]) -> GetPX();
+					G4double pY = ((*ShieldHits)[h]) -> GetPY();
+					G4double pZ = ((*ShieldHits)[h]) -> GetPZ();
+
+					if (vol_name != "LeadShield"){
+						Shield_outFile << local_event_number << "," << trID << "," << parentID << "," << name << "," << proc << "," << vol_name << "," << x <<","<<y<<","<<z<<","
+							<<time<< "," <<kinEn<<","<< pX <<","<< pY <<","<< pZ <<","<< eDep << "," << trackl <<G4endl;
+						fHistoManager->FillShieldVectors(local_event_number, trID, parentID, 
+								time, kinEn, eDep, trackl, x, y, z, pX, pY, pZ);
+
+					}
+				}
+			}         
+		}
+#endif
+
+		/**
+		  PMT_index_reduced = PMT_index;
+		  sort(PMT_index_reduced.begin(), PMT_index_reduced.end());
+		  PMT_index_reduced.erase(unique(PMT_index_reduced.begin(), PMT_index_reduced.end()), PMT_index_reduced.end() );
+
+		// writing the PMT outputs
+		//std::cout  << PMT_index_reduced.size() << std::endl;
+		PMT_outFile << "{" << "\"Event_ID\":" << event_number << ",";
+		PMT_outFile << "\"PMT_signal\":[";
+
+		for (int i = 0; i < PMT_index_reduced.size();i++){
+
+		if (i > 0){PMT_outFile << ',';}
+		PMT_outFile << "{\"PMT_ID\":" << PMT_index_reduced[i] << ",";
+		PMT_outFile << "\"Time\":[" ;
+		int count = 0; 
+		for (int j=0; j < PMT_index.size();j++){  //
+		if (PMT_index[j] == PMT_index_reduced[i]){
+		if (count > 0) {PMT_outFile <<",";}
+		PMT_outFile << PMT_time[j];
+		count++;
+		}
+		}
+		PMT_outFile << "],";
+
+		PMT_outFile << "\"KE\":[" ;
+		count = 0;
+		for (int j=0; j < PMT_index.size();j++){  //
+		if (PMT_index[j] == PMT_index_reduced[i]){
+		if (count > 0) {PMT_outFile <<",";}
+		PMT_outFile << PMT_KE[j];
+		count++;
+		}
+		}
+
+		PMT_outFile << "]}";
+		}
+		PMT_outFile << "]";
+		PMT_outFile << "}" <<G4endl;
+		 ***/
+
+		SiliconHits = (NNbarHitsCollection*)(HCE->GetHC(CHCID6));        
+		if (SiliconHits) {
+			hitCount = SiliconHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
+				G4double time = ((*SiliconHits)[h]) -> GetTime(); 
+				G4double trID = ((*SiliconHits)[h]) -> GetTrackID(); 
+				G4int i = ((*SiliconHits)[h]) -> GetXID();
+				G4String name     = ((*SiliconHits)[h]) -> GetName();
+				G4int parentID = ((*SiliconHits)[h]) -> GetParentID();
+				G4String proc = ((*SiliconHits)[h]) -> GetProcess();
+				G4double kinEn    = ((*SiliconHits)[h]) -> GetKinEn();
+				eDep     = ((*SiliconHits)[h]) -> GetEdep();
+				module_ID = ((*SiliconHits)[h]) -> GetMod_ID();
+				x = ((*SiliconHits)[h]) -> GetPosX();
+				y = ((*SiliconHits)[h]) -> GetPosY();
+				z = ((*SiliconHits)[h]) -> GetPosZ();
+				G4double trackl = ((*SiliconHits)[h]) -> GetTrackLength();
+
+				Silicon_outFile << local_event_number<<"," << i << "," << trID << "," << parentID << "," << name << "," << x <<","<<y<<","<<z<<","<<
+					time<< "," <<kinEn<<","<<eDep << "," << trackl <<G4endl;
+				fHistoManager->FillSiVectors(local_event_number, trID, parentID, i, 
+						time, kinEn, eDep, trackl, x, y, z);
+
+			}
+		}
+	}
+
+	else {G4cout << "No HCE" << G4endl;}
+	auto eventID = event->GetEventID();
+	auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
+	if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {G4cout << "---> End of event: " << eventID << G4endl;}
+
 }  

@@ -35,12 +35,13 @@
 //#include "PrimaryGeneratorAction.hh"
 #include "G4GenericMessenger.hh"
 
+class HistoManager;
 class NNbarRun;
 
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction();
+    RunAction(HistoManager*);
     virtual ~RunAction();
 	//std::vector<string> particle_name{ "Neutron","Proton","Gamma","Electron","Muon","Pion","Kaon" };
   	G4Run* GenerateRun();
@@ -49,6 +50,7 @@ class RunAction : public G4UserRunAction
 
     private:
         G4GenericMessenger* fMessenger;
+        HistoManager* fHistoManager;
 		NNbarRun* fRun;
 };
 
