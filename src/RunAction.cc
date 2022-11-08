@@ -296,8 +296,9 @@ void RunAction::BeginOfRunAction(const G4Run*)
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
 
-  G4String fileName = "../../output/lead-glass-sim.root";
+// G4String fileName = "../../output/lead-glass-sim.root";
 //G4String fileName = "../../output/lead-glass-sim.csv";
+  G4String fileName = "../../output/output.root";
 
   analysisManager->OpenFile(fileName);
 }
