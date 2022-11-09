@@ -1,5 +1,8 @@
 # Calorimeter simulation for NNbar/HIBEAM experiment
 
+![plot](./img/scintillators.png)
+
+
 This branch is used to study photon transport in the scintillator staves and the wavelength shifting fibers. It is built for MultiThreaded mode in Geant4
 
 <h3>How to Build</h3>
