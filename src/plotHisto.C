@@ -42,58 +42,11 @@ TStyle *nnbarStyle = new TStyle("NNbar","NNbar style");
   nnbarStyle->SetTitleYOffset(1.5);
 
 
-  gROOT->Reset();
-  gROOT->SetStyle("NNbar");
-  
-//......................................................
-
-  // Draw histos filled by Geant4 simulation 
-  //  
-  //
-  //  Eabs
-  //  Egap
-  //  Labs
-  //  NumCerenkov
-  //  PhotonTime
-  //  DecayTime
-  //  PhotonPos 
-
-  // Open file filled by Geant4 simulation 
-  TFile f("B4.root");
-
-  // Create a canvas and divide it into 2x2 pads
-  TCanvas* c1 = new TCanvas("c1", "", 20, 20, 1000, 1000);
-  c1->Divide(2,2);
-  
-  // Draw Eabs histogram in the pad 1
-  c1->cd(1);
-  TH1D* hist1 = (TH1D*)f.Get("Eabs");
-  hist1->Draw("HIST");
-  
-  // Draw Labs histogram in the pad 2
-  c1->cd(2);
-  TH1D* hist2 = (TH1D*)f.Get("Egap");
-  hist2->Draw("HIST");
-  
-  // Draw Egap histogram in the pad 3
-  // with logaritmic scale for y
-  TH1D* hist3 = (TH1D*)f.Get("NumCerenkov");
-  c1->cd(3);
-  gPad->SetLogy(1);
-  hist3->Draw("HIST");
-  
-  // Draw Lgap histogram in the pad 4
-  // with logaritmic scale for y
-  c1->cd(4);
-  gPad->SetLogy(1);
-  TH1D* hist4 = (TH1D*)f.Get("PhotonTime");
-  hist4->Draw("HIST");
-
   // set label offset
   nnbarStyle->SetLabelOffset(0.01,"xyz");
 
   // use large fonts
-  Int_t font=42; //  helvetica-medium-r-normal "Arial"
+  Int_t font=62; //  helvetica-medium-r-normal "Arial"
   Double_t tsize=0.055;
   nnbarStyle->SetTextFont(font);
 
@@ -135,6 +88,87 @@ TStyle *nnbarStyle = new TStyle("NNbar","NNbar style");
   // put tick marks on top and RHS of plots
   nnbarStyle->SetPadTickX(1);
   nnbarStyle->SetPadTickY(1);
+
+
+
+
+  //gROOT->Reset();
+  gROOT->SetStyle("NNbar");
+  gROOT->ForceStyle("NNbar");
+ 
+//......................................................
+
+  // Draw histos filled by Geant4 simulation 
+  //  
+
+  // Open file filled by Geant4 simulation 
+  TFile f("output.root");
+
+  // Create a canvas and divide it into 5x2 pads
+  TCanvas* c1 = new TCanvas("c1", "", 200, 200, 1000, 1000);
+  c1->UseCurrentStyle();
+
+  c1->Divide(2,5);
+ 
+
+ 
+  // Draw histogram in pad 1
+  c1->cd(1);
+  TH1D* hist1 = (TH1D*)f.Get("scintphotons_A");
+  hist1->Draw("HIST");
+  
+  // Draw histogram in pad 2
+  c1->cd(2);
+  TH1D* hist2 = (TH1D*)f.Get("scintphotons_B");
+  hist2->Draw("HIST");
+  
+  // Draw histogram in pad 3
+  TH1D* hist3 = (TH1D*)f.Get("scintphotons_C");
+  c1->cd(3);
+  hist3->Draw("HIST");
+  
+  // Draw histogram in pad 4
+  c1->cd(4);
+  TH1D* hist4 = (TH1D*)f.Get("scintphotons_D");
+  hist4->Draw("HIST");
+
+  // Draw histogram in pad 5
+  c1->cd(5);
+  TH1D* hist5 = (TH1D*)f.Get("scintphotons_E");
+  hist5->Draw("HIST");
+  
+  // Draw histogram in pad 6
+  c1->cd(6);
+  TH1D* hist6 = (TH1D*)f.Get("scintphotons_F");
+  hist6->Draw("HIST");
+  
+  // Draw histogram in pad 7
+  TH1D* hist7 = (TH1D*)f.Get("scintphotons_G");
+  c1->cd(7);
+  hist7->Draw("HIST");
+  
+  // Draw histogram in pad 8
+  c1->cd(8);
+  TH1D* hist8 = (TH1D*)f.Get("scintphotons_H");
+  hist8->Draw("HIST");
+
+  // Draw histogram in pad 9
+  TH1D* hist9 = (TH1D*)f.Get("scintphotons_I");
+  c1->cd(9);
+  hist9->Draw("HIST");
+  
+  // Draw histogram in pad 10
+  c1->cd(10);
+  TH1D* hist10 = (TH1D*)f.Get("scintphotons_J");
+  hist10->Draw("HIST");
+
+
+
+
+
+
+  
+  c1->SaveAs("name.png");
 
   return nnbarStyle;
 
