@@ -115,68 +115,57 @@ void EventAction::EndOfEventAction(const G4Event* event)
  
     G4HCofThisEvent* HCE = event->GetHCofThisEvent();
 
-    int CHCID1 = -1;
-//    int CHCID2 = -1;
-//    int CHCID3 = -1;
-    //int CHCIDs[25] = {-1};
+    int CHCID = -1;
 
-    G4String name[] = {"A"};
-//    G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+    //G4String name[] = {"A"};
+    G4String name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
     G4String scorer = "/Pop";
-    int module_counter = 0;
 
 
 //  Scintillator Bar Hits
-    for(int i=0; i<1; i++) {
-        std::cout << "scorer: " << scorer << std::endl;
-        //std::cout << "name: " << name[i] << j << scorer << std::endl;
-        scorer = "/Pop";
-        std::string scorerName = "scint_" + name[i] + scorer;
+    for(int i=0; i<10; i++) {
 
-        int CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
-        std::cout << "Got collection ID " << std::endl;
-        std::cout << "Name: " << scorerName << ": CHCID = " << CHCID << std::endl;
+      
+      scorer = "/Pop";
+      std::string scorerName = "scint_" + name[i] + scorer;
 
-       std::cout << "Getting sum from hits"  << std::endl;
-       auto pop = GetSum(GetHitsCollection(CHCID, event)); 
-       std::cout << "Finished getting sum " << std::endl;
+      CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+      //std::cout << "Got collection ID " << std::endl;
+      //std::cout << "Name: " << scorerName << ": CHCID = " << CHCID << std::endl;
+      auto pop = GetSum(GetHitsCollection(CHCID, event)); 
 
-       // scorer = "/eDep";
-       // scorerName = "scint_" + name[i] + scorer;
-       // CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
-       // std::cout << "Name: " << scorerName << " CHCID: " << CHCID << std::endl;
-       // auto eDep = GetSum(GetHitsCollection(CHCID,event));
+      //scorer = "/eDep";
+      //scorerName = "scint_" + name[i] + scorer;
+      //CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+      //std::cout << "Name: " << scorerName << " CHCID: " << CHCID << std::endl;
+      //auto eDep = GetSum(GetHitsCollection(CHCID,event));
 
 
-       // scorer = "/Pop";
-       // scorerName = "fiber_" + name[i] + scorer;
-       // CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
-       // std::cout << "Name: " << scorerName << " CHCID: " << CHCID << std::endl;
-       // auto popFiber = GetSum(GetHitsCollection(CHCID, event)); 
+      //scorer = "/Pop";
+      //scorerName = "fiber_" + name[i] + scorer;
+      //CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+      //std::cout << "Name: " << scorerName << " CHCID: " << CHCID << std::endl;
+      //auto popFiber = GetSum(GetHitsCollection(CHCID, event)); 
 
-
-        //scorerName = "sipm_" + name[i] + scorer;
-        //CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
-        //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
-        //auto popSipm = GetSum(GetHitsCollection(CHCID, event)); 
-       
+      //scorerName = "sipm_" + name[i] + scorer;
+      //CHCID = G4SDManager::GetSDMpointer()->GetCollectionID(scorerName);
+      //std::cout << "Name: " << scorerName << "CHCID: " << CHCID << std::endl;
+      //auto popSipm = GetSum(GetHitsCollection(CHCID, event)); 
         
 
-        //G4AnalysisManager* analysis = G4AnalysisManager::Instance();
-        //analysis->FillH1(CHCID, pop);
-        // eDep in Scint, Pop in Fiber
+      G4AnalysisManager* analysis = G4AnalysisManager::Instance();
+      analysis->FillH1(i, pop);
 
-        //if (eDep >0) { 
-
+      //if (eDep >0) { 
         //analysis->FillH1(i+1, eDep/CLHEP::MeV);
         //analysis->FillH2(i, eDep/CLHEP::MeV, pop);
         //analysis->FillH2(i+10, pop, popFiber);
-        //}
+       //}
 
       //std::cout << "Num SiPM Photons:  " << popSipm << std::endl;
       //std::cout << "Num Fiber Photons: " << popFiber << std::endl;
-      //std::cout << "Num Scint Photons: " << pop << std::endl;
+      std::cout << "Num Scint Photons in " << scorerName << " : " << pop << std::endl;
       //std::cout << "eDep: " << eDep/CLHEP::MeV << std::endl;
 
     }
