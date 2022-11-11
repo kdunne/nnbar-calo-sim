@@ -27,3 +27,16 @@ $ ./nnbar-calo-sim
 <h5>Macro Mode</h5>
 
 $ ./nnbar-calo-sim -m nnbar-calo-sim.in
+
+
+
+<h3>Contents</h3>
+
+<h5>WLSMaterials.cc</h5> a class for creating and getting the different materials
+
+<h5>DetectorConstruction.cc</h5> geometry and sensitive detector definitions
+
+<h5>RunAction.cc</h5> Book histograms, create and write to output file
+
+<h5>PrimaryGeneratorAction.cc</h5> Set particle gun type, position
+
