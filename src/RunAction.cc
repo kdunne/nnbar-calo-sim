@@ -156,7 +156,7 @@ void RunAction::BeginOfRunAction(const G4Run*)
 
 // G4String fileName = "../../output/lead-glass-sim.root";
 //G4String fileName = "../../output/lead-glass-sim.csv";
-  G4String fileName = "../../output/output.root";
+  G4String fileName = "../output/output.root";
 
   analysisManager->OpenFile(fileName);
 }

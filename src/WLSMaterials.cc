@@ -250,10 +250,18 @@ void WLSMaterials::CreateMaterials()
     1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
     1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00};
 
+  G4double absLength[] =
+  { 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
+    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
+    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
+    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
+    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00};
+
   assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
 
   G4MaterialPropertiesTable* mpt = new G4MaterialPropertiesTable();
   mpt->AddProperty("RINDEX", photonEnergy, refractiveIndex, nEntries);
+  mpt->AddProperty("ABSLENGTH", photonEnergy, absLength, nEntries);
 
   fAir->SetMaterialPropertiesTable(mpt);
 
@@ -290,9 +298,8 @@ void WLSMaterials::CreateMaterials()
 
   // Add entries into properties table
   G4MaterialPropertiesTable* mptWLSfiber = new G4MaterialPropertiesTable();
-  mptWLSfiber->
-           AddProperty("RINDEX",photonEnergy,refractiveIndexWLSfiber,nEntries);
-  // mptWLSfiber->AddProperty("ABSLENGTH",photonEnergy,absWLSfiber,nEntries);
+  mptWLSfiber->AddProperty("RINDEX",photonEnergy,refractiveIndexWLSfiber,nEntries);
+  mptWLSfiber->AddProperty("ABSLENGTH",photonEnergy,absLength,nEntries);
   mptWLSfiber->AddProperty("WLSABSLENGTH",photonEnergy,absWLSfiber,nEntries);
   mptWLSfiber->AddProperty("WLSCOMPONENT",photonEnergy,emissionFib,nEntries);
   mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 0.5*ns);
@@ -363,8 +370,7 @@ void WLSMaterials::CreateMaterials()
 
   // Add entries into properties table
   G4MaterialPropertiesTable* mptSilicone = new G4MaterialPropertiesTable();
-  mptSilicone->
-           AddProperty("RINDEX",photonEnergy,refractiveIndexSilicone,nEntries);
+  mptSilicone->AddProperty("RINDEX",photonEnergy,refractiveIndexSilicone,nEntries);
   mptSilicone->AddProperty("ABSLENGTH",photonEnergy,absClad,nEntries);
 
   fSilicone->SetMaterialPropertiesTable(mptSilicone);
@@ -404,8 +410,7 @@ void WLSMaterials::CreateMaterials()
   G4MaterialPropertiesTable* mptPolystyrene = new G4MaterialPropertiesTable();
   mptPolystyrene->AddProperty("RINDEX",photonEnergy,refractiveIndexPS,nEntries);
   mptPolystyrene->AddProperty("ABSLENGTH",photonEnergy,absPS,nEntries);
-  mptPolystyrene->
-               AddProperty("FASTCOMPONENT",photonEnergy, scintilFast,nEntries);
+  mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT1",photonEnergy, scintilFast,nEntries);
 
 // 68% anthracene - 17400/MeV : 11832/MeV
   //mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
@@ -413,7 +418,7 @@ void WLSMaterials::CreateMaterials()
 
 //  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);
-  mptPolystyrene->AddConstProperty("FASTTIMECONSTANT", 10.*ns);
+  mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 10.*ns);
  
   fPolystyrene->SetMaterialPropertiesTable(mptPolystyrene);
 

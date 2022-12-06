@@ -114,7 +114,7 @@ int main(int argc, char** argv)
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
   runManager->SetUserInitialization(physicsList);
-
+  G4OpticalParameters::Instance()->Dump();
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
   

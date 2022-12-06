@@ -264,7 +264,7 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos
 
   new G4LogicalSkinSurface("TiO2Surface",ExtrusionLV,TiO2Surface);
 
-
+  TiO2Surface->DumpInfo();
 
 
 
