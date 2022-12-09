@@ -61,6 +61,7 @@ class WLSMaterials
     G4NistManager*     fNistMan;
 
     G4Material*        fAir;
+    G4Material*        fSi;
 
     G4Material*        fPMMA;
     G4Material*        fPethylene;

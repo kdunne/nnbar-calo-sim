@@ -26,7 +26,7 @@
 //
 
 #include "DetectorConstruction.hh"
-#include "LightGuideSD.hh"
+#include "GenericSD.hh"
 #include "WLSMaterials.hh"
 
 #include "G4Material.hh"
@@ -107,7 +107,7 @@ void DetectorConstruction::DefineMaterials() {
   // Vacuum
   new G4Material("Galactic", z=1., a=1.01*g/mole, density= universe_mean_density,
                   kStateGas, 2.73*kelvin, 3.e-18*pascal);
-
+  
   fMaterials = WLSMaterials::GetInstance();
 
 }
@@ -124,75 +124,37 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   G4double WorldSizeY = 5.*cm;
   G4double WorldSizeZ = 502*mm;
 
+  //G4int scintBars = 10;
   G4double scintThickness = 3.*cm; 
   //G4double scintThickness = 4.*cm;
 
   G4double WLSfiberZ  = WorldSizeZ - 2*mm;
-  G4double WLSfiberR  = 1.8*mm;
+ // G4double WLSfiberR  = 1.8*mm;
 
-  G4double HoleRadius       = 1*mm;
-  G4double HoleLength       = WLSfiberZ;
-  G4double FiberRadius      = .7*mm;
+ // G4double HoleRadius       = 1*mm;
+ // G4double HoleLength       = WLSfiberZ;
+ // G4double FiberRadius      = .7*mm;
 
-  G4double WLSfiberOrigin = 0.0;
+ // G4double WLSfiberOrigin = 0.0;
 
   // Get materials
   auto defaultMaterial    = G4Material::GetMaterial("Galactic");
  
   // World
-  auto worldS 
-    = new G4Box("World",           // its name
-                 WorldSizeX/2., WorldSizeY/2., WorldSizeZ/2.); // its size
-                         
-  auto worldLV
-    = new G4LogicalVolume(
-                 worldS,           // its solid
-                 defaultMaterial,  // its material
-                 "World");         // its name
-                                   
-  auto worldPV
-    = new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(),  // at (0,0,0)
-                 worldLV,          // its logical volume                         
-                 "World",          // its name
-                 0,                // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-  
-// One bar at a time
-// std::string name[] = {"A"};
-//G4double xPos[] = {0.};
-//G4double yPos[] = {0.};
-//G4double zPos[] = {0.};
-
+  auto worldS = new G4Box("World", WorldSizeX/2., WorldSizeY/2., WorldSizeZ/2.);
+  auto worldLV = new G4LogicalVolume(worldS, defaultMaterial, "World");
+  auto worldPV = new G4PVPlacement(0, G4ThreeVector(), worldLV, "World", 0, false, 0, fCheckOverlaps);  
 
   // 10 Bars
   std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
-  // 3 cm thick bars
-  G4double xPos[] = {-13.5, -10.5, -7.5, -4.5, -1.5, 1.5, 4.5, 7.5, 10.5, 13.5};
-
-  // 4 cm thick bars
-  //G4double xPos[] = {-18, -14, -10, -6, -2, 2, 6, 10, 14, 18};
-
-  G4double yPos[] = {0,0,0,0,0,0,0,0,0,0};
-  G4double zPos[] = {0,0,0,0,0,0,0,0,0,0};
-
-  for(int i=0; i<10; i++) {
-        //std::cout << xPos[i] <<"," << yPos[i] << std::endl;
         //std::cout << "name: " << name[i] << std::endl;
+		//G4double xPos = (i+0.5)*scintThickness-double(scintBars)/2*scintThickness;
+		G4double xPos = 0.;
+		G4double yPos = 0.;
+		G4double zPos = 0.;
 
-        BuildScintBar(worldLV, 
-                          xPos[i], 
-                          yPos[i],
-                          name[i],
-                          zPos[i], 
-                          scintThickness,
-                          WorldSizeY,
-                          WorldSizeZ);
-  }
+        BuildScintBar(worldLV, xPos, yPos, name[0], zPos, scintThickness, WorldSizeY, WorldSizeZ);
 
     
   return worldPV;
@@ -202,44 +164,32 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
 void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ) {
 
+  G4double SiPMThickness = 2.*mm;
+  G4double SiPMXYSize = 2.*mm;
   G4double HoleRadius   = 1*mm;
+  G4double HoleY_A = -1.25*cm;
+  G4double HoleY_B = 1.25*cm;
   G4double WLSfiberR    = .9*mm;
-  G4double WLSfiberZ    = (WorldSizeZ-2*mm) /2.;
+  G4double WLSfiberZ    = (WorldSizeZ-SiPMThickness) /2.;
   //G4double WLSfiberZ  = WorldSizeZ/2;
   G4double CoatingThickness = .25*mm;
-  G4double SiPMThickness = 2.*mm;
 
   G4double ScintZSize = WorldSizeZ-(SiPMThickness*2);
   G4double ScintXYSize = scintThickness-CoatingThickness;
 
-
   G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
-
 
   //--------------------------------------------------
   // Extrusion
   //--------------------------------------------------
 
-
-  auto ExtrusionS =
-        new G4Box("Extrusion", scintThickness/2, WorldSizeY/2, ScintZSize/2);
-
-  auto ExtrusionLV =
-        new G4LogicalVolume(ExtrusionS,
-                            FindMaterial("Coating"),
-                            "Extrusion");
-
-
+  auto ExtrusionS = new G4Box("Extrusion", scintThickness/2, WorldSizeY/2, ScintZSize/2);
+  auto ExtrusionLV = new G4LogicalVolume(ExtrusionS, FindMaterial("Coating"), "Extrusion");
 
   G4double fExtrusionReflectivity = 1.;
-  G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface",
-                                                       glisur,
-                                                       ground,
-                                                       dielectric_metal,
-                                                       fExtrusionReflectivity);
+  G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface", glisur, ground, dielectric_metal, fExtrusionReflectivity);
 
-  G4MaterialPropertiesTable* TiO2SurfaceProperty =
-                                             new G4MaterialPropertiesTable();
+  G4MaterialPropertiesTable* TiO2SurfaceProperty = new G4MaterialPropertiesTable();
 
   G4double p_TiO2[] = {2.00*eV, 3.47*eV};
   G4int nbins = sizeof(p_TiO2)/sizeof(G4double);
@@ -254,331 +204,114 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos
 
   TiO2Surface -> SetMaterialPropertiesTable(TiO2SurfaceProperty);
 
-  new G4PVPlacement(0,
-                    G4ThreeVector(xPos*cm, yPos*cm, zPos*cm),
-                    ExtrusionLV,
-                    "Extrusion",
-                    worldLV,
-                    false,
-                    0);
+  new G4PVPlacement(0, G4ThreeVector(xPos, yPos, zPos), ExtrusionLV, "Extrusion", worldLV, false, 0);
 
   new G4LogicalSkinSurface("TiO2Surface",ExtrusionLV,TiO2Surface);
 
   TiO2Surface->DumpInfo();
 
-
-
-
   //--------------------------------------------------
   // Scintillator
   //--------------------------------------------------
-
-
  
-  std::string scintName = "scint_" + name;
+  auto ScintillatorS = new G4Box("Scintillator", (scintThickness-CoatingThickness*2)/2, (WorldSizeY-CoatingThickness*2)/2, (ScintZSize-CoatingThickness*2)/2);
 
-  auto ScintillatorS 
-    = new G4Box("Scintillator", (scintThickness-CoatingThickness*2)/2, (WorldSizeY-CoatingThickness*2)/2, (ScintZSize-CoatingThickness*2)/2);
-
-  auto ScintillatorLV 
-    = new G4LogicalVolume(
-                 ScintillatorS,
-                 FindMaterial("Polystyrene"),
-                 scintName);
-
-  auto ScintillatorPV 
-    = new G4PVPlacement(
-                 0,
-                 G4ThreeVector(0, 0, 0),
-                 ScintillatorLV,
-                 scintName,
-                 ExtrusionLV,
-                 false,
-                 0);
-
-
-
- std::cout << "Built scintillator " << scintName << std::endl;
-
-
-/***
-  //----------------------------------------------
-  // Hole 
-  // ---------------------------------------------
-
-  std::string hole_name = "hole" + name;
-
-  auto HoleS 
-    = new G4Tubs("Hole",
-                 0.,
-                 HoleRadius,
-                 (ScintZSize-CoatingThickness*2)/2,
-                 0.*deg,
-                 360.*deg);
-
-  auto HoleLV 
-    = new G4LogicalVolume(
-                 HoleS,
-                 FindMaterial("G4_AIR"),
-                 hole_name);
-
-  auto holePV = new G4PVPlacement(0,
-                    G4ThreeVector(0., 0., 0.),
-                    HoleLV,
-                    "Hole",
-                    ScintillatorLV,
-                    false,
-                    0);
-
-***/
-
-
+  auto ScintillatorLV = new G4LogicalVolume(ScintillatorS, FindMaterial("Polystyrene"), "ScintillatorLV");
+  auto ScintillatorPV = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ScintillatorLV, "Scintillator", ExtrusionLV, false, 0);
 
 //-----------------------------
-// Hole A
+// Holes 
 // -----------------------------
 
+  auto HoleS = new G4Tubs("Hole", 0., HoleRadius, (ScintZSize-CoatingThickness*2)/2, 0.*deg, 360.*deg);
+  
+  auto HoleLV_A = new G4LogicalVolume(HoleS, FindMaterial("G4_AIR"), "HoleALV");
+  auto HolePV_A = new G4PVPlacement(0, G4ThreeVector(0., HoleY_A, 0.), HoleLV_A, "Hole", ScintillatorLV, false, 0);
 
-  std::string hole_name = "holeA_" + name;
-
-  auto HoleS
-    = new G4Tubs("Hole",
-                 0.,
-                 HoleRadius,
-                 (ScintZSize-CoatingThickness*2)/2,
-                 0.*deg,
-                 360.*deg);
-
-  auto HoleLV_A
-    = new G4LogicalVolume(
-                 HoleS,
-                 FindMaterial("G4_AIR"),
-                 hole_name);
-
-  auto HolePV_A = new G4PVPlacement(0,
-                    G4ThreeVector(0., -1.25*cm, 0.),
-                    HoleLV_A,
-                    "Hole",
-                    ScintillatorLV,
-                    false,
-                    0);
-
-
-//-----------------------------
-// Hole B
-// -----------------------------
-
-
-  hole_name = "holeB_" + name;
-
- /*** auto HoleS
-    = new G4Tubs("Hole",
-                 0.,
-                 HoleRadius,
-                 (ScintZSize-CoatingThickness*2)/2,
-                 0.*deg,
-                 360.*deg);
-***/
-
-  auto HoleLV_B
-    = new G4LogicalVolume(
-                 HoleS,
-                 FindMaterial("G4_AIR"),
-                 hole_name);
-
-  auto HolePV_B = new G4PVPlacement(0,
-                    G4ThreeVector(0., 1.25*cm, 0.),
-                    HoleLV_B,
-                    "Hole",
-                    ScintillatorLV,
-                    false,
-                    0);
-
-
-
-
-
-
+  auto HoleLV_B = new G4LogicalVolume(HoleS, FindMaterial("G4_AIR"), "HoleBLV");
+  auto HolePV_B = new G4PVPlacement(0, G4ThreeVector(0., HoleY_B, 0.), HoleLV_B, "Hole", ScintillatorLV, false, 1);
 
   //--------------------------------------------------
-  // Cladding A
+  // Cladding
   //--------------------------------------------------
 
-  auto cladS
-    = new G4Tubs("Clad1",
-                 WLSfiberR,
-                 WLSfiberR + (0.042*mm/2),  // radius
-                 (ScintZSize-CoatingThickness*2)/2,   // length
-                 0.0*deg,
-                 360*deg);
+  auto cladS = new G4Tubs("Clad1", WLSfiberR, WLSfiberR + (0.042*mm/2), (ScintZSize-CoatingThickness*2)/2, 0.0*deg, 360*deg);
 
-  auto cladLV_A
-    = new G4LogicalVolume(cladS,
-                          FindMaterial("Pethylene"),
-                          "clad");
+  auto cladLV_A = new G4LogicalVolume(cladS, FindMaterial("Pethylene"), "clad");
+  auto cladPV_A = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), cladLV_A, "clad", HoleLV_A, false, 0);
 
-  auto cladPV_A 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        cladLV_A,
-                        "clad",
-                        HoleLV_A,
-                        false,
-                        0);
-
+  auto cladLV_B = new G4LogicalVolume(cladS, FindMaterial("Pethylene"), "clad");
+  auto cladPV_B = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), cladLV_B, "clad", HoleLV_B, false, 1);
 
   //--------------------------------------------------
-  // Cladding B
+  // WLS Fibers
   //--------------------------------------------------
 
-  auto cladLV_B
-    = new G4LogicalVolume(cladS,
-                          FindMaterial("Pethylene"),
-                          "clad");
+  auto FiberS = new G4Tubs("WLSFiber", 0., WLSfiberR, (ScintZSize-CoatingThickness*2)/2, 0.*deg, 360.*deg);
 
-  auto cladPV_B 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        cladLV_B,
-                        "clad",
-                        HoleLV_B,
-                        false,
-                        0);
+  auto FiberLV_A = new G4LogicalVolume(FiberS, FindMaterial("PMMA"), "FiberALV");
+  auto FiberPV_A = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), FiberLV_A, "WLSFiber", cladLV_A, false, 0);
 
-
-
+  auto FiberLV_B = new G4LogicalVolume(FiberS, FindMaterial("PMMA"), "FiberBLV");
+  auto FiberPV_B = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.), FiberLV_B, "WLSFiber", cladLV_B, false, 1);
 
   //--------------------------------------------------
-  // WLS Fiber A
+  // PhotonDet (Sensitive Detector)
   //--------------------------------------------------
-  std::string fiberName = "fiberA_" + name;
 
+  // Physical Construction
+  auto SiPMS = new G4Box("SiPM", SiPMXYSize/2., SiPMXYSize/2., SiPMThickness/2.);
+  
+  auto SiPMLV_A0 = new G4LogicalVolume(SiPMS, FindMaterial("G4_Si"), "SiPMA0LV");
+  auto SiPMPV_A0 = new G4PVPlacement(0, G4ThreeVector(0., HoleY_A, (ScintZSize+SiPMThickness-CoatingThickness*2)/2), SiPMLV_A0, "SiPM", ExtrusionLV, false, 0);
+  auto SiPMLV_A1 = new G4LogicalVolume(SiPMS, FindMaterial("G4_Si"), "SiPMA1LV");
+  auto SiPMPV_A1 = new G4PVPlacement(0, G4ThreeVector(0., HoleY_A, -(ScintZSize+SiPMThickness-CoatingThickness*2)/2), SiPMLV_A1, "SiPM", ExtrusionLV, false, 1);
+  
+  auto SiPMLV_B0 = new G4LogicalVolume(SiPMS, FindMaterial("G4_Si"), "SiPMB0LV");
+  auto SiPMPV_B0 = new G4PVPlacement(0, G4ThreeVector(0., -HoleY_A, (ScintZSize+SiPMThickness-CoatingThickness*2)/2), SiPMLV_B0, "SiPM", ExtrusionLV, false, 2);
+  auto SiPMLV_B1 = new G4LogicalVolume(SiPMS, FindMaterial("G4_Si"), "SiPMB1LV");
+  auto SiPMPV_B1 = new G4PVPlacement(0, G4ThreeVector(0., -HoleY_A, -(ScintZSize+SiPMThickness-CoatingThickness*2)/2), SiPMLV_B1, "SiPM", ExtrusionLV, false, 3);
 
-  auto FiberS 
-    = new G4Tubs("WLSFiber",
-                  0.,
-                  WLSfiberR,
-                  (ScintZSize-CoatingThickness*2)/2,
-                  0.*deg,
-                  360.*deg);
+  // SiPM Surface Properties
+  G4OpticalSurface* SiPMSurface = new G4OpticalSurface("SiPMSurface", glisur, ground, dielectric_dielectric, polished);
 
-  auto FiberLV_A 
-    = new G4LogicalVolume(FiberS,
-                          FindMaterial("PMMA"),
-                          fiberName);
+  G4MaterialPropertiesTable* SiPMSurfaceProperty = new G4MaterialPropertiesTable();
 
-  //FiberLV->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,10*ms));
-                                 
-  auto FiberPV_A 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        FiberLV_A,
-                        "WLSFiber",
-                        cladLV_A,
-                        false,
-                        0);
+  std::vector<G4double> p_Si    = { 2.00 * eV, 3.47 * eV };
+  std::vector<G4double> refl_Si = { 0., 0. };
+  std::vector<G4double> effi_Si = { 1., 1. };
 
+  SiPMSurfaceProperty->AddProperty("REFLECTIVITY", p_Si, refl_Si);
+  SiPMSurfaceProperty->AddProperty("EFFICIENCY", p_Si, effi_Si);
 
+  SiPMSurface->SetMaterialPropertiesTable(SiPMSurfaceProperty);
 
-  //--------------------------------------------------
-  // WLS Fiber B
-  //--------------------------------------------------
-  fiberName = "fiberB_" + name;
-
-
-  auto FiberLV_B 
-    = new G4LogicalVolume(FiberS,
-                          FindMaterial("PMMA"),
-                          fiberName);
-
-  //FiberLV->SetUserLimits(new G4UserLimits(DBL_MAX,DBL_MAX,10*ms));
-                                 
-  auto FiberPV_B 
-    = new G4PVPlacement(0,
-                        G4ThreeVector(0.,0.,0.),
-                        FiberLV_B,
-                        "WLSFiber",
-                        cladLV_B,
-                        false,
-                        0);
-
-
-
-
-
-
-
+  auto SiPMSurf_A0 = new G4LogicalBorderSurface("SiPMSurface", FiberPV_A, SiPMPV_A0, SiPMSurface);
+  auto SiPMSurf_A1 = new G4LogicalBorderSurface("SiPMSurface", FiberPV_A, SiPMPV_A1, SiPMSurface);
+  auto SiPMSurf_B0 = new G4LogicalBorderSurface("SiPMSurface", FiberPV_B, SiPMPV_B0, SiPMSurface);
+  auto SiPMSurf_B1 = new G4LogicalBorderSurface("SiPMSurface", FiberPV_B, SiPMPV_B1, SiPMSurface);
 
 
 }
 
 
-
-
 void DetectorConstruction::ConstructSDandField()
 {
-  G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
+	G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
 
-  std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
-
-  //auto scintName = "scint_A" ;
+	std::string name[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
 
-  for(int i=0; i<10; i++) {
-    
- 
-    // declare scint as Primitive Scoreer
-    auto scintName = "scint_" + name[i];
-
-    auto scintDetector = new G4MultiFunctionalDetector(scintName);
-    G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
-
-    G4VPrimitiveScorer* primitive = new G4PSPopulation("Pop");
-
-    G4String fltName, particleName;
-    G4SDParticleFilter* photonFilter =
-        new G4SDParticleFilter(fltName="optPhoton", particleName="opticalphoton");
-    primitive->SetFilter(photonFilter);
-    scintDetector->RegisterPrimitive(primitive);
-
-    SetSensitiveDetector(scintName, scintDetector);
-    G4cout << "set sensitive detector " << scintName << " done." << G4endl;
-
-
-
-
-    // declare fiberA as Primitive Scorer
-    auto fiberName = "fiberA_" + name[i];
-
-    auto fiberDetector = new G4MultiFunctionalDetector(fiberName);
-    G4SDManager::GetSDMpointer()->AddNewDetector(fiberDetector);
-
-    primitive = new G4PSPopulation("Pop");
-
-    primitive->SetFilter(photonFilter);
-    fiberDetector->RegisterPrimitive(primitive);
-
-    SetSensitiveDetector(fiberName, fiberDetector);
-    G4cout << "set sensitive detector " << fiberName << " done." << G4endl;
-
-
-    // declare fiberB as Primitive Scorer
-    fiberName = "fiberB_" + name[i];
-
-    fiberDetector = new G4MultiFunctionalDetector(fiberName);
-    G4SDManager::GetSDMpointer()->AddNewDetector(fiberDetector);
-
-    primitive = new G4PSPopulation("Pop");
-
-    primitive->SetFilter(photonFilter);
-    fiberDetector->RegisterPrimitive(primitive);
-
-    SetSensitiveDetector(fiberName, fiberDetector);
-    G4cout << "set sensitive detector " << fiberName << " done." << G4endl;
-
-
-
-  }
+	// declare scint as detector
+	auto scintDetector = new GenericSD("ScintDet");
+	G4SDManager::GetSDMpointer()->AddNewDetector(scintDetector);
+	SetSensitiveDetector("ScintillatorLV", scintDetector);
+	SetSensitiveDetector("FiberALV", scintDetector);
+	SetSensitiveDetector("FiberBLV", scintDetector);
+	SetSensitiveDetector("SiPMA0LV", scintDetector);
+	SetSensitiveDetector("SiPMA1LV", scintDetector);
+	SetSensitiveDetector("SiPMB0LV", scintDetector);
+	SetSensitiveDetector("SiPMB1LV", scintDetector);
 
 }
 

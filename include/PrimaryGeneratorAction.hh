@@ -33,11 +33,12 @@
 
 class G4ParticleGun;
 class G4Event;
+class HistoManager;
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
-  PrimaryGeneratorAction();    
+  PrimaryGeneratorAction(HistoManager *histo);    
   virtual ~PrimaryGeneratorAction();
 
   virtual void GeneratePrimaries(G4Event* event);
@@ -47,6 +48,7 @@ public:
 
 private:
   G4ParticleGun*  fParticleGun; 
+  HistoManager* fHistoManager;
 };
 
 //....

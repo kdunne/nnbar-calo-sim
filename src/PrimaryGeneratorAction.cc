@@ -26,6 +26,7 @@
 // 
 
 #include "PrimaryGeneratorAction.hh"
+#include "HistoManager.hh"
 
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -38,10 +39,14 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
+#include "G4Threading.hh"
+#include "G4AutoLock.hh"
+
+namespace {G4Mutex PrimaryGeneratorMutex = G4MUTEX_INITIALIZER;}
 //.....
 
-PrimaryGeneratorAction::PrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(),
+PrimaryGeneratorAction::PrimaryGeneratorAction(HistoManager *histo)
+ : G4VUserPrimaryGeneratorAction(),fHistoManager(histo),
    fParticleGun(nullptr)
 {
   G4int nofParticles = 1;
@@ -69,22 +74,29 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
-  //G4double worldZHalfLength = 42.*cm / 2.; // 35
-  //G4double worldZHalfLength = 37.*cm / 2.; // 30
-  //G4double worldZHalfLength = 32.*cm / 2.; // 25
-  //G4double worldZHalfLength = 29.*cm/2;    // 22
-//  G4double worldZHalfLength = 27.*cm/2.;   // 20
-  //G4double worldZHalfLength = 25.*cm/2;      // 18
-  //G4double worldZHalfLength = 22.*cm/2.;   // 15
-  //G4double worldZHalfLength = 17.*cm/2.;   // 10
-  //G4cout << "Gun at position " << (worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
-  //G4double worldZHalfLength = 27.5*cm;
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
+	auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
+	G4AutoLock lock(&PrimaryGeneratorMutex);
+	// Set gun position
+	fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
 
-  // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
+	fParticleGun->GeneratePrimaryVertex(anEvent);
 
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+	// write particle properties to file
+	fHistoManager->ClearPVectors();
+	G4int evno = anEvent->GetEventID();
+	G4int pid = fParticleGun->GetParticleDefinition()->GetPDGEncoding();
+	G4double mass = fParticleGun->GetParticleDefinition()->GetPDGMass();
+	G4double charge = fParticleGun->GetParticleDefinition()->GetPDGCharge();
+	G4double ke = fParticleGun->GetParticleEnergy();
+	G4double x = fParticleGun->GetParticlePosition().getX();
+	G4double y = fParticleGun->GetParticlePosition().getY();
+	G4double z = fParticleGun->GetParticlePosition().getZ();
+	G4double t = 0.;
+	G4double px = fParticleGun->GetParticleMomentumDirection().getX();
+	G4double py = fParticleGun->GetParticleMomentumDirection().getY();
+	G4double pz = fParticleGun->GetParticleMomentumDirection().getZ();
+	fHistoManager->FillPVectors(evno,pid,mass,charge,ke,x,y,z,t,px,py,pz);
+	
 }
 
 //....

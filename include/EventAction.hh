@@ -33,32 +33,27 @@
 #include "G4THitsMap.hh"
 #include "globals.hh"
 
+class HistoManager;
+
 class EventAction : public G4UserEventAction
 {
 public:
-  EventAction();
+  EventAction(HistoManager* histo);
   virtual ~EventAction();
 
   virtual void  BeginOfEventAction(const G4Event* event);
   virtual void    EndOfEventAction(const G4Event* event);
     
 private:
+  HistoManager* fHistoManager;
   // methods
-  G4THitsMap<G4double>* GetHitsCollection(G4int hcID,
-                                          const G4Event* event) const;
+  G4THitsMap<G4double>* GetHitsCollection(G4int hcID,const G4Event* event) const;
   G4double GetSum(G4THitsMap<G4double>* hitsMap) const;
   void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
                             G4double gapEdep, G4double scintTrackLength) const; //, G4double gapTrackLength) const;
   
   // data members                   
-  G4int  fAbsoEdepHCID;
-  G4int  fGapEdepHCID;
-  G4int  fAbsoTrackLengthHCID;
-  G4int  fCerenkovHCID;
-  G4int  fScintTrackLengthHCID;
   G4int  scintHitsCollectionID;
-  G4int  absHitsCollectionID;
-  G4int  tubeHitsCollectionID;
 };
                      
 //....

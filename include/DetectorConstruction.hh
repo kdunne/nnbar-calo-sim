@@ -28,7 +28,6 @@
 #ifndef DetectorConstruction_h
 #define DetectorConstruction_h 1
 
-#include "AbsorberSD.hh"
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 

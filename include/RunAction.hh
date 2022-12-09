@@ -31,17 +31,22 @@
 #include "G4UserRunAction.hh"
 #include "globals.hh"
 
-class G4Run;
+class NNbarRun;
+class HistoManager;
 
 
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction();
+    RunAction(HistoManager* histo);
     virtual ~RunAction();
 
+	G4Run* GenerateRun();
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
+  private:
+	HistoManager* fHistoManager;
+	NNbarRun* fRun;
 };
 
 //....

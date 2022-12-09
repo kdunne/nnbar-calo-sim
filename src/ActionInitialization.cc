@@ -30,6 +30,7 @@
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "SteppingAction.hh"
+#include "HistoManager.hh"
 
 //....
 
@@ -46,22 +47,25 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new RunAction);
+	HistoManager *histo = new HistoManager();
+  	SetUserAction(new RunAction(histo));
 }
 
 //....
 
 void ActionInitialization::Build() const
 {
-  SetUserAction(new PrimaryGeneratorAction);
-  
-  SetUserAction(new RunAction);
-  
-  EventAction* eventAction = new EventAction();
-  SetUserAction(eventAction);
-  
-  SetUserAction(new SteppingAction());
-  
+	HistoManager *histo = new HistoManager();
+	SetUserAction(new PrimaryGeneratorAction(histo));
+
+	RunAction* runAction = new RunAction(histo);
+	SetUserAction(runAction);
+
+	EventAction* eventAction = new EventAction(histo);
+	SetUserAction(eventAction);
+
+	SetUserAction(new SteppingAction());
+
 }  
 
 //....

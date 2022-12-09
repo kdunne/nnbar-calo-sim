@@ -111,6 +111,12 @@ void WLSMaterials::CreateMaterials()
   //--------------------------------------------------
 
   fAir = fNistMan->FindOrBuildMaterial("G4_AIR");
+ 
+  //--------------------------------------------------
+  // Si
+  //--------------------------------------------------
+ 
+  fSi = fNistMan->FindOrBuildMaterial("G4_Si");
 
   //--------------------------------------------------
   // WLSfiber PMMA
@@ -265,6 +271,33 @@ void WLSMaterials::CreateMaterials()
 
   fAir->SetMaterialPropertiesTable(mpt);
 
+
+  //--------------------------------------------------
+  // Si
+  //--------------------------------------------------
+
+  G4double refractiveIndexSi[] =
+  { 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88,
+    3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88,
+    3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88,
+    3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88,
+    3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88};
+
+  G4double absLengthSi[] =
+  { 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
+    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
+    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
+    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
+    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9};
+
+  assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
+
+  G4MaterialPropertiesTable* mptSi = new G4MaterialPropertiesTable();
+  mptSi->AddProperty("RINDEX", photonEnergy, refractiveIndexSi, nEntries);
+  mptSi->AddProperty("ABSLENGTH", photonEnergy, absLengthSi, nEntries);
+
+  fSi->SetMaterialPropertiesTable(mptSi);
+
   //--------------------------------------------------
   //  PMMA for WLSfibers
   //--------------------------------------------------
@@ -414,7 +447,7 @@ void WLSMaterials::CreateMaterials()
 
 // 68% anthracene - 17400/MeV : 11832/MeV
   //mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1/MeV);
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1183/MeV);
 
 //  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);
