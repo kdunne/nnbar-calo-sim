@@ -27,6 +27,7 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 #include "Analysis.hh"
+#include "PhysicsList.hh"
 
 #include "G4Types.hh"
 #include "G4OpticalPhysics.hh"
@@ -109,12 +110,11 @@ int main(int argc, char** argv)
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
-  G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
-  physicsList->RegisterPhysics(opticalPhysics);
+   
+  G4VModularPhysicsList* physicsList = new PhysicsList();
+  //G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(30.0*eV, 10.0*TeV);
   runManager->SetUserInitialization(physicsList);
-  G4OpticalParameters::Instance()->Dump();
+
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
   

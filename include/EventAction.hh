@@ -53,6 +53,7 @@ private:
                             G4double gapEdep, G4double scintTrackLength) const; //, G4double gapTrackLength) const;
   
   // data members                   
+  G4int  genHitsCollectionID;
   G4int  scintHitsCollectionID;
 };
                      

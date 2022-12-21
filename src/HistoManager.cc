@@ -118,6 +118,10 @@ void HistoManager::Book()
 		analysisManager->CreateNtupleIColumn("sipm_parentid", sipm_parentid);
 		analysisManager->CreateNtupleIColumn("sipm_no", sipm_no);
 		analysisManager->CreateNtupleDColumn("sipm_t", sipm_t);
+		analysisManager->CreateNtupleDColumn("sipm_ke", sipm_ke);
+		analysisManager->CreateNtupleDColumn("sipm_x", sipm_x);
+		analysisManager->CreateNtupleDColumn("sipm_y", sipm_y);
+		analysisManager->CreateNtupleDColumn("sipm_z", sipm_z);
 
 		analysisManager->FinishNtuple();  
 		fFactoryOn = true;
@@ -194,6 +198,10 @@ void HistoManager::ClearEventVectors()
 	sipm_parentid.clear();
 	sipm_no.clear();
 	sipm_t.clear();
+	sipm_ke.clear();
+	sipm_x.clear();
+	sipm_y.clear();
+	sipm_z.clear();
 
 }
 
@@ -263,13 +271,18 @@ void HistoManager::FillFiberVectors(G4int evtno, G4int trackid, G4int parentid,
 
 
 void HistoManager::FillSiPMVectors(G4int evtno, G4int trackid, G4int parentid,
-		G4int no, G4double t)
+		G4int no, G4double t, G4double ke,
+		G4double x, G4double y, G4double z)
 {
 	sipm_evtno.push_back(evtno);
 	sipm_trackid.push_back(trackid);
 	sipm_parentid.push_back(parentid);
 	sipm_no.push_back(no);
 	sipm_t.push_back(t);
+	sipm_ke.push_back(ke);
+	sipm_x.push_back(x);
+	sipm_y.push_back(y);
+	sipm_z.push_back(z);
 }
 
 

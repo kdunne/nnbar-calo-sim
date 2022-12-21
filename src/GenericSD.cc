@@ -62,6 +62,7 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	G4ThreeVector pos = PreStep->GetPosition(); // Get pre-step position
 	G4ThreeVector vertex = theTrack->GetVertexPosition(); // Get Vertex position
 	G4double vertex_KE = theTrack->GetVertexKineticEnergy(); // Get Vertex Kinetic Energy
+	G4ThreeVector mom = PreStep->GetMomentum(); // Get pre-step position
 
 	// Read voxel indexes: i is the x index, k is the z index
 	const G4VTouchable* touchable = PreStep->GetTouchable();
@@ -96,8 +97,10 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 		parentID = 0;
 	}
 
-	if(proc=="Decay") {
-		G4cout << "Killing particle " << particleName << G4endl;
+	//G4cout << proc  << G4endl;
+	//G4cout << pos.getX() << " " << pos.getY() << " " << pos.getZ() << G4endl;
+	//G4cout << mom.getX() << " " << mom.getY() << " " << mom.getZ() << G4endl;
+	if(proc=="OpWLS"&&detname=="Scintillator") { // kill photons that escaped the fiber
 		theTrack->SetTrackStatus(fKillTrackAndSecondaries);
 	}
 	

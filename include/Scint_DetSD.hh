@@ -23,34 +23,36 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
 
-#ifndef PrimaryGeneratorAction_h
-#define PrimaryGeneratorAction_h 1
+#ifndef Scint_DetSD_h
+#define Scint_DetSD_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4VSensitiveDetector.hh"
 #include "globals.hh"
 
-class G4GeneralParticleSource;
-class G4Event;
-class HistoManager;
+#include "NNbarHit.hh"
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
+class Scint_DetSD : public G4VSensitiveDetector
 {
 public:
-  PrimaryGeneratorAction(HistoManager *histo);    
-  virtual ~PrimaryGeneratorAction();
-
-  virtual void GeneratePrimaries(G4Event* event);
-  
-  // set methods
-  void SetRandomFlag(G4bool value);
-
+    Scint_DetSD(G4String name);
+    ~Scint_DetSD();
+    
+    
+    std::ofstream ofs;
+    void Initialize(G4HCofThisEvent*);
+    
+    G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
+    
+    void EndOfEvent(G4HCofThisEvent*HCE);
+    
 private:
-  G4GeneralParticleSource*  fParticleGun; 
-  HistoManager* fHistoManager;
+    NNbarHitsCollection *HitsCollection;
+    G4String sensitiveDetectorName;
 };
-
-//....
-
 #endif
+
+

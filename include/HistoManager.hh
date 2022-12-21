@@ -63,7 +63,8 @@ class HistoManager
 			G4double part_x, G4double part_y, G4double part_z);
 	
 	void FillSiPMVectors(G4int evtno, G4int trackid, G4int parentid, 
-			G4int no, G4double t);
+			G4int no, G4double t, G4double ke,
+			G4double x, G4double y, G4double z);
 	
 	void ClearPVectors();
     void ClearEventVectors();
@@ -120,6 +121,10 @@ class HistoManager
 	std::vector<G4int> sipm_parentid;
 	std::vector<G4int> sipm_no;
 	std::vector<G4double> sipm_t;
+	std::vector<G4double> sipm_ke;
+	std::vector<G4double> sipm_x;
+	std::vector<G4double> sipm_y;
+	std::vector<G4double> sipm_z;
   
 };
 

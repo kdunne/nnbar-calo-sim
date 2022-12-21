@@ -33,6 +33,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"
 #include "G4Event.hh"
+#include "G4GeneralParticleSource.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
@@ -49,17 +50,19 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(HistoManager *histo)
  : G4VUserPrimaryGeneratorAction(),fHistoManager(histo),
    fParticleGun(nullptr)
 {
-  G4int nofParticles = 1;
-  fParticleGun = new G4ParticleGun(nofParticles);
+    fParticleGun = new G4GeneralParticleSource();
 
-  // default particle kinematic
-  // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
-  auto particleDefinition 
-    = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
-  fParticleGun->SetParticleDefinition(particleDefinition);
-//  fParticleGun->SetParticlePosition(G4ThreeVector(15.,0.,0.));
-//  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1.,0.,0.));
-  fParticleGun->SetParticleEnergy(200*MeV);
+// G4int nofParticles = 1;
+ // fParticleGun = new G4ParticleGun(nofParticles);
+
+ // // default particle kinematic
+ // // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
+ // auto particleDefinition 
+ //   = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
+ // fParticleGun->SetParticleDefinition(particleDefinition);
+////  fParticleGun->SetParticlePosition(G4ThreeVector(15.,0.,0.));
+////  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1.,0.,0.));
+ // fParticleGun->SetParticleEnergy(200*MeV);
 }
 
 //....
@@ -77,7 +80,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 	G4AutoLock lock(&PrimaryGeneratorMutex);
 	// Set gun position
-	fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
+	//fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
 
 	fParticleGun->GeneratePrimaryVertex(anEvent);
 

@@ -1,35 +1,4 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-/// \file optical/wls/src/WLSMaterials.cc
-/// \brief Implementation of the WLSMaterials class
-//
-//
 #include "WLSMaterials.hh"
-
 #include "G4SystemOfUnits.hh"
 
 WLSMaterials* WLSMaterials::fInstance = 0;
@@ -39,9 +8,7 @@ WLSMaterials* WLSMaterials::fInstance = 0;
 WLSMaterials::WLSMaterials()
 {
   fNistMan = G4NistManager::Instance();
-
   fNistMan->SetVerbose(2);
-
   CreateMaterials();
 }
 
@@ -255,19 +222,11 @@ void WLSMaterials::CreateMaterials()
     1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
     1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
     1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00};
-
-  G4double absLength[] =
-  { 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
-    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
-    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
-    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00,
-    1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00, 1000.00};
-
+  
   assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
 
   G4MaterialPropertiesTable* mpt = new G4MaterialPropertiesTable();
   mpt->AddProperty("RINDEX", photonEnergy, refractiveIndex, nEntries);
-  mpt->AddProperty("ABSLENGTH", photonEnergy, absLength, nEntries);
 
   fAir->SetMaterialPropertiesTable(mpt);
 
@@ -284,11 +243,11 @@ void WLSMaterials::CreateMaterials()
     3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88, 3.88};
 
   G4double absLengthSi[] =
-  { 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
-    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
-    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
-    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9,
-    1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9, 1.e-9};
+  { 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm,
+    0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm,
+    0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm,
+    0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm,
+    0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm, 0.01*mm};
 
   assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
 
@@ -302,40 +261,19 @@ void WLSMaterials::CreateMaterials()
   //  PMMA for WLSfibers
   //--------------------------------------------------
 
-  G4double refractiveIndexWLSfiber[] =
-  { 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
-    1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
-    1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
-    1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
-    1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60};
-
-  assert(sizeof(refractiveIndexWLSfiber) == sizeof(photonEnergy));
-
-  G4double absWLSfiber[] =
-  {5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,
-   5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,
-   5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,5.40*m,1.10*m,
-   1.10*m,1.10*m,1.10*m,1.10*m,1.10*m,1.10*m, 1.*mm, 1.*mm, 1.*mm, 1.*mm,
-    1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm, 1.*mm};
-
-  assert(sizeof(absWLSfiber) == sizeof(photonEnergy));
-
-  G4double emissionFib[] =
-  {0.05, 0.10, 0.30, 0.50, 0.75, 1.00, 1.50, 1.85, 2.30, 2.75,
-   3.25, 3.80, 4.50, 5.20, 6.00, 7.00, 8.50, 9.50, 11.1, 12.4,
-   12.9, 13.0, 12.8, 12.3, 11.1, 11.0, 12.0, 11.0, 17.0, 16.9,
-   15.0, 9.00, 2.50, 1.00, 0.05, 0.00, 0.00, 0.00, 0.00, 0.00,
-   0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00};
-
-  assert(sizeof(emissionFib) == sizeof(photonEnergy));
-
+  std::vector<G4double> wls_Energy = {2.00*eV, 2.16*eV, 2.25*eV, 2.36*eV, 2.43*eV, 2.48*eV, 2.53*eV, 2.61*eV, 2.76*eV, 2.92*eV, 3.1*eV, 3.5*eV};
+  std::vector<G4double> refractiveIndexWLSfiber =  { 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59};
+  std::vector<G4double> absFiber = {  3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m, 3.0*m };
+  std::vector<G4double> WLSabsFiber = { 10.0*m, 10.0*m, 10.0*m, 10.0*m, 10.0*m, 2.0*mm, 0.1*mm, 0.1*mm, 0.1*mm, 1.0*mm, 5.0*mm, 10.0*m };
+  std::vector<G4double> emissionFib = { 0.0, 0.3, 0.6, 0.7, 1., 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  
   // Add entries into properties table
   G4MaterialPropertiesTable* mptWLSfiber = new G4MaterialPropertiesTable();
-  mptWLSfiber->AddProperty("RINDEX",photonEnergy,refractiveIndexWLSfiber,nEntries);
-  mptWLSfiber->AddProperty("ABSLENGTH",photonEnergy,absLength,nEntries);
-  mptWLSfiber->AddProperty("WLSABSLENGTH",photonEnergy,absWLSfiber,nEntries);
-  mptWLSfiber->AddProperty("WLSCOMPONENT",photonEnergy,emissionFib,nEntries);
-  mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 0.5*ns);
+  mptWLSfiber->AddProperty("RINDEX",wls_Energy,refractiveIndexWLSfiber);
+  mptWLSfiber->AddProperty("ABSLENGTH",wls_Energy,absFiber);
+  mptWLSfiber->AddProperty("WLSABSLENGTH",wls_Energy,WLSabsFiber);
+  mptWLSfiber->AddProperty("WLSCOMPONENT",wls_Energy,emissionFib);
+  mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 2.5*ns);
 
   fPMMA->SetMaterialPropertiesTable(mptWLSfiber);
 
@@ -343,28 +281,14 @@ void WLSMaterials::CreateMaterials()
   //  Polyethylene
   //--------------------------------------------------
 
-  G4double refractiveIndexClad1[] =
-  { 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
-    1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
-    1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
-    1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
-    1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49};
-
-  assert(sizeof(refractiveIndexClad1) == sizeof(photonEnergy));
-
-  G4double absClad[] =
-  {20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,
-   20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,
-   20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,
-   20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,
-   20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m,20.0*m};
-
-  assert(sizeof(absClad) == sizeof(photonEnergy));
+  std::vector<G4double> wls_Energy_short = {2.00*eV, 3.5*eV};
+  std::vector<G4double> refractiveIndexClad1 = { 1.49, 1.49,};
+  std::vector<G4double> absClad = {20.0*m,20.0*m};
 
   // Add entries into properties table
   G4MaterialPropertiesTable* mptClad1 = new G4MaterialPropertiesTable();
-  mptClad1->AddProperty("RINDEX",photonEnergy,refractiveIndexClad1,nEntries);
-  mptClad1->AddProperty("ABSLENGTH",photonEnergy,absClad,nEntries);
+  mptClad1->AddProperty("RINDEX",wls_Energy_short,refractiveIndexClad1);
+  mptClad1->AddProperty("ABSLENGTH",wls_Energy_short,absClad);
 
   fPethylene->SetMaterialPropertiesTable(mptClad1);
 
@@ -372,91 +296,40 @@ void WLSMaterials::CreateMaterials()
   // Fluorinated Polyethylene
   //--------------------------------------------------
 
-   G4double refractiveIndexClad2[] =
-   { 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
-     1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
-     1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
-     1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
-     1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42};
-
-   assert(sizeof(refractiveIndexClad2) == sizeof(photonEnergy));
+  std::vector<G4double> refractiveIndexClad2 = { 1.42, 1.42};
 
   // Add entries into properties table
   G4MaterialPropertiesTable* mptClad2 = new G4MaterialPropertiesTable();
-  mptClad2->AddProperty("RINDEX",photonEnergy,refractiveIndexClad2,nEntries);
-  mptClad2->AddProperty("ABSLENGTH",photonEnergy,absClad,nEntries);
+  mptClad2->AddProperty("RINDEX",wls_Energy_short,refractiveIndexClad2);
+  mptClad2->AddProperty("ABSLENGTH",wls_Energy_short,absClad);
 
   fFPethylene->SetMaterialPropertiesTable(mptClad2);
-
-  //--------------------------------------------------
-  // Silicone
-  //--------------------------------------------------
-
-   G4double refractiveIndexSilicone[] =
-   { 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46,
-     1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46,
-     1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46,
-     1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46,
-     1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46, 1.46};
-
-   assert(sizeof(refractiveIndexSilicone) == sizeof(photonEnergy));
-
-  // Add entries into properties table
-  G4MaterialPropertiesTable* mptSilicone = new G4MaterialPropertiesTable();
-  mptSilicone->AddProperty("RINDEX",photonEnergy,refractiveIndexSilicone,nEntries);
-  mptSilicone->AddProperty("ABSLENGTH",photonEnergy,absClad,nEntries);
-
-  fSilicone->SetMaterialPropertiesTable(mptSilicone);
 
   //--------------------------------------------------
   //  Polystyrene
   //--------------------------------------------------
 
-  G4double refractiveIndexPS[] =
-  { 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50,
-    1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50,
-    1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50,
-    1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50,
-    1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50, 1.50};
+  std::vector<G4double> ScintPhotonEnergy =  { 2.08*eV, 2.38*eV, 2.58*eV, 2.7*eV, 2.76*eV, 2.82*eV, 2.92*eV, 2.95*eV, 3.02*eV, 3.1*eV, 3.26*eV, 3.44*eV};
+  std::vector<G4double> rindex_scint = {1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58};
+  std::vector<G4double> atten_scint = {210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm, 210.*cm};
+  std::vector<G4double> scintilFast = {.04, .07, .20, .49, .84, 1.0, .83, .55, .40, .17,.03, 0.};
+  std::vector<G4double> scintilSlow = {.04, .07, .20, .49, .84, 1.0, .83, .55, .40, .17,.03, 0.};
 
-  assert(sizeof(refractiveIndexPS) == sizeof(photonEnergy));
-
-  G4double absPS[] =
-  {2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,
-   2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,
-   2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,
-   2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,
-   2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm,2.*cm};
-
-  assert(sizeof(absPS) == sizeof(photonEnergy));
-
-  G4double scintilFast[] =
-  {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-
-  assert(sizeof(scintilFast) == sizeof(photonEnergy));
-
-  // Add entries into properties table
-  G4MaterialPropertiesTable* mptPolystyrene = new G4MaterialPropertiesTable();
-  mptPolystyrene->AddProperty("RINDEX",photonEnergy,refractiveIndexPS,nEntries);
-  mptPolystyrene->AddProperty("ABSLENGTH",photonEnergy,absPS,nEntries);
-  mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT1",photonEnergy, scintilFast,nEntries);
-
-// 68% anthracene - 17400/MeV : 11832/MeV
-  //mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",11832/MeV);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1183/MeV);
-
-//  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD",1000./keV);
-  mptPolystyrene->AddConstProperty("RESOLUTIONSCALE",1.0);
-  mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 10.*ns);
- 
+  G4MaterialPropertiesTable *mptPolystyrene = new G4MaterialPropertiesTable();
+  mptPolystyrene->AddProperty("RINDEX", ScintPhotonEnergy, rindex_scint,false,true);
+  mptPolystyrene->AddProperty("ABSLENGTH", ScintPhotonEnergy, atten_scint,false,true);
+  mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT1", ScintPhotonEnergy, scintilFast,false,true);
+  mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT2", ScintPhotonEnergy, scintilSlow,false,true);
+  // 64% of Antracene: 17400
+  double yield = 17400*0.64;
+  double yieldScale = 0.0125;
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD", yield*yieldScale/MeV); //original 11136.
+  mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", sqrt(yieldScale));
+  mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 0.9*ns); // org: 0.9
+  mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT2", 2.1*ns); // org: 2.1
+  mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD1", 1.);
   fPolystyrene->SetMaterialPropertiesTable(mptPolystyrene);
-
-  // Set the Birks Constant for the Polystyrene scintillator
-
+  
   fPolystyrene->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
   G4cout << "Scintillator Properties -------" << G4endl;
