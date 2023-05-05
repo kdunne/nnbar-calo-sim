@@ -122,8 +122,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 	// 5x3x50 cm scintillator bars   
 	//G4double WorldSizeX = 40.*cm;
 
-	G4double WorldSizeY = 17.75*cm;
-	G4double WorldSizeZ = 1602*mm;
+	G4double WorldSizeY = 10.0*cm;
+	G4double WorldSizeZ = 3202*mm;
 
 	//G4int scintBars = 10;
 	G4double scintThickness = 3.*cm; 

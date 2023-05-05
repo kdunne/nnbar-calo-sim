@@ -273,7 +273,7 @@ void WLSMaterials::CreateMaterials()
   mptWLSfiber->AddProperty("ABSLENGTH",wls_Energy,absFiber);
   mptWLSfiber->AddProperty("WLSABSLENGTH",wls_Energy,WLSabsFiber);
   mptWLSfiber->AddProperty("WLSCOMPONENT",wls_Energy,emissionFib);
-  mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 2.5*ns);
+  mptWLSfiber->AddConstProperty("WLSTIMECONSTANT", 7.4*ns);
 
   fPMMA->SetMaterialPropertiesTable(mptWLSfiber);
 
@@ -322,9 +322,10 @@ void WLSMaterials::CreateMaterials()
   mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT2", ScintPhotonEnergy, scintilSlow,false,true);
   // 64% of Antracene: 17400
   double yield = 17400*0.64;
-  double yieldScale = 0.0125;
+  double yieldScale = 0.05;
   mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD", yield*yieldScale/MeV); //original 11136.
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", sqrt(yieldScale));
+  //mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", 1.);
   mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 0.9*ns); // org: 0.9
   mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT2", 2.1*ns); // org: 2.1
   mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD1", 1.);

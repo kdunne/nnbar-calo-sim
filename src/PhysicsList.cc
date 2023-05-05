@@ -22,6 +22,7 @@
 #include "G4Scintillation.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpRayleigh.hh"
+#include "G4OpWLS.hh"
 #include "G4OpBoundaryProcess.hh"
 #include "G4LossTableManager.hh"
 #include "G4EmSaturation.hh"
@@ -70,10 +71,13 @@ PhysicsList::PhysicsList(): G4VModularPhysicsList()
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   
   auto opticalParams = G4OpticalParameters::Instance();
-  opticalParams->SetWLSTimeProfile("delta");
+  opticalParams->SetProcessActivation("Cerenkov", false);
+  opticalParams->SetWLSTimeProfile("exponential");
+  opticalParams->SetWLS2TimeProfile("exponential");
+  //opticalParams->SetWLSTimeProfile("delta");
   //opticalParams->SetScintillationYieldFactor(1.0);
   //opticalParams->SetScintillationExcitationRatio(0.0);
-  opticalParams->SetCerenkovMaxPhotonsPerStep(2000);
+  opticalParams->SetCerenkovMaxPhotonsPerStep(100);
   opticalParams->SetCerenkovMaxBetaChange(100.0);
   opticalParams->SetCerenkovTrackSecondariesFirst(true);
   opticalParams->SetScintTrackInfo(true);
