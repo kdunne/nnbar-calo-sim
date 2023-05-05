@@ -1,0 +1,5 @@
+/run/initialize
+/MCPLgenerator/inputFile XX.mcpl
+/output/filename XX_out
+/run/printProgress 50000
+/run/beamOn NN
