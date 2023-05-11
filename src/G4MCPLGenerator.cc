@@ -126,38 +126,29 @@ void G4MCPLGenerator::GeneratePrimaries(G4Event* evt)
 	int event_diff = local_event_number - initial_local_event_number;
 	if (initial_local_event_number == 0 && flag==0){
 		for (int i = initial_local_event_number; i < initial_local_event_number + event_diff; i++){
-			//for (int j = 0; j < data_event_num[int(i)]; j++){FindNext();} // skip all these
 			FindNextEvent();
 		}
 	}
 	else{
 		for (int i = initial_local_event_number+1; i < initial_local_event_number + event_diff; i++){
-			//for (int j = 0; j < data_event_num[int(i)]; j++){FindNext();} // skip all these
 			FindNextEvent();
 		}
 	}
 
 	//Transfer m_p info to gun and shoot:
 	G4ParticleTable * particleTable = G4ParticleTable :: GetParticleTable();
-	//int event_count = data_event_num[int(local_event_number)];
 
 	uint64_t curpos = mcpl_currentposition(m_mcplfile);
 	int event_count = FindNextEvent();
 	mcpl_seek(m_mcplfile,curpos-1);
 	FindNext();
-	//if (!m_p) {
-	//		G4cout << "G4MCPLGenerator: No more particles to use from input file after this event. Requesting soft abort of run." << G4endl;
-	//		G4RunManager::GetRunManager()->AbortRun(true);//soft abort
-	//	}
-	//std::cout<< "Thread ID " << G4Threading::G4GetThreadId() << "-- event:" << local_event_number << " ;; count:" << event_count << " E0 "<< initial_local_event_number << std::endl;
 
 	for (int i=0; i<event_count; i++){
-		//if (m_p->pdgcode==111){
-		//if (initial_local_event_number>0){FindNext();}
 
 		assert(m_currentPDG == m_p->pdgcode && m_currentPartDef);
 		m_gun->SetParticleDefinition(m_currentPartDef);
-		G4ThreeVector pos(m_p->position[0],m_p->position[1],m_p->position[2]); //m_p->position[2] 
+		G4ThreeVector pos(m_p->position[0]*2,800,m_p->position[2]*2); //m_p->position[2] 
+		//G4ThreeVector pos(m_p->position[0],m_p->position[1],m_p->position[2]); //m_p->position[2] 
 		pos *= CLHEP::cm;
 		G4ThreeVector dir(m_p->direction[0],m_p->direction[1],m_p->direction[2]);
 		G4ThreeVector pol(m_p->polarisation[0],m_p->polarisation[1],m_p->polarisation[2]);
@@ -172,31 +163,11 @@ void G4MCPLGenerator::GeneratePrimaries(G4Event* evt)
 		m_gun->SetParticlePolarization(pol);
 		const G4int ivertex = evt->GetNumberOfPrimaryVertex();
 
-		//std::cout<< "= = = Thread ID " << G4Threading::G4GetThreadId() << "-- event:" << local_event_number << " for loop :" << i << std::endl;
-
-		//if (sqrt(pow(m_p->position[0],2) + pow(m_p->position[1],2))<80.0){
-
 		G4double mass = particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass();
 		G4double charge = particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge();
-	//	Particle_outFile << local_event_number << ",";
-	//	Particle_outFile << m_p->userflags<< ",";
-	//	Particle_outFile << m_p->pdgcode << ",";
-	//	Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGMass() << ",";
-	//	Particle_outFile << particleTable -> FindParticle(m_p->pdgcode) -> GetPDGCharge() << ",";
-	//	Particle_outFile << m_p->ekin << ",";
-	//	Particle_outFile << m_p->position[0] << ",";
-	//	Particle_outFile << m_p->position[1] << ",";
-	//	Particle_outFile << m_p->position[2] << ",";
-	//	Particle_outFile << m_p -> time/s << ",";
-	//	Particle_outFile << m_p->direction[0] << ",";
-	//	Particle_outFile << m_p->direction[1] << ",";
-	//	Particle_outFile << m_p->direction[2] << G4endl;
 
 		fHistoManager->FillCryVectors(local_event_number,m_p->pdgcode,mass,charge,m_p->ekin,pos[0],pos[1],pos[2],time,dir[0],dir[1],dir[2]);
 		m_gun->GeneratePrimaryVertex(evt);
-	//	std::cout << "Thread ID " << G4Threading::G4GetThreadId() << " == Seq number: " << local_event_number << ", Event_number: " << i << "," << m_p->pdgcode << ", KE: "
-	//		<< m_p->ekin << std::endl;
-	//	//}
 
 		if (weight!=1.0) {evt->GetPrimaryVertex(ivertex)->SetWeight(weight);}//}
 																			 //Prepare for next.
@@ -207,10 +178,6 @@ void G4MCPLGenerator::GeneratePrimaries(G4Event* evt)
 		}
 	} // end bracket for loop
 
-  // if (local_event_number == 0){
-  //   FindNext();
-  //   std::cout<< "Extra" << std::endl;
-  // } // need to run FindNext for one extra time... 
   initial_local_event_number = local_event_number;
 }
 

@@ -102,7 +102,8 @@ G4bool detSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
     G4int parentID =  theTrack->GetParentID();
 	//if(){
-	if(((parentID==0&&theTrack->GetCurrentStepNumber()==2)||primaries_only==0)&&PostStep->GetStepStatus()==fGeomBoundary){
+	//if(((parentID==0&&theTrack->GetCurrentStepNumber()==2)||primaries_only==0)&&PostStep->GetStepStatus()==fGeomBoundary){
+	if(PostStep->GetStepStatus()==fGeomBoundary){
 	
 		//	G4cout << theTrack->GetCurrentStepNumber() << "," << aStep->IsFirstStepInVolume() << "," << aStep->IsLastStepInVolume() << "," << namePre << "," << namePost << G4endl;
 		//}
@@ -142,6 +143,9 @@ G4bool detSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 		detectorHit -> SetPY(py);
 		detectorHit -> SetPZ(pz);
 		HitsCollection -> insert(detectorHit);
+ 
+	 	theTrack->SetTrackStatus(fStopAndKill);
+
 	}
     //}
     return true;

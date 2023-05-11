@@ -96,55 +96,6 @@ void HistoManager::Book()
 		analysisManager->CreateNtupleDColumn("det_px", det_px);
 		analysisManager->CreateNtupleDColumn("det_py", det_py);
 		analysisManager->CreateNtupleDColumn("det_pz", det_pz);
-
-		analysisManager->CreateNtupleIColumn("det2_pid", det2_pid);
-		analysisManager->CreateNtupleDColumn("det2_t", det2_t);
-		analysisManager->CreateNtupleDColumn("det2_ekin", det2_ekin);
-		analysisManager->CreateNtupleDColumn("det2_x", det2_x);
-		analysisManager->CreateNtupleDColumn("det2_y", det2_y);
-		analysisManager->CreateNtupleDColumn("det2_z", det2_z);
-		analysisManager->CreateNtupleDColumn("det2_px", det2_px);
-		analysisManager->CreateNtupleDColumn("det2_py", det2_py);
-		analysisManager->CreateNtupleDColumn("det2_pz", det2_pz);
-		
-		analysisManager->CreateNtupleIColumn("cv_evtno", cv_evtno);
-		analysisManager->CreateNtupleIColumn("cv_trackid", cv_trackid);
-		analysisManager->CreateNtupleIColumn("cv_pid", cv_pid);
-		analysisManager->CreateNtupleIColumn("cv_bar", cv_bar);
-		analysisManager->CreateNtupleIColumn("cv_plane", cv_plane);
-		analysisManager->CreateNtupleIColumn("cv_planedir", cv_planedir);
-		//analysisManager->CreateNtupleSColumn("cv_name", cv_name);
-		//analysisManager->CreateNtupleSColumn("cv_proc", cv_proc);
-		//analysisManager->CreateNtupleSColumn("cv_vol_name", cv_vol_name);
-		analysisManager->CreateNtupleDColumn("cv_t", cv_t);
-		analysisManager->CreateNtupleDColumn("cv_ke", cv_ke);
-		analysisManager->CreateNtupleDColumn("cv_eDep", cv_eDep);
-		analysisManager->CreateNtupleDColumn("cv_tracklength", cv_tracklength);
-		analysisManager->CreateNtupleDColumn("cv_x", cv_x);
-		analysisManager->CreateNtupleDColumn("cv_y", cv_y);
-		analysisManager->CreateNtupleDColumn("cv_z", cv_z);
-		analysisManager->CreateNtupleDColumn("cv_px", cv_px);
-		analysisManager->CreateNtupleDColumn("cv_py", cv_py);
-		analysisManager->CreateNtupleDColumn("cv_pz", cv_pz);
-		
-		analysisManager->CreateNtupleIColumn("cvDigi_mul", cvDigi_mul);
-		analysisManager->CreateNtupleIColumn("cvDigi_pid", cvDigi_pid);
-		analysisManager->CreateNtupleIColumn("cvDigi_bar", cvDigi_bar);
-		analysisManager->CreateNtupleIColumn("cvDigi_plane", cvDigi_plane);
-		analysisManager->CreateNtupleDColumn("cvDigi_eDep", cvDigi_eDep);
-		analysisManager->CreateNtupleDColumn("cvDigi_u", cvDigi_u);
-		analysisManager->CreateNtupleDColumn("cvDigi_v", cvDigi_v);
-		analysisManager->CreateNtupleDColumn("cvDigi_w", cvDigi_w);
-		analysisManager->CreateNtupleDColumn("cvDigi_e1", cvDigi_e1);
-		analysisManager->CreateNtupleDColumn("cvDigi_e2", cvDigi_e2);
-		analysisManager->CreateNtupleDColumn("cvDigi_e3", cvDigi_e3);
-		analysisManager->CreateNtupleDColumn("cvDigi_e4", cvDigi_e4);
-		analysisManager->CreateNtupleDColumn("cvDigi_t1", cvDigi_t1);
-		analysisManager->CreateNtupleDColumn("cvDigi_t2", cvDigi_t2);
-		analysisManager->CreateNtupleDColumn("cvDigi_t3", cvDigi_t3);
-		analysisManager->CreateNtupleDColumn("cvDigi_t4", cvDigi_t4);
-		analysisManager->CreateNtupleDColumn("cvDigi_post", cvDigi_post);
-		analysisManager->CreateNtupleDColumn("cvDigi_pose", cvDigi_pose);
 		analysisManager->FinishNtuple();  
 		fFactoryOn = true;
 	}
@@ -196,58 +147,6 @@ void HistoManager::ClearEventVectors()
 	det_py.clear();
 	det_pz.clear();
 	
-	det2_pid.clear();
-	det2_t.clear();
-	det2_ekin.clear();
-	det2_x.clear();
-	det2_y.clear();
-	det2_z.clear();
-	det2_px.clear();
-	det2_py.clear();
-	det2_pz.clear();
-
-	cv_evtno.clear();
-	cv_trackid.clear();
-	cv_pid.clear();
-	cv_bar.clear();
-	cv_plane.clear();
-	cv_planedir.clear();
-	//cv_name.clear();
-	//cv_proc.clear();
-	//cv_vol_name.clear();
-	cv_t.clear();
-	cv_ke.clear();
-	cv_eDep.clear();
-	cv_tracklength.clear();
-	cv_x.clear();
-	cv_y.clear();
-	cv_z.clear();
-	cv_px.clear();
-	cv_py.clear();
-	cv_pz.clear();
-}
-
-void HistoManager::ClearDigiVectors()
-{
-	cvDigi_mul.clear();
-	cvDigi_mul.push_back(0);
-	cvDigi_pid.clear();
-	cvDigi_bar.clear();
-	cvDigi_plane.clear();
-	cvDigi_eDep.clear();
-	cvDigi_u.clear();
-	cvDigi_v.clear();
-	cvDigi_w.clear();
-	cvDigi_e1.clear();
-	cvDigi_e2.clear();
-	cvDigi_e3.clear();
-	cvDigi_e4.clear();
-	cvDigi_t1.clear();
-	cvDigi_t2.clear();
-	cvDigi_t3.clear();
-	cvDigi_t4.clear();
-	cvDigi_post.clear();
-	cvDigi_pose.clear();
 }
 
 void HistoManager::FillCryVectors(G4int evtno, G4int pid, G4double m, G4double q,
@@ -281,76 +180,6 @@ void HistoManager::FillDetVectors(G4int pid, G4double t, G4double ekin, G4double
 	det_py.push_back(py);
 	det_pz.push_back(pz);
 }
-
-
-void HistoManager::FillDet2Vectors(G4int pid, G4double t, G4double ekin, G4double x, G4double y, G4double z,
-		G4double px, G4double py, G4double pz)
-{
-	det2_pid.push_back(pid);
-	det2_t.push_back(t);
-	det2_ekin.push_back(ekin);
-	det2_x.push_back(x);
-	det2_y.push_back(y);
-	det2_z.push_back(z);
-	det2_px.push_back(px);
-	det2_py.push_back(py);
-	det2_pz.push_back(pz);
-}
-
-
-
-void HistoManager::FillCVVectors(G4int evtno, G4int trackid, G4int pid, G4int bar, G4int plane,
-		G4int planedir, G4double t, G4double ke, G4double eDep, 
-		G4double tracklength, G4double x, G4double y, G4double z,
-		G4double px, G4double py, G4double pz)
-{
-	cv_evtno.push_back(evtno);
-	cv_trackid.push_back(trackid);
-	cv_pid.push_back(pid);
-	cv_bar.push_back(bar);
-	cv_plane.push_back(plane);
-	cv_planedir.push_back(planedir);
-	cv_t.push_back(t);
-	cv_ke.push_back(ke);
-	cv_eDep.push_back(eDep);
-	cv_tracklength.push_back(tracklength);
-	cv_x.push_back(x);
-	cv_y.push_back(y);
-	cv_z.push_back(z);
-	cv_px.push_back(px);
-	cv_py.push_back(py);
-	cv_pz.push_back(pz);
-
-}
-
-
-void HistoManager::FillCVDigiVectors(G4int pid, G4int bar, G4int plane, G4double eDep,
-			G4double u, G4double v, G4double w,
-			G4double e1, G4double e2, G4double e3, G4double e4,
-			G4double t1, G4double t2, G4double t3, G4double t4,
-			G4double post, G4double pose)
-{
-	cvDigi_mul[0]++;
-	cvDigi_pid.push_back(pid);
-	cvDigi_bar.push_back(bar);
-	cvDigi_plane.push_back(plane);
-	cvDigi_eDep.push_back(eDep);
-	cvDigi_u.push_back(u);
-	cvDigi_v.push_back(v);
-	cvDigi_w.push_back(w);
-	cvDigi_e1.push_back(e1);
-	cvDigi_e2.push_back(e2);
-	cvDigi_e3.push_back(e3);
-	cvDigi_e4.push_back(e4);
-	cvDigi_t1.push_back(t1);
-	cvDigi_t2.push_back(t2);
-	cvDigi_t3.push_back(t3);
-	cvDigi_t4.push_back(t4);
-	cvDigi_post.push_back(post);
-	cvDigi_pose.push_back(pose);
-
-}
-
 
 void HistoManager::FillTree()
 {
