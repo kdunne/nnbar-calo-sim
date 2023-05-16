@@ -32,6 +32,8 @@
 
 #include "G4THitsMap.hh"
 #include "globals.hh"
+#include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 class HistoManager;
 
@@ -46,11 +48,19 @@ class EventAction : public G4UserEventAction
 
 	private:
 		HistoManager* fHistoManager;
+
+		const G4int nPlanes=12;
+		const G4int nBarsPerPlane=64;
+		const G4int nBars=nPlanes*nBarsPerPlane;
+		const G4double bar_length = 640*cm;
+		const G4double bar_thickness = 3*cm;
+		const G4double bar_width = 10*cm;
+
 		// methods
 		G4THitsMap<G4double>* GetHitsCollection(G4int hcID,
 				const G4Event* event) const;
-		G4double CalcEnergy(G4double edep, G4double w, G4double r);
-		G4double CalcTime(G4double w, G4double v);
+	//	G4double CalcEnergy(G4double edep, G4double w, G4double r);
+	//	G4double CalcTime(G4double w, G4double v);
 		void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
 				G4double gapEdep, G4double scintTrackLength) const; //, G4double gapTrackLength) const;
 
@@ -59,46 +69,7 @@ class EventAction : public G4UserEventAction
 		G4int  det2HitsCollectionID;
 		G4int  CVHitsCollectionID;
 
-		G4int b = 1;
-		G4int ltime     = 0.;
-		G4int parentID  = 0;
-		G4String proc   = "";
-		G4String name   = "";
-		G4double time   = 0.;
-		G4int trID      = 0;
-		G4int i         = 0;
-		G4double kinEn  = 0.;
-		G4double eDep   = 0.;
-		G4double trackl = 0.;	
-		G4int hitCount  = 0;
-		G4int org_replica = 99;
-		G4int group_ID = 999;
-		G4int module_ID = 999;
-		G4double x=0;
-		G4double y=0;
-		G4double z=0;
-
-		// Book vector to keep track of Edep in each Scintillator Sheet
-		G4double EdepPerSheet[10] = {0., 0., 0., 0., 0.,0., 0., 0., 0., 0.};
-		G4int ScintPerSheet[10] = { 0,0,0,0,0,0,0,0,0,0 };
-		G4int ScintPerSheet_new[10] = { 0,0,0,0,0,0,0,0,0,0 };
-		G4double totEdep   = 0.;     
-		G4double eDepScint = 0.;
-		G4double eDepAbs   = 0.;
-		G4double eDepTube  = 0.; 
-		G4double extraEdep = 0.;
-		G4double eDepCompt = 0.;
-		G4double eDepInelastic= 0.;
-		G4double eDephIoni = 0.;
-		G4double eDepHadElas = 0.;
-		G4double eDepPrimary = 0.;
-		G4double eDepOther = 0.;
-		G4int cerenkovCounter = 0;
-		G4int scint_photons = 0;
-		G4int scint_photons_check = 0;
-		G4int PMT_photons = 0;
-
-};
+	};
 
 //....
 

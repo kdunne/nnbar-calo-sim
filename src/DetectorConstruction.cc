@@ -240,14 +240,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto worldLV = new G4LogicalVolume(worldS,defaultMaterial,"World");
 	auto worldPV = new G4PVPlacement(0,G4ThreeVector(),worldLV,"WorldPV",0,false,0,fCheckOverlaps);
 
-// HIBEAM
-	G4double bar_l = 3.2*m;
-	G4double bar_t = 2.0*cm;
-	G4double shortbar_l = 1.0*m;
-// NNBAR
-//	G4double bar_l = 6.4*m;
-//	G4double bar_t = 3.0*cm;
-//	G4double shortbar_l = 2.1*m;
+	// NNBAR
+	G4double bar_l = 6.4*m;
+	G4double bar_t = 3.0*cm;
+	G4double shortbar_l = 2.1*m;
 
 	G4double detector_half=bar_l/2.+2*bar_t+1*mm;
 	auto detector = new G4Box("detector",detector_half, detector_half, detector_half);
@@ -255,34 +251,19 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),detectorLV,"detector",worldLV,false,0,fCheckOverlaps);  
 
 	// Build rudimentary annihilation detector
-		
-// HIBEAM
-	G4double passive_half=1.5*m;
-	G4double passive_length=1.5*m;
-	G4double det2_half=1.35*m;
-	G4double det2_length=1.35*m;
-	G4double lg_half=1.30*m;
-	G4double lg_length=1.30*m;
-	G4double scint_half=1.03*m;
-	G4double scint_length=1.03*m;
-	G4double tpc_half=0.73*m;
-	G4double tpc_length=0.73*m;
-	G4double pipe_outer_radius=0.57*m;
-	G4double pipe_inner_radius=0.55*m;
-	//G4double pipe_length=6.0*m;
 // NNBAR
-//	G4double passive_half=3.1*m;
-//	G4double passive_length=3.1*m;
-//	G4double det2_half=2.8*m;
-//	G4double det2_length=2.8*m;
-//	G4double lg_half=2.50*m;
-//	G4double lg_length=2.75*m;
-//	G4double scint_half=2.2*m;
-//	G4double scint_length=2*m;
-//	G4double tpc_half=1.87*m;
-//	G4double tpc_length=2*m;
-//	G4double pipe_outer_radius=1.02*m;
-//	G4double pipe_inner_radius=1.00*m;
+	G4double passive_half=3.1*m;
+	G4double passive_length=3.1*m;
+	G4double det2_half=2.8*m;
+	G4double det2_length=2.8*m;
+	G4double lg_half=2.50*m;
+	G4double lg_length=2.75*m;
+	G4double scint_half=2.2*m;
+	G4double scint_length=2*m;
+	G4double tpc_half=1.87*m;
+	G4double tpc_length=2*m;
+	G4double pipe_outer_radius=1.02*m;
+	G4double pipe_inner_radius=1.00*m;
 	//G4double pipe_length=6.0*m;
 	
 	auto passive_box = new G4Box("passive",passive_half, passive_half, passive_length);
@@ -347,8 +328,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_l/2.+3.*bar_t/2.),0.),CV_ud_2_LV,"down_layer2",detectorLV,false,3,fCheckOverlaps);
 
 	// ===> Filling Scint CV ud with scint bars
-	int num_ud_xbars = 16;
-	int num_ud_zbars = 16;
+	int num_ud_xbars = 64;
+	int num_ud_zbars = 64;
 
 	G4double xbar_ud_w = veto_ud_x/num_ud_xbars*mm;
 	G4double zbar_ud_w = veto_ud_z/num_ud_zbars*mm;
@@ -384,8 +365,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(-(bar_l/2.+3.*bar_t/2.),0.,0.),CV_lr_2_LV,"right_layer2",detectorLV,false,7,fCheckOverlaps);
 
 	// ===> Filling Scint CV top with scint bars
-	int num_lr_ybars = 16;
-	int num_lr_zbars = 16;
+	int num_lr_ybars = 64;
+	int num_lr_zbars = 64;
 
 	G4double ybar_lr_w = veto_lr_y/num_lr_ybars*mm;
 	G4double zbar_lr_w = veto_lr_z/num_lr_zbars*mm;
@@ -421,8 +402,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+3.*bar_t/2.)),CV_fb_2_LV,"front_layer2",detectorLV,false,11,fCheckOverlaps);
 
 	// ===> Filling Scint CV top with scint bars
-	int num_fb_xbars = 16;
-	int num_fb_ybars = 16;
+	int num_fb_xbars = 64;
+	int num_fb_ybars = 64;
 
 	G4double xbar_fb_w = veto_fb_x/num_fb_xbars*mm;
 	G4double ybar_fb_w = veto_fb_y/num_fb_ybars*mm;

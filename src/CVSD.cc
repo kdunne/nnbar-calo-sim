@@ -132,10 +132,13 @@ G4bool CVSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     G4int bar_id  = touchable->GetReplicaNumber(0);
     G4int plane_id  = touchable->GetReplicaNumber(1);
 	G4int xid;
-	if(plane_id==1||plane_id==3||plane_id==9||plane_id==11) {xid=1;} 
-	else if(plane_id==5||plane_id==7||plane_id==8||plane_id==10) {xid=2;} 
-	else if(plane_id==0||plane_id==2||plane_id==4||plane_id==6) {xid=3;}
-	else {xid=4;}
+	if(plane_id==0||plane_id==2) {xid=0;} 
+	else if(plane_id==1||plane_id==3) {xid=1;} 
+	else if(plane_id==4||plane_id==6) {xid=2;} 
+	else if(plane_id==5||plane_id==7) {xid=3;} 
+	else if(plane_id==8||plane_id==10) {xid=4;} 
+	else if(plane_id==9||plane_id==11) {xid=5;}
+	else {xid=-1;}
     //G4int origin_replica = theTrack->GetOriginTouchable()->GetReplicaNumber(0); // ** I added this here !!!
 
     // Get Time
