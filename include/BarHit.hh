@@ -47,11 +47,11 @@ private:
     
 public:
     void SetGeom(G4int p, G4int b, G4double d, G4double l, G4double w, G4double t);
-	void AddHit(G4double xx, G4double yy, G4double zz, G4double ee);
+	void AddHit(G4double xx, G4double yy, G4double zz, G4double ee, G4double tt);
 	void AnalyzeHits();
 	
 	G4double CalcEnergy(G4double ed, G4double w, G4double r);
-	G4double CalcTime(G4double w, G4double v);
+	G4double CalcTime(G4double t0, G4double w, G4double v);
 
     inline G4int GetPlane(){return plane;}
     inline G4int GetBar(){return bar;}

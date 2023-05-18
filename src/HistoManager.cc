@@ -97,15 +97,16 @@ void HistoManager::Book()
 		analysisManager->CreateNtupleDColumn("det_py", det_py);
 		analysisManager->CreateNtupleDColumn("det_pz", det_pz);
 
-		analysisManager->CreateNtupleIColumn("det2_pid", det2_pid);
-		analysisManager->CreateNtupleDColumn("det2_t", det2_t);
-		analysisManager->CreateNtupleDColumn("det2_ekin", det2_ekin);
-		analysisManager->CreateNtupleDColumn("det2_x", det2_x);
-		analysisManager->CreateNtupleDColumn("det2_y", det2_y);
-		analysisManager->CreateNtupleDColumn("det2_z", det2_z);
-		analysisManager->CreateNtupleDColumn("det2_px", det2_px);
-		analysisManager->CreateNtupleDColumn("det2_py", det2_py);
-		analysisManager->CreateNtupleDColumn("det2_pz", det2_pz);
+		analysisManager->CreateNtupleIColumn("sampling_trackid", sampling_trackid);
+		analysisManager->CreateNtupleIColumn("sampling_pid", sampling_pid);
+		analysisManager->CreateNtupleDColumn("sampling_t", sampling_t);
+		analysisManager->CreateNtupleDColumn("sampling_ekin", sampling_ekin);
+		analysisManager->CreateNtupleDColumn("sampling_x", sampling_x);
+		analysisManager->CreateNtupleDColumn("sampling_y", sampling_y);
+		analysisManager->CreateNtupleDColumn("sampling_z", sampling_z);
+		analysisManager->CreateNtupleDColumn("sampling_px", sampling_px);
+		analysisManager->CreateNtupleDColumn("sampling_py", sampling_py);
+		analysisManager->CreateNtupleDColumn("sampling_pz", sampling_pz);
 		
 		analysisManager->CreateNtupleIColumn("cv_evtno", cv_evtno);
 		analysisManager->CreateNtupleIColumn("cv_trackid", cv_trackid);
@@ -132,6 +133,7 @@ void HistoManager::Book()
 		analysisManager->CreateNtupleIColumn("cvDigi_bar", cvDigi_bar);
 		analysisManager->CreateNtupleIColumn("cvDigi_plane", cvDigi_plane);
 		analysisManager->CreateNtupleDColumn("cvDigi_eDep", cvDigi_eDep);
+		analysisManager->CreateNtupleDColumn("cvDigi_time", cvDigi_time);
 		analysisManager->CreateNtupleDColumn("cvDigi_u", cvDigi_u);
 		analysisManager->CreateNtupleDColumn("cvDigi_v", cvDigi_v);
 		analysisManager->CreateNtupleDColumn("cvDigi_w", cvDigi_w);
@@ -196,15 +198,16 @@ void HistoManager::ClearEventVectors()
 	det_py.clear();
 	det_pz.clear();
 	
-	det2_pid.clear();
-	det2_t.clear();
-	det2_ekin.clear();
-	det2_x.clear();
-	det2_y.clear();
-	det2_z.clear();
-	det2_px.clear();
-	det2_py.clear();
-	det2_pz.clear();
+	sampling_trackid.clear();
+	sampling_pid.clear();
+	sampling_t.clear();
+	sampling_ekin.clear();
+	sampling_x.clear();
+	sampling_y.clear();
+	sampling_z.clear();
+	sampling_px.clear();
+	sampling_py.clear();
+	sampling_pz.clear();
 
 	cv_evtno.clear();
 	cv_trackid.clear();
@@ -235,6 +238,7 @@ void HistoManager::ClearDigiVectors()
 	cvDigi_bar.clear();
 	cvDigi_plane.clear();
 	cvDigi_eDep.clear();
+	cvDigi_time.clear();
 	cvDigi_u.clear();
 	cvDigi_v.clear();
 	cvDigi_w.clear();
@@ -283,20 +287,20 @@ void HistoManager::FillDetVectors(G4int pid, G4double t, G4double ekin, G4double
 }
 
 
-void HistoManager::FillDet2Vectors(G4int pid, G4double t, G4double ekin, G4double x, G4double y, G4double z,
+void HistoManager::FillSamplingVectors(G4int trackid, G4int pid, G4double t, G4double ekin, G4double x, G4double y, G4double z,
 		G4double px, G4double py, G4double pz)
 {
-	det2_pid.push_back(pid);
-	det2_t.push_back(t);
-	det2_ekin.push_back(ekin);
-	det2_x.push_back(x);
-	det2_y.push_back(y);
-	det2_z.push_back(z);
-	det2_px.push_back(px);
-	det2_py.push_back(py);
-	det2_pz.push_back(pz);
+	sampling_trackid.push_back(trackid);
+	sampling_pid.push_back(pid);
+	sampling_t.push_back(t);
+	sampling_ekin.push_back(ekin);
+	sampling_x.push_back(x);
+	sampling_y.push_back(y);
+	sampling_z.push_back(z);
+	sampling_px.push_back(px);
+	sampling_py.push_back(py);
+	sampling_pz.push_back(pz);
 }
-
 
 
 void HistoManager::FillCVVectors(G4int evtno, G4int trackid, G4int pid, G4int bar, G4int plane,
@@ -325,7 +329,7 @@ void HistoManager::FillCVVectors(G4int evtno, G4int trackid, G4int pid, G4int ba
 
 
 void HistoManager::FillCVDigiVectors(G4int pid, G4int bar, G4int plane, G4double eDep,
-			G4double u, G4double v, G4double w,
+			G4double time, G4double u, G4double v, G4double w,
 			G4double e1, G4double e2, G4double e3, G4double e4,
 			G4double t1, G4double t2, G4double t3, G4double t4,
 			G4double post, G4double pose)
@@ -335,6 +339,7 @@ void HistoManager::FillCVDigiVectors(G4int pid, G4int bar, G4int plane, G4double
 	cvDigi_bar.push_back(bar);
 	cvDigi_plane.push_back(plane);
 	cvDigi_eDep.push_back(eDep);
+	cvDigi_time.push_back(time);
 	cvDigi_u.push_back(u);
 	cvDigi_v.push_back(v);
 	cvDigi_w.push_back(w);

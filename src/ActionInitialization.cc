@@ -6,6 +6,7 @@
 
 #include "RunAction.hh"
 #include "EventAction.hh"
+//#include "TrackingAction.hh"
 #include "SteppingAction.hh"
 
 //....
@@ -40,6 +41,7 @@ void ActionInitialization::Build() const
 
 	EventAction* eventAction = new EventAction(histo);
 	SetUserAction(eventAction);
+	//SetUserAction(new TrackingAction());
 	SetUserAction(new SteppingAction());
 }  
 

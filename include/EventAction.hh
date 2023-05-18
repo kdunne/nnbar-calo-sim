@@ -66,7 +66,7 @@ class EventAction : public G4UserEventAction
 
 		// data members                   
 		G4int  detHitsCollectionID;
-		G4int  det2HitsCollectionID;
+		G4int  samplingHitsCollectionID;
 		G4int  CVHitsCollectionID;
 
 	};

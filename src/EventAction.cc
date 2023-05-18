@@ -61,7 +61,7 @@ EventAction::EventAction(HistoManager *histo):
     G4UserEventAction(),
 	fHistoManager(histo),
     detHitsCollectionID(-1),
-    //det2HitsCollectionID(-1),
+    samplingHitsCollectionID(-1),
     CVHitsCollectionID(-1)
 {
 }
@@ -134,9 +134,9 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 	if(detHitsCollectionID == -1) {
 		detHitsCollectionID = pSDManager->GetCollectionID("detectorLV/detHitCollection");
 	}
-//	if(det2HitsCollectionID == -1) {
-//		det2HitsCollectionID = pSDManager->GetCollectionID("det2LV/detHitCollection");
-//	}
+	if(samplingHitsCollectionID == -1) {
+		samplingHitsCollectionID = pSDManager->GetCollectionID("samplingLV/samplingHitCollection");
+	}
 	if(CVHitsCollectionID == -1) {
 		CVHitsCollectionID = pSDManager->GetCollectionID("CVLV/CVHitCollection");
 	}
@@ -154,9 +154,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	if (detHC<0) {detHC = G4SDManager::GetSDMpointer()->GetCollectionID("detectorLV/detHitCollection");}
 	NNbarHitsCollection* detHits  = 0;
 	
-//	int det2HC = -1;
-//	if (det2HC<0) {det2HC = G4SDManager::GetSDMpointer()->GetCollectionID("det2LV/detHitCollection");}
-//	NNbarHitsCollection* det2Hits  = 0;
+	int samplingHC = -1;
+	if (samplingHC<0) {samplingHC = G4SDManager::GetSDMpointer()->GetCollectionID("samplingLV/samplingHitCollection");}
+	NNbarHitsCollection* samplingHits  = 0;
 
 	int CVHC = -1;
 	if (CVHC<0) {CVHC = G4SDManager::GetSDMpointer()->GetCollectionID("CVLV/CVHitCollection");}
@@ -194,26 +194,27 @@ void EventAction::EndOfEventAction(const G4Event* event)
 			}
 		}
 
-	//	det2Hits = (NNbarHitsCollection*)(HCE->GetHC(det2HC));
-	//	if (det2Hits) {
-	//		hitCount = det2Hits->entries();
-	//		for (G4int h=0; h<hitCount; h++) {
-	//			name     = ((*det2Hits)[h]) -> GetName();
-	//			if (name != "opticalphoton"){
-	//				time     = ((*det2Hits)[h]) -> GetTime(); 
-	//				G4int pid   = ((*det2Hits)[h]) -> GetParentID(); 
-	//				G4double ekin = ((*det2Hits)[h]) -> GetKinEn();
-	//				G4double xx = ((*det2Hits)[h]) -> GetPosX();
-	//				G4double yy = ((*det2Hits)[h]) -> GetPosY();
-	//				G4double zz = ((*det2Hits)[h]) -> GetPosZ();
-	//				G4double pX = ((*det2Hits)[h]) -> GetPX();
-	//				G4double pY = ((*det2Hits)[h]) -> GetPY();
-	//				G4double pZ = ((*det2Hits)[h]) -> GetPZ();
+		samplingHits = (NNbarHitsCollection*)(HCE->GetHC(samplingHC));
+		if (samplingHits) {
+			G4int hitCount = samplingHits->entries();
+			for (G4int h=0; h<hitCount; h++) {
+				G4String name     = ((*samplingHits)[h]) -> GetName();
+				if (name != "opticalphoton"){
+					G4double time     = ((*samplingHits)[h]) -> GetTime(); 
+					G4int trID   = ((*samplingHits)[h]) -> GetTrackID(); 
+					G4int pid   = ((*samplingHits)[h]) -> GetPID(); 
+					G4double ekin = ((*samplingHits)[h]) -> GetKinEn();
+					G4double xx = ((*samplingHits)[h]) -> GetPosX();
+					G4double yy = ((*samplingHits)[h]) -> GetPosY();
+					G4double zz = ((*samplingHits)[h]) -> GetPosZ();
+					G4double pX = ((*samplingHits)[h]) -> GetPX();
+					G4double pY = ((*samplingHits)[h]) -> GetPY();
+					G4double pZ = ((*samplingHits)[h]) -> GetPZ();
 
-	//				fHistoManager->FillDet2Vectors(pid, time, ekin, xx, yy, zz, pX, pY, pZ);
-	//			}
-	//		}
-	//	}
+					fHistoManager->FillSamplingVectors(trID, pid, time, ekin, xx, yy, zz, pX, pY, pZ);
+				}
+			}
+		}
 
 
 		CVHits = (NNbarHitsCollection*)(HCE->GetHC(CVHC));
@@ -260,22 +261,22 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 					switch(planedir){
 						case 0:
-							bar[n].AddHit(yy,xx,zz,eDep);
+							bar[n].AddHit(yy,xx,zz,eDep,time);
 							break;
 						case 1:
-							bar[n].AddHit(yy,zz,xx,eDep);
+							bar[n].AddHit(yy,zz,xx,eDep,time);
 							break;
 						case 2:
-							bar[n].AddHit(xx,yy,zz,eDep);
+							bar[n].AddHit(xx,yy,zz,eDep,time);
 							break;
 						case 3:
-							bar[n].AddHit(xx,zz,yy,eDep);
+							bar[n].AddHit(xx,zz,yy,eDep,time);
 							break;
 						case 4:
-							bar[n].AddHit(zz,xx,yy,eDep);
+							bar[n].AddHit(zz,xx,yy,eDep,time);
 							break;
 						case 5:
-							bar[n].AddHit(zz,yy,xx,eDep);
+							bar[n].AddHit(zz,yy,xx,eDep,time);
 							break;
 						default:
 							break;
@@ -289,7 +290,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 					bar[ii].AnalyzeHits();
 					if (bar[ii].GetE1()>1.*keV && bar[ii].GetE2()>1.*keV && bar[ii].GetE3()>1.*keV && bar[ii].GetE4()>1.*keV){
 						fHistoManager->FillCVDigiVectors(cvpid[ii], bar[ii].GetBar(), bar[ii].GetPlane(),
-								bar[ii].GetEDep(), bar[ii].GetX(), bar[ii].GetY(), bar[ii].GetZ(),
+								bar[ii].GetEDep(), bar[ii].GetTime(), bar[ii].GetX(), bar[ii].GetY(), bar[ii].GetZ(),
 								bar[ii].GetE1(), bar[ii].GetE2(), bar[ii].GetE3(), bar[ii].GetE4(),
 								bar[ii].GetT1(), bar[ii].GetT2(), bar[ii].GetT3(), bar[ii].GetT4(), 
 								bar[ii].GetPosT(), bar[ii].GetPosE()); 

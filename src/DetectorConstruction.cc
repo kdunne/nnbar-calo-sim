@@ -1,5 +1,6 @@
 #include "DetectorConstruction.hh"
 #include "detSD.hh"
+#include "samplingSD.hh"
 #include "CVSD.hh"
 
 #include "G4Material.hh"
@@ -254,8 +255,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 // NNBAR
 	G4double passive_half=3.1*m;
 	G4double passive_length=3.1*m;
-	G4double det2_half=2.8*m;
-	G4double det2_length=2.8*m;
+	G4double sampling_half=2.8*m;
+	G4double sampling_length=2.8*m;
 	G4double lg_half=2.50*m;
 	G4double lg_length=2.75*m;
 	G4double scint_half=2.2*m;
@@ -267,20 +268,20 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	//G4double pipe_length=6.0*m;
 	
 	auto passive_box = new G4Box("passive",passive_half, passive_half, passive_length);
-	auto det2_box = new G4Box("det2",det2_half, det2_half, det2_length);
+	auto sampling_box = new G4Box("sampling",sampling_half, sampling_half, sampling_length);
 	auto leadglass_box = new G4Box("leadglass",lg_half, lg_half, lg_length);
 	auto scintillator_box = new G4Box("scintillator",scint_half, scint_half, scint_length);
 	auto tpc_box = new G4Box("scintillator", tpc_half, tpc_half, tpc_length);
 	auto gap_box = new G4Box("gap", pipe_outer_radius+1*mm, pipe_outer_radius+1*mm, passive_length);
 		
-	auto passive0 = new G4SubtractionSolid("passive0",passive_box, det2_box);
+	auto passive0 = new G4SubtractionSolid("passive0",passive_box, sampling_box);
 	auto passive = new G4SubtractionSolid("passive",passive0,gap_box);
 	auto passiveLV = new G4LogicalVolume(passive,shieldMaterial,"passiveLV");
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),passiveLV,"passive",detectorLV,false,0,fCheckOverlaps);  
 
-	auto det2 = new G4SubtractionSolid("det2",det2_box,leadglass_box);
-	auto det2LV = new G4LogicalVolume(det2,defaultMaterial,"det2LV");
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),det2LV,"det2",detectorLV,false,0,fCheckOverlaps);  
+	auto sampling = new G4SubtractionSolid("sampling",sampling_box,leadglass_box);
+	auto samplingLV = new G4LogicalVolume(sampling,defaultMaterial,"samplingLV");
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),samplingLV,"sampling",detectorLV,false,0,fCheckOverlaps);  
 
 	auto leadglass0 = new G4SubtractionSolid("leadglass0",leadglass_box,scintillator_box);
 	auto leadglass = new G4SubtractionSolid("leadglass",leadglass0,gap_box);
@@ -296,17 +297,17 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto tpcLV = new G4LogicalVolume(tpc,G4Material::GetMaterial("Gas"),"tpcLV");
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),tpcLV,"tpc",detectorLV,false,0,fCheckOverlaps);  
 		
-	auto beampipe = new G4Cons("beampipe", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,det2_half,0.,360.*deg);
+	auto beampipe = new G4Cons("beampipe", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,sampling_half,0.,360.*deg);
 	auto beampipeLV = new G4LogicalVolume(beampipe,G4Material::GetMaterial("Aluminum"),"beampipeLV");
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),beampipeLV,"beampipeLV",detectorLV,false,0,fCheckOverlaps);  
 
-	auto beampipe2 = new G4Cons("beampipe2", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,(detector_half-det2_half)/2.,0.,360.*deg);
+	auto beampipe2 = new G4Cons("beampipe2", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,(detector_half-sampling_half)/2.,0.,360.*deg);
 	auto beampipe2LV = new G4LogicalVolume(beampipe2,G4Material::GetMaterial("Aluminum"),"beampipe2LV");
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,det2_half+(detector_half-det2_half)/2.),beampipe2LV,"beampipe2LV",detectorLV,false,0,fCheckOverlaps);  
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,sampling_half+(detector_half-sampling_half)/2.),beampipe2LV,"beampipe2LV",detectorLV,false,0,fCheckOverlaps);  
 
-	auto beampipe3 = new G4Cons("beampipe3", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,(detector_half-det2_half)/2.,0.,360.*deg);
+	auto beampipe3 = new G4Cons("beampipe3", pipe_inner_radius, pipe_outer_radius, pipe_inner_radius, pipe_outer_radius,(detector_half-sampling_half)/2.,0.,360.*deg);
 	auto beampipe3LV = new G4LogicalVolume(beampipe2,G4Material::GetMaterial("Aluminum"),"beampipe3LV");
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,-det2_half-(detector_half-det2_half)/2.),beampipe3LV,"beampipe3LV",detectorLV,false,0,fCheckOverlaps);  
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,-sampling_half-(detector_half-sampling_half)/2.),beampipe3LV,"beampipe3LV",detectorLV,false,0,fCheckOverlaps);  
 	// ***********************************************
 	// ======= Scintillator CV building  =========
 	// ***********************************************
@@ -513,10 +514,10 @@ void DetectorConstruction::ConstructSDandField()
 	G4SDManager::GetSDMpointer()->AddNewDetector(DetectorBox);
 	SetSensitiveDetector("detectorLV", DetectorBox);
 	
-//	G4String Det2BoxName = "det2LV" ;
-//	detSD* Det2Box = new detSD(Det2BoxName,0);
-//	G4SDManager::GetSDMpointer()->AddNewDetector(Det2Box);
-//	SetSensitiveDetector("det2LV", Det2Box);
+	G4String samplingBoxName = "samplingLV" ;
+	samplingSD* samplingBox = new samplingSD(samplingBoxName);
+	G4SDManager::GetSDMpointer()->AddNewDetector(samplingBox);
+	SetSensitiveDetector("samplingLV", samplingBox);
 
 	G4String CVDetectorName = "CVLV" ;
 	CVSD* shieldDetector = new CVSD(CVDetectorName);

@@ -82,8 +82,9 @@ void BarHit::SetGeom(G4int p, G4int b, G4double d, G4double l, G4double w, G4dou
 	y0 = distance - width*(bar+0.5);
 }
 
-void BarHit::AddHit(G4double xx, G4double yy, G4double zz, G4double ee)
+void BarHit::AddHit(G4double xx, G4double yy, G4double zz, G4double ee, G4double tt)
 {
+	if(eDep==0.) time = tt;
 	eDep += ee;
 
 	xx = (xx>0) ? xx-x0 : xx+x0;
@@ -110,13 +111,13 @@ G4double BarHit::CalcEnergy(G4double ed, G4double w, G4double r)
 	return np/ppMeV;  
 }  
 
-G4double BarHit::CalcTime(G4double w, G4double v)
+G4double BarHit::CalcTime(G4double t0, G4double w, G4double v)
 {
 	
 	CLHEP::HepRandomEngine* engine = new CLHEP::HepJamesRandom();
 	CLHEP::RandGaussQ rGauss(engine);
   	
-	G4double t=sqrt(w*w+v*v)/c_scint;
+	G4double t=t0+sqrt(w*w+v*v)/c_scint;
 	t = rGauss.shoot(t,0.5*ns);
 	t = (t<0) ? -t : t;
 	return t;  
@@ -135,10 +136,10 @@ void BarHit::AnalyzeHits()
 	G4double r1 = sqrt(x*x+y1*y1);
 	G4double r2 = sqrt(x*x+y2*y2);
 
-	t1 = CalcTime(z1,y1);
-	t2 = CalcTime(z2,y1);
-	t3 = CalcTime(z1,y2);
-	t4 = CalcTime(z2,y2);
+	t1 = CalcTime(time, z1, y1);
+	t2 = CalcTime(time, z2, y1);
+	t3 = CalcTime(time, z1, y2);
+	t4 = CalcTime(time, z2, y2);
 
 	e1 = CalcEnergy(eDep, z1, r1);
 	e2 = CalcEnergy(eDep, z2, r1);
