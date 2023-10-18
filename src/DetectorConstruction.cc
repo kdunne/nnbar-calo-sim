@@ -1,5 +1,6 @@
 #include "DetectorConstruction.hh"
 #include "detSD.hh"
+#include "samplingSD.hh"
 #include "CVSD.hh"
 
 #include "G4Material.hh"
@@ -525,10 +526,10 @@ void DetectorConstruction::ConstructSDandField()
 	G4SDManager::GetSDMpointer()->AddNewDetector(DetectorBox);
 	SetSensitiveDetector("detectorLV", DetectorBox);
 	
-//	G4String samplingBoxName = "samplingLV" ;
-//	detSD* samplingBox = new detSD(samplingBoxName,0);
-//	G4SDManager::GetSDMpointer()->AddNewDetector(samplingBox);
-//	SetSensitiveDetector("samplingLV", samplingBox);
+	G4String samplingBoxName = "samplingLV" ;
+	samplingSD* samplingBox = new samplingSD(samplingBoxName);
+	G4SDManager::GetSDMpointer()->AddNewDetector(samplingBox);
+	SetSensitiveDetector("samplingLV", samplingBox);
 
 	G4String CVDetectorName = "CVLV" ;
 	CVSD* shieldDetector = new CVSD(CVDetectorName);
