@@ -61,9 +61,9 @@ void HistoManager::Book()
 		analysisManager->SetDefaultFileType("root");
 		analysisManager->SetVerboseLevel(1);
 		// Only merge in MT mode to avoid warning when running in Sequential mode
-#ifdef G4MULTITHREADED
-		analysisManager->SetNtupleMerging(true);
-#endif
+// #ifdef G4MULTITHREADED
+// 		analysisManager->SetNtupleMerging(true);
+// #endif
   		analysisManager->SetFileName(filename.c_str());
 		G4bool fileOpen = analysisManager->OpenFile();
 		if (! fileOpen) {
