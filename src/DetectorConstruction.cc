@@ -245,7 +245,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	G4double bar_l = 4.4*m;
 	G4double bar_w = 3.2*m;
 	G4double bar_t = 2.0*cm;
-	G4double shortbar_l = 1.1*m;
+	G4double shortbar_l = 1.2*m;
 // NNBAR
 //	G4double bar_l = 6.4*m;
 //	G4double bar_t = 3.0*cm;
