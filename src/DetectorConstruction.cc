@@ -63,13 +63,15 @@
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4GenericMessenger.hh"
 
 //....
 
 DetectorConstruction::DetectorConstruction()
  : G4VUserDetectorConstruction(),
-   fCheckOverlaps(true)
+   fCheckOverlaps(true),fLength(200.*cm),fWidth(20.*cm),fThickness(2.*cm)
 {
+	DefineCommands();
 }
 
 //....
@@ -122,14 +124,14 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 	// 5x3x50 cm scintillator bars   
 	//G4double WorldSizeX = 40.*cm;
 
-	G4double WorldSizeY = 10.0*cm;
-	G4double WorldSizeZ = 3202*mm;
+	G4double WorldSizeY = fWidth;
+	G4double WorldSizeZ = fLength + 2*mm;
 
 	//G4int scintBars = 10;
-	G4double scintThickness = 3.*cm; 
+	G4double scintThickness = fThickness; 
 	//G4double scintThickness = 4.*cm;
 
-	G4double WLSfiberZ  = WorldSizeZ - 2*mm;
+	G4double WLSfiberZ  = fLength;
 	// G4double WLSfiberR  = 1.8*mm;
 
 	// G4double HoleRadius       = 1*mm;
@@ -156,8 +158,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 	G4double zPos = 0.;
 
 	BuildScintBar(worldLV, xPos, yPos, name[0], zPos, scintThickness, WorldSizeY, WorldSizeZ);
-
-
+	G4cout << "Scintillator bar dimensions: " << fLength/cm << " cm x " << fWidth/cm << " cm x " << fThickness/cm << " cm" << G4endl;
+	G4cout << worldS->GetXHalfLength() << ", " << worldS->GetYHalfLength() << ", " << worldS->GetZHalfLength() << G4endl;
 	return worldPV;
 }
 
@@ -341,9 +343,43 @@ void DetectorConstruction::ConstructSDandField()
 
 }
 
-
 G4Material* DetectorConstruction::FindMaterial(G4String name) {
     G4Material* material = G4Material::GetMaterial(name,true);
     return material;
 }
 
+void DetectorConstruction::DefineCommands()
+{
+	// Define /B5/generator command directory using generic messenger class
+	fMessenger = new G4GenericMessenger(this, "/scint/", "Scintillator bar properties");
+
+	// randomizePrimary command
+	auto& lengthCmd = fMessenger->DeclarePropertyWithUnit("length", "cm", fLength);
+	G4String guidance = "Scintillator bar length in cm.\n";
+	lengthCmd.SetGuidance(guidance);
+	lengthCmd.SetParameterName("length", true);
+	lengthCmd.SetRange("length>=0.");
+	lengthCmd.SetDefaultValue("200.");
+
+	auto& widthCmd = fMessenger->DeclarePropertyWithUnit("width", "cm", fWidth);
+	guidance = "Scintillator bar width in cm.\n";
+	widthCmd.SetGuidance(guidance);
+	widthCmd.SetParameterName("width", true);
+	widthCmd.SetRange("width>=0.");
+	widthCmd.SetDefaultValue("20.");
+
+	auto& thicknessCmd = fMessenger->DeclarePropertyWithUnit("thickness", "cm", fThickness);
+	guidance = "Scintillator bar thickness in cm.\n";
+	thicknessCmd.SetGuidance(guidance);
+	thicknessCmd.SetParameterName("thickness", true);
+	thicknessCmd.SetRange("thickness>=0.");
+	thicknessCmd.SetDefaultValue("2.");
+	
+	auto& yScaleCmd = fMessenger->DeclareProperty("yScale", fYScale);
+	guidance = "Scaling factor for scintillator yield.\n";
+	yScaleCmd.SetGuidance(guidance);
+	yScaleCmd.SetParameterName("yScale", true);
+	yScaleCmd.SetRange("yScale>=0.");
+	yScaleCmd.SetDefaultValue("0.05");
+
+}

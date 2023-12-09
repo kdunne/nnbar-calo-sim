@@ -322,7 +322,7 @@ void WLSMaterials::CreateMaterials()
   mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT2", ScintPhotonEnergy, scintilSlow,false,true);
   // 64% of Antracene: 17400
   double yield = 17400*0.64;
-  double yieldScale = 0.05;
+  double yieldScale = 0.025;
   mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD", yield*yieldScale/MeV); //original 11136.
   mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", sqrt(yieldScale));
   //mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", 1.);

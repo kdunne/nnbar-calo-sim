@@ -37,6 +37,7 @@
 #include "globals.hh"
 
 
+class G4GenericMessenger;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class HistoManager
@@ -72,6 +73,11 @@ class HistoManager
     void FillTree();
     
   private:
+	void DefineCommands();
+	
+	G4String filename;
+	G4GenericMessenger* fMessenger = nullptr;
+
 	G4bool fFactoryOn;
 
 	std::vector<G4int> p_evtno;

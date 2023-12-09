@@ -34,13 +34,15 @@
 
 #include "HistoManager.hh"
 #include "G4UnitsTable.hh"
+#include "G4GenericMessenger.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 HistoManager::HistoManager()
-:fFactoryOn(false)
-{}
-
+	:fFactoryOn(false)
+{
+	DefineCommands();
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 HistoManager::~HistoManager()
@@ -62,7 +64,8 @@ void HistoManager::Book()
 #ifdef G4MULTITHREADED
 		analysisManager->SetNtupleMerging(true);
 #endif
-		G4bool fileOpen = analysisManager->OpenFile("ScintAna");
+  		analysisManager->SetFileName(filename.c_str());
+		G4bool fileOpen = analysisManager->OpenFile();
 		if (! fileOpen) {
 			G4cerr << "\n---> HistoManager::Book(): cannot open "
 				<< analysisManager->GetFileName() << G4endl;
@@ -293,3 +296,15 @@ void HistoManager::FillTree()
 	analysisManager->AddNtupleRow(0);	
 }
 
+void HistoManager::DefineCommands()
+{
+	// Define /B5/generator command directory using generic messenger class
+	fMessenger = new G4GenericMessenger(this, "/output/", "Output control");
+
+	// randomizePrimary command
+	auto& outputFileCmd = fMessenger->DeclareProperty("filename", filename);
+	G4String guidance = "Path of output file.\n";
+	outputFileCmd.SetGuidance(guidance);
+	outputFileCmd.SetParameterName("outputFile", true);
+	outputFileCmd.SetDefaultValue("ScintAna");
+}
