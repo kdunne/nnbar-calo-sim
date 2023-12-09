@@ -20,7 +20,7 @@ private:
 	const G4double c_scint=CLHEP::c_light/1.59; //from Kuraray data sheet
 	const G4double AttLen=3.0*m; //from Kuraray data sheet
 		
-	const G4double ppMeV=17400*0.56;
+	const G4double ppMeV=17400*0.64;
 	const G4double parr[3] = {0.139, 110.68*mm, 0.0687};
 	const G4double parw[2] = {0.2395, 1860.*mm};
 

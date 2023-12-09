@@ -230,6 +230,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto defaultMaterial = G4Material::GetMaterial("Galactic");
 	auto scintMaterial = G4Material::GetMaterial("Scint");
 	auto shieldMaterial = G4Material::GetMaterial("StainlessSteel");
+	auto attenuatorMaterial = G4Material::GetMaterial("Galactic");
 
 	if ( ! defaultMaterial || ! scintMaterial) {
 		G4ExceptionDescription msg; msg << "Cannot retrieve materials already defined.";
@@ -242,7 +243,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto worldPV = new G4PVPlacement(0,G4ThreeVector(),worldLV,"WorldPV",0,false,0,fCheckOverlaps);
 
 // HIBEAM
-	G4double bar_l = 4.4*m;
+	G4double bar_l = 4.2*m;
 	G4double bar_w = 3.2*m;
 	G4double bar_t = 2.0*cm;
 	G4double shortbar_l = 1.2*m;
@@ -319,6 +320,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	// ======= Scintillator CV building  =========
 	// ***********************************************
 	G4double pipe_gap = pipe_outer_radius + 0.02*m;
+	G4double attenuator_gap = 1*cm;
 	// Scint CV up/down
 	G4double veto_ud_x = bar_w; 
 	G4double veto_ud_y = bar_t-0.05*cm; 
@@ -330,10 +332,16 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto CV_ud_2_S = new G4Box("CV_ud_S",veto_ud_x/2., veto_ud_y/2., veto_ud_z/2.);
 	auto CV_ud_2_LV = new G4LogicalVolume(CV_ud_2_S,defaultMaterial,"CV_ud_2_LV");
 
+	auto Att_ud_S = new G4Box("Att_ud_S",veto_ud_x/2., attenuator_gap/2., veto_ud_z/2.);
+	auto Att_ud_LV = new G4LogicalVolume(Att_ud_S,attenuatorMaterial,"Att_ud_LV");
+
 	new G4PVPlacement(0,G4ThreeVector(0.,bar_w/2.+bar_t/2.,0.),CV_ud_1_LV,"up_layer1",detectorLV,false,0,fCheckOverlaps);  
-	new G4PVPlacement(0,G4ThreeVector(0.,bar_w/2.+3.*bar_t/2.,0.),CV_ud_2_LV,"up_layer2",detectorLV,false,1,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,bar_w/2.+3.*bar_t/2.+attenuator_gap,0.),CV_ud_2_LV,"up_layer2",detectorLV,false,1,fCheckOverlaps);
 	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_w/2.+bar_t/2.),0.),CV_ud_1_LV,"down_layer1",detectorLV,false,2,fCheckOverlaps);  
-	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_w/2.+3.*bar_t/2.),0.),CV_ud_2_LV,"down_layer2",detectorLV,false,3,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_w/2.+3.*bar_t/2.+attenuator_gap),0.),CV_ud_2_LV,"down_layer2",detectorLV,false,3,fCheckOverlaps);
+	
+	new G4PVPlacement(0,G4ThreeVector(0.,bar_w/2.+bar_t+attenuator_gap/2.,0.),Att_ud_LV,"up_attenuator",detectorLV,false,101,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_w/2.+bar_t+attenuator_gap/2.),0.),Att_ud_LV,"down_attenuator",detectorLV,false,102,fCheckOverlaps);
 
 	// ===> Filling Scint CV ud with scint bars
 	int num_ud_xbars = 16;
@@ -367,11 +375,17 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto CV_lr_2_S = new G4Box("CV_lr_S",veto_lr_x/2., veto_lr_y/2., veto_lr_z/2.);
 	auto CV_lr_2_LV = new G4LogicalVolume(CV_lr_2_S,defaultMaterial,"CV_lr_2_LV");
 
-	new G4PVPlacement(0,G4ThreeVector(bar_w/2.+bar_t/2.,0.,0.),CV_lr_1_LV,"left_layer1",detectorLV,false,4,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(bar_w/2.+3.*bar_t/2.,0.,0.),CV_lr_2_LV,"left_layer2",detectorLV,false,5,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+bar_t/2.),0.,0.),CV_lr_1_LV,"right_layer1",detectorLV,false,6,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+3.*bar_t/2.),0.,0.),CV_lr_2_LV,"right_layer2",detectorLV,false,7,fCheckOverlaps);
+	auto Att_lr_S = new G4Box("Att_lr_S",attenuator_gap/2., veto_lr_y/2., veto_lr_z/2.);
+	auto Att_lr_LV = new G4LogicalVolume(Att_lr_S,attenuatorMaterial,"Att_lr_LV");
 
+	new G4PVPlacement(0,G4ThreeVector(bar_w/2.+bar_t/2.,0.,0.),CV_lr_1_LV,"left_layer1",detectorLV,false,4,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(bar_w/2.+3.*bar_t/2.+attenuator_gap,0.,0.),CV_lr_2_LV,"left_layer2",detectorLV,false,5,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+bar_t/2.),0.,0.),CV_lr_1_LV,"right_layer1",detectorLV,false,6,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+3.*bar_t/2.+attenuator_gap),0.,0.),CV_lr_2_LV,"right_layer2",detectorLV,false,7,fCheckOverlaps);
+
+	new G4PVPlacement(0,G4ThreeVector(bar_w/2.+bar_t+attenuator_gap,0.,0.),Att_lr_LV,"left_attenuator",detectorLV,false,103,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+bar_t+attenuator_gap),0.,0.),Att_lr_LV,"right_attenuator",detectorLV,false,104,fCheckOverlaps);
+	
 	// ===> Filling Scint CV top with scint bars
 	int num_lr_ybars = 16;
 	int num_lr_zbars = 21;
@@ -404,11 +418,17 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto CV_fb_2_S = new G4Box("CV_fb_S",veto_fb_x/2., veto_fb_y/2., veto_fb_z/2.);
 	auto CV_fb_2_LV = new G4LogicalVolume(CV_fb_2_S,defaultMaterial,"CV_fb_2_LV");
 
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+bar_t/2.),CV_fb_1_LV,"back_layer1",detectorLV,false,8,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+3.*bar_t/2.),CV_fb_2_LV,"back_layer2",detectorLV,false,9,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+bar_t/2.)),CV_fb_1_LV,"front_layer1",detectorLV,false,10,fCheckOverlaps);
-	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+3.*bar_t/2.)),CV_fb_2_LV,"front_layer2",detectorLV,false,11,fCheckOverlaps);
+	auto Att_fb_0 = new G4Box("Att_fb_0",veto_fb_x/2., veto_fb_y/2., veto_fb_z/2.);
+	auto Att_fb_S = new G4SubtractionSolid("Att_fb_S",Att_fb_0,gap_box);
+	auto Att_fb_LV = new G4LogicalVolume(Att_fb_S,attenuatorMaterial,"Att_fb_LV");
 
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+bar_t/2.),CV_fb_1_LV,"back_layer1",detectorLV,false,8,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+3.*bar_t/2.+attenuator_gap),CV_fb_2_LV,"back_layer2",detectorLV,false,9,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+bar_t/2.)),CV_fb_1_LV,"front_layer1",detectorLV,false,10,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+3.*bar_t/2.+attenuator_gap)),CV_fb_2_LV,"front_layer2",detectorLV,false,11,fCheckOverlaps);
+
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+bar_t+attenuator_gap/2.),Att_fb_LV,"back_attenuator",detectorLV,false,105,fCheckOverlaps);
+	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+bar_t+attenuator_gap/2.)),Att_fb_LV,"front_attenuator",detectorLV,false,106,fCheckOverlaps);
 	// ===> Filling Scint CV top with scint bars
 	int num_fb_xbars = 16;
 	int num_fb_ybars = 16;
@@ -503,6 +523,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	CV_fb_1_LV->SetVisAttributes(G4VisAttributes::GetInvisible());
 	CV_fb_2_LV->SetVisAttributes(G4VisAttributes::GetInvisible());
 
+	Att_ud_LV->SetVisAttributes(black_color); 
+	Att_lr_LV->SetVisAttributes(black_color); 
+	Att_fb_LV->SetVisAttributes(black_color); 
+	
 	CV_xbar_ud_LV->SetVisAttributes(red_color);
 	CV_zbar_ud_LV->SetVisAttributes(red_color);
 	CV_ybar_lr_LV->SetVisAttributes(red_color);
