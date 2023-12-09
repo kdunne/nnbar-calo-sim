@@ -125,7 +125,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 	//G4double WorldSizeX = 40.*cm;
 
 	G4double WorldSizeY = fWidth;
-	G4double WorldSizeZ = fLength + 2*mm;
+	G4double WorldSizeZ = fLength + 4*mm;
 
 	//G4int scintBars = 10;
 	G4double scintThickness = fThickness; 
@@ -158,8 +158,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 	G4double zPos = 0.;
 
 	BuildScintBar(worldLV, xPos, yPos, name[0], zPos, scintThickness, WorldSizeY, WorldSizeZ);
-	G4cout << "Scintillator bar dimensions: " << fLength/cm << " cm x " << fWidth/cm << " cm x " << fThickness/cm << " cm" << G4endl;
-	G4cout << worldS->GetXHalfLength() << ", " << worldS->GetYHalfLength() << ", " << worldS->GetZHalfLength() << G4endl;
 	return worldPV;
 }
 
@@ -187,6 +185,9 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos
 	auto ExtrusionS = new G4Box("Extrusion", scintThickness/2, WorldSizeY/2, ScintZSize/2);
 	auto ExtrusionLV = new G4LogicalVolume(ExtrusionS, FindMaterial("Coating"), "Extrusion");
 
+	G4cout << "Scintillator bar dimensions: " << fLength/cm << " cm x " << fWidth/cm << " cm x " << fThickness/cm << " cm" << G4endl;
+	G4cout << "Checking G4Box size: " << ExtrusionS->GetZHalfLength() << " mm x " << ExtrusionS->GetYHalfLength() << " mm x " << ExtrusionS->GetXHalfLength() << " mm" << G4endl;
+	
 	G4double fExtrusionReflectivity = 1.;
 	//G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface", glisur, ground, dielectric_metal, fExtrusionReflectivity);
 	G4OpticalSurface* TiO2Surface = new G4OpticalSurface("TiO2Surface");
