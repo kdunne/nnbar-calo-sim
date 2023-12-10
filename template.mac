@@ -1,4 +1,14 @@
+/cv/lengthX 320 cm
+/cv/lengthZ 420 cm
+/cv/lengthS 120 cm
+/cv/thickness 2 cm
+/cv/numBarsX 16
+/cv/numBarsZ 21
+/cv/attenuatorMaterial 1
+
 /run/initialize
+/eventWrite/writeSampling true
+/eventWrite/writeCV true
 /MCPLgenerator/inputFile XX.mcpl
 /output/filename XX_out
 /run/printProgress 50000
