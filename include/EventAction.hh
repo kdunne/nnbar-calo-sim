@@ -35,6 +35,7 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+class G4GenericMessenger;
 class HistoManager;
 
 class EventAction : public G4UserEventAction
@@ -50,11 +51,11 @@ class EventAction : public G4UserEventAction
 		HistoManager* fHistoManager;
 
 		const G4int nPlanes=12;
-		const G4int nBarsPerPlane=64;
+		const G4int nBarsPerPlane=42;
 		const G4int nBars=nPlanes*nBarsPerPlane;
-		const G4double bar_length = 640*cm;
-		const G4double bar_thickness = 3*cm;
-		const G4double bar_width = 10*cm;
+		const G4double bar_length = 420*cm;
+		const G4double bar_thickness = 2*cm;
+		const G4double bar_width = 20*cm;
 
 		// methods
 		G4THitsMap<G4double>* GetHitsCollection(G4int hcID,
@@ -63,6 +64,11 @@ class EventAction : public G4UserEventAction
 	//	G4double CalcTime(G4double w, G4double v);
 		void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
 				G4double gapEdep, G4double scintTrackLength) const; //, G4double gapTrackLength) const;
+
+		void DefineCommands();
+		G4bool fWriteSampling;
+		G4bool fWriteCV;
+		G4GenericMessenger* fMessenger = nullptr;
 
 		// data members                   
 		G4int  detHitsCollectionID;

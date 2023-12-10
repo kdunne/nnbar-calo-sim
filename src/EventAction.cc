@@ -42,6 +42,7 @@
 #include "G4DigiManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
+#include "G4GenericMessenger.hh"
 
 #include "G4Threading.hh"
 #include "G4AutoLock.hh"
@@ -62,8 +63,11 @@ EventAction::EventAction(HistoManager *histo):
 	fHistoManager(histo),
     detHitsCollectionID(-1),
     samplingHitsCollectionID(-1),
-    CVHitsCollectionID(-1)
+    CVHitsCollectionID(-1),
+	fWriteSampling(true),
+	fWriteCV(true)
 {
+	DefineCommands();
 }
 
 //....
@@ -194,24 +198,26 @@ void EventAction::EndOfEventAction(const G4Event* event)
 			}
 		}
 
-		samplingHits = (NNbarHitsCollection*)(HCE->GetHC(samplingHC));
-		if (samplingHits) {
-			G4int hitCount = samplingHits->entries();
-			for (G4int h=0; h<hitCount; h++) {
-				G4String name     = ((*samplingHits)[h]) -> GetName();
-				if (name != "opticalphoton"){
-					G4double time     = ((*samplingHits)[h]) -> GetTime(); 
-					G4int trID   = ((*samplingHits)[h]) -> GetTrackID(); 
-					G4int pid   = ((*samplingHits)[h]) -> GetPID(); 
-					G4double ekin = ((*samplingHits)[h]) -> GetKinEn();
-					G4double xx = ((*samplingHits)[h]) -> GetPosX();
-					G4double yy = ((*samplingHits)[h]) -> GetPosY();
-					G4double zz = ((*samplingHits)[h]) -> GetPosZ();
-					G4double pX = ((*samplingHits)[h]) -> GetPX();
-					G4double pY = ((*samplingHits)[h]) -> GetPY();
-					G4double pZ = ((*samplingHits)[h]) -> GetPZ();
+		if(fWriteSampling){
+			samplingHits = (NNbarHitsCollection*)(HCE->GetHC(samplingHC));
+			if (samplingHits) {
+				G4int hitCount = samplingHits->entries();
+				for (G4int h=0; h<hitCount; h++) {
+					G4String name     = ((*samplingHits)[h]) -> GetName();
+					if (name != "opticalphoton"){
+						G4double time     = ((*samplingHits)[h]) -> GetTime(); 
+						G4int trID   = ((*samplingHits)[h]) -> GetTrackID(); 
+						G4int pid   = ((*samplingHits)[h]) -> GetPID(); 
+						G4double ekin = ((*samplingHits)[h]) -> GetKinEn();
+						G4double xx = ((*samplingHits)[h]) -> GetPosX();
+						G4double yy = ((*samplingHits)[h]) -> GetPosY();
+						G4double zz = ((*samplingHits)[h]) -> GetPosZ();
+						G4double pX = ((*samplingHits)[h]) -> GetPX();
+						G4double pY = ((*samplingHits)[h]) -> GetPY();
+						G4double pZ = ((*samplingHits)[h]) -> GetPZ();
 
-					fHistoManager->FillSamplingVectors(trID, pid, time, ekin, xx, yy, zz, pX, pY, pZ);
+						fHistoManager->FillSamplingVectors(trID, pid, time, ekin, xx, yy, zz, pX, pY, pZ);
+					}
 				}
 			}
 		}
@@ -255,10 +261,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
 					G4double pX = ((*CVHits)[h]) -> GetPX();
 					G4double pY = ((*CVHits)[h]) -> GetPY();
 					G4double pZ = ((*CVHits)[h]) -> GetPZ();
-					
-					fHistoManager->FillCVVectors(local_event_number, trID, cvpid[n], cvbar, plane, planedir, 
-							time, kinEn, eDep, trackl, xx, yy, zz, pX, pY, pZ);
 
+					if(fWriteCV){
+						fHistoManager->FillCVVectors(local_event_number, trID, cvpid[n], cvbar, plane, planedir, 
+								time, kinEn, eDep, trackl, xx, yy, zz, pX, pY, pZ);
+					}
 					switch(planedir){
 						case 0:
 							bar[n].AddHit(yy,xx,zz,eDep,time);
@@ -305,4 +312,23 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
 	if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {G4cout << "---> End of event: " << eventID << G4endl;}
 
-}  
+} 
+
+void EventAction::DefineCommands()
+{
+	// Define /B5/generator command directory using generic messenger class
+	fMessenger = new G4GenericMessenger(this, "/eventWrite/", "Controls writing events to file.");
+
+	auto& writeSamplingCmd = fMessenger->DeclareProperty("writeSampling", fWriteSampling);
+	G4String guidance = "Write data from sampling layer to file.\n";
+	writeSamplingCmd.SetGuidance(guidance);
+	writeSamplingCmd.SetParameterName("writeSampling", true);
+	writeSamplingCmd.SetDefaultValue("true");
+
+	auto& writeCVCmd = fMessenger->DeclareProperty("writeCV", fWriteCV);
+	guidance = "Write raw CV data to file.\n";
+	writeCVCmd.SetGuidance(guidance);
+	writeCVCmd.SetParameterName("writeCV", true);
+	writeCVCmd.SetDefaultValue("true");
+	
+}

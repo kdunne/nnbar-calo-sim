@@ -538,7 +538,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	G4cout << "***************************" << G4endl; 
 	G4cout << "***Veto geometry summary***" << G4endl; 
 	G4cout << "***************************" << G4endl;
-	G4cout << fLengthZ << ", " << fLengthX << ", " << fLengthS << ", " << fAttenuatorMaterial << G4endl; 
+	//G4cout << fLengthZ << ", " << fLengthX << ", " << fLengthS << ", " << fAttenuatorMaterial << G4endl; 
 	G4cout << "Parallel bar length: " << CV_xbar_ud_S->GetZHalfLength()*0.2 << " cm" << G4endl;
 	G4cout << "Perpendicular bar length: " << CV_zbar_ud_S->GetXHalfLength()*0.2 << " cm" << G4endl;
 	G4cout << "Short bar length: " << CV_xshortbar_fb_S->GetXHalfLength()*0.2 << " cm" << G4endl;
@@ -576,6 +576,7 @@ void DetectorConstruction::ConstructSDandField()
 	SetSensitiveDetector("CV_ybar_fb_LV", shieldDetector);
 
 }
+
 void DetectorConstruction::DefineCommands()
 {
 	// Define /B5/generator command directory using generic messenger class
@@ -612,15 +613,15 @@ void DetectorConstruction::DefineCommands()
 	auto& numBarsXCmd = fMessenger->DeclareProperty("numBarsX", fNumBarsX);
 	guidance = "Number of bars perpendicular to beam per layer.\n";
 	numBarsXCmd.SetGuidance(guidance);
-	numBarsXCmd.SetParameterName("numBarX", true);
-	numBarsXCmd.SetRange("numBarX>=0");
+	numBarsXCmd.SetParameterName("numBarsX", true);
+	numBarsXCmd.SetRange("numBarsX>=0");
 	numBarsXCmd.SetDefaultValue("16");
 
 	auto& numBarsZCmd = fMessenger->DeclareProperty("numBarsZ", fNumBarsZ);
 	guidance = "Number of bars perpendicular to beam per layer.\n";
 	numBarsZCmd.SetGuidance(guidance);
-	numBarsZCmd.SetParameterName("numBarZ", true);
-	numBarsZCmd.SetRange("numBarZ>=0");
+	numBarsZCmd.SetParameterName("numBarsZ", true);
+	numBarsZCmd.SetRange("numBarsZ>=0");
 	numBarsZCmd.SetDefaultValue("21");
 	
 	auto& attenuatorMaterialCmd = fMessenger->DeclareProperty("attenuatorMaterial", fAttenuatorMaterial);
