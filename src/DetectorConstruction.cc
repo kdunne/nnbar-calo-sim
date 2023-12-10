@@ -39,6 +39,7 @@
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4GenericMessenger.hh"
 #include<string>
 //#include "G4GDMLParser.hh"
 #include <boost/lexical_cast.hpp>
@@ -48,8 +49,12 @@ using boost::lexical_cast;
 
 
 DetectorConstruction::DetectorConstruction()
-	: G4VUserDetectorConstruction(), fCheckOverlaps(false)
+	: G4VUserDetectorConstruction(), fCheckOverlaps(false),
+	fLengthX(320.*cm),fLengthZ(420.*cm),fLengthS(120.*cm),
+	fThickness(2.*cm),fNumBarsX(16),fNumBarsZ(21),
+	fAttenuatorMaterial(0)
 {
+	DefineCommands();
 }
 //....
 DetectorConstruction::~DetectorConstruction()
@@ -231,8 +236,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto scintMaterial = G4Material::GetMaterial("Scint");
 	auto shieldMaterial = G4Material::GetMaterial("StainlessSteel");
 	auto attenuatorMaterial = G4Material::GetMaterial("Galactic");
+	if(fAttenuatorMaterial==1) attenuatorMaterial = G4Material::GetMaterial("Aluminum");
 
-	if ( ! defaultMaterial || ! scintMaterial) {
+	if ( ! defaultMaterial || ! scintMaterial || ! shieldMaterial|| ! attenuatorMaterial) {
 		G4ExceptionDescription msg; msg << "Cannot retrieve materials already defined.";
 		G4Exception("DetectorConstruction::DefineVolumes()","MyCode0001", FatalException, msg);}
 
@@ -242,15 +248,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto worldLV = new G4LogicalVolume(worldS,defaultMaterial,"World");
 	auto worldPV = new G4PVPlacement(0,G4ThreeVector(),worldLV,"WorldPV",0,false,0,fCheckOverlaps);
 
-// HIBEAM
-	G4double bar_l = 4.2*m;
-	G4double bar_w = 3.2*m;
-	G4double bar_t = 2.0*cm;
-	G4double shortbar_l = 1.2*m;
-// NNBAR
-//	G4double bar_l = 6.4*m;
-//	G4double bar_t = 3.0*cm;
-//	G4double shortbar_l = 2.1*m;
+	G4double bar_l = fLengthZ;
+	G4double bar_w = fLengthX;
+	G4double bar_t = fThickness;
+	G4double shortbar_l = fLengthS;
 
 	G4double detector_half=bar_w/2.+2*bar_t+1*mm;
 	G4double detector_length=bar_l/2.+2*bar_t+1*mm;
@@ -258,9 +259,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	auto detectorLV = new G4LogicalVolume(detector,defaultMaterial,"detectorLV");
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,0.),detectorLV,"detector",worldLV,false,0,fCheckOverlaps);  
 
-	// Build rudimentary annihilation detector
-		
-// HIBEAM
+// Build rudimentary annihilation detector
 	G4double passive_half=1.45*m;
 	G4double passive_length=2.1*m;
 	G4double sampling_half=1.26*m;
@@ -344,8 +343,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(0.,-(bar_w/2.+bar_t+attenuator_gap/2.),0.),Att_ud_LV,"down_attenuator",detectorLV,false,102,fCheckOverlaps);
 
 	// ===> Filling Scint CV ud with scint bars
-	int num_ud_xbars = 16;
-	int num_ud_zbars = 21;
+	int num_ud_xbars = fNumBarsX;
+	int num_ud_zbars = fNumBarsZ;
 
 	G4double xbar_ud_w = veto_ud_x/num_ud_xbars*mm;
 	G4double zbar_ud_w = veto_ud_z/num_ud_zbars*mm;
@@ -387,8 +386,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(-(bar_w/2.+bar_t+attenuator_gap),0.,0.),Att_lr_LV,"right_attenuator",detectorLV,false,104,fCheckOverlaps);
 	
 	// ===> Filling Scint CV top with scint bars
-	int num_lr_ybars = 16;
-	int num_lr_zbars = 21;
+	int num_lr_ybars = fNumBarsX;
+	int num_lr_zbars = fNumBarsZ;
 
 	G4double ybar_lr_w = veto_lr_y/num_lr_ybars*mm;
 	G4double zbar_lr_w = veto_lr_z/num_lr_zbars*mm;
@@ -430,8 +429,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,bar_l/2.+bar_t+attenuator_gap/2.),Att_fb_LV,"back_attenuator",detectorLV,false,105,fCheckOverlaps);
 	new G4PVPlacement(0,G4ThreeVector(0.,0.,-(bar_l/2.+bar_t+attenuator_gap/2.)),Att_fb_LV,"front_attenuator",detectorLV,false,106,fCheckOverlaps);
 	// ===> Filling Scint CV top with scint bars
-	int num_fb_xbars = 16;
-	int num_fb_ybars = 16;
+	int num_fb_xbars = fNumBarsX;
+	int num_fb_ybars = fNumBarsX;
 
 	G4double xbar_fb_w = veto_fb_x/num_fb_xbars*mm;
 	G4double ybar_fb_w = veto_fb_y/num_fb_ybars*mm;
@@ -536,6 +535,17 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 	CV_xshortbar_fb_LV->SetVisAttributes(red_color);
 	CV_yshortbar_fb_LV->SetVisAttributes(red_color);
 
+	G4cout << "***************************" << G4endl; 
+	G4cout << "***Veto geometry summary***" << G4endl; 
+	G4cout << "***************************" << G4endl;
+	G4cout << fLengthZ << ", " << fLengthX << ", " << fLengthS << ", " << fAttenuatorMaterial << G4endl; 
+	G4cout << "Parallel bar length: " << CV_xbar_ud_S->GetZHalfLength()*0.2 << " cm" << G4endl;
+	G4cout << "Perpendicular bar length: " << CV_zbar_ud_S->GetXHalfLength()*0.2 << " cm" << G4endl;
+	G4cout << "Short bar length: " << CV_xshortbar_fb_S->GetXHalfLength()*0.2 << " cm" << G4endl;
+	G4cout << "Bar thickness: " << CV_xbar_ud_S->GetYHalfLength()*0.2 << " cm" << G4endl;
+	G4cout << "Attenuator Material: " << Att_ud_LV->GetMaterial() << G4endl;
+	G4cout << "***************************" << G4endl; 
+	
 	return worldPV;
 }
 
@@ -566,6 +576,60 @@ void DetectorConstruction::ConstructSDandField()
 	SetSensitiveDetector("CV_ybar_fb_LV", shieldDetector);
 
 }
+void DetectorConstruction::DefineCommands()
+{
+	// Define /B5/generator command directory using generic messenger class
+	fMessenger = new G4GenericMessenger(this, "/cv/", "Cosmic veto properties");
 
+	auto& lengthXCmd = fMessenger->DeclarePropertyWithUnit("lengthX", "cm", fLengthX);
+	G4String guidance = "Length of bars perpendicular to beam in cm.\n";
+	lengthXCmd.SetGuidance(guidance);
+	lengthXCmd.SetParameterName("lengthX", true);
+	lengthXCmd.SetRange("lengthX>=0.");
+	lengthXCmd.SetDefaultValue("320.");
+
+	auto& lengthZCmd = fMessenger->DeclarePropertyWithUnit("lengthZ", "cm", fLengthZ);
+	guidance = "Length of bars parallel to beam in cm.\n";
+	lengthZCmd.SetGuidance(guidance);
+	lengthZCmd.SetParameterName("lengthZ", true);
+	lengthZCmd.SetRange("lengthZ>=0.");
+	lengthZCmd.SetDefaultValue("420.");
+
+	auto& lengthSCmd = fMessenger->DeclarePropertyWithUnit("lengthS", "cm", fLengthS);
+	guidance = "Length of short bars in front and back in cm.\n";
+	lengthSCmd.SetGuidance(guidance);
+	lengthSCmd.SetParameterName("lengthS", true);
+	lengthSCmd.SetRange("lengthS>=0.");
+	lengthSCmd.SetDefaultValue("120.");
+
+	auto& thicknessCmd = fMessenger->DeclarePropertyWithUnit("thickness", "cm", fThickness);
+	guidance = "Scintillator bar thickness in cm.\n";
+	thicknessCmd.SetGuidance(guidance);
+	thicknessCmd.SetParameterName("thickness", true);
+	thicknessCmd.SetRange("thickness>=0.");
+	thicknessCmd.SetDefaultValue("2.");
+		
+	auto& numBarsXCmd = fMessenger->DeclareProperty("numBarsX", fNumBarsX);
+	guidance = "Number of bars perpendicular to beam per layer.\n";
+	numBarsXCmd.SetGuidance(guidance);
+	numBarsXCmd.SetParameterName("numBarX", true);
+	numBarsXCmd.SetRange("numBarX>=0");
+	numBarsXCmd.SetDefaultValue("16");
+
+	auto& numBarsZCmd = fMessenger->DeclareProperty("numBarsZ", fNumBarsZ);
+	guidance = "Number of bars perpendicular to beam per layer.\n";
+	numBarsZCmd.SetGuidance(guidance);
+	numBarsZCmd.SetParameterName("numBarZ", true);
+	numBarsZCmd.SetRange("numBarZ>=0");
+	numBarsZCmd.SetDefaultValue("21");
+	
+	auto& attenuatorMaterialCmd = fMessenger->DeclareProperty("attenuatorMaterial", fAttenuatorMaterial);
+	guidance = "Material of attenuator layer. 0=Void, 1=Aluminium.\n";
+	attenuatorMaterialCmd.SetGuidance(guidance);
+	attenuatorMaterialCmd.SetParameterName("attenuatorMaterial", true);
+	//attenuatorMaterialCmd.SetRange("attenuatorMaterial>=0");
+	attenuatorMaterialCmd.SetDefaultValue("0");
+
+}
 //....
 

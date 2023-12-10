@@ -107,8 +107,6 @@ int main(int argc, char** argv)
   
   auto actionInitialization = new ActionInitialization();
   runManager->SetUserInitialization(actionInitialization);
-
-  runManager->Initialize();
   
   // Initialize visualization
   auto visManager = new G4VisExecutive;
