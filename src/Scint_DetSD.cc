@@ -76,7 +76,6 @@ void Scint_DetSD::Initialize(G4HCofThisEvent*)
 G4bool Scint_DetSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
     //if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint_detectorPV") return false;
-    
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();

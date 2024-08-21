@@ -23,49 +23,45 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file PrimaryGenerator.hh
+/// \brief Definition of the PrimaryGenerator class
 //
+// 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "ActionInitialization.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "RunAction.hh"
-#include "EventAction.hh"
-#include "SteppingAction.hh"
-#include "HistoManager.hh"
+#ifndef PrimaryGenerator_h
+#define PrimaryGenerator_h 1
 
-//....
+#include "G4VPrimaryGenerator.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4PrimaryParticle.hh"
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
-{}
+class G4Event;
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::~ActionInitialization()
-{;}
-
-//....
-
-void ActionInitialization::BuildForMaster() const
+class PrimaryGenerator : public G4VPrimaryGenerator
 {
-	HistoManager *histo = new HistoManager();
-  	SetUserAction(new RunAction(histo));
-}
+  public:
+    PrimaryGenerator();    
+   ~PrimaryGenerator();
 
-//....
+  public:
+    void GeneratePrimaryVertex(G4Event*);
+	G4ThreeVector GetParticlePosition(){return position;}
+	G4ParticleDefinition* GetParticleDefinition1(){return partdef1;}
+	G4ParticleDefinition* GetParticleDefinition2(){return partdef2;}
+	G4ThreeVector GetParticleMomentumDirection1(){return particle1->GetMomentumDirection();}
+	G4ThreeVector GetParticleMomentumDirection2(){return particle2->GetMomentumDirection();}
+	G4double GetParticleEnergy1(){return particle1->GetKineticEnergy();}
+	G4double GetParticleEnergy2(){return particle2->GetKineticEnergy();}
+  private:
+	G4ThreeVector position; 
+	G4ParticleDefinition *partdef1, *partdef2;
+	G4PrimaryParticle *particle1, *particle2;
+};
 
-void ActionInitialization::Build() const
-{
-	HistoManager *histo = new HistoManager();
-	SetUserAction(new PrimaryGeneratorAction(histo));
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-	RunAction* runAction = new RunAction(histo);
-	SetUserAction(runAction);
-
-	EventAction* eventAction = new EventAction(histo);
-	SetUserAction(eventAction);
-
-	//SetUserAction(new SteppingAction());
-
-}  
-
-//....
+#endif

@@ -119,10 +119,10 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(actionInitialization);
   
   // Initialize visualization
-  auto visManager = new G4VisExecutive;
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
-  visManager->Initialize();
+ // auto visManager = new G4VisExecutive;
+ // // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
+ // // G4VisManager* visManager = new G4VisExecutive("Quiet");
+ // visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
   }
 
   // Job termination
-  delete visManager;
+  //delete visManager;
   delete runManager;
 }
 

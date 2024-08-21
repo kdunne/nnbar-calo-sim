@@ -46,7 +46,6 @@ void GenericSD::Initialize(G4HCofThisEvent*)
 //.....
 G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
-
 	G4Track *theTrack = aStep->GetTrack();
 	G4StepPoint* PreStep = aStep->GetPreStepPoint();
 
@@ -88,10 +87,16 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	G4int parentID = 0;
 	G4String proc = "";
 	// Getting Process on parentID of primary causes seg fault
-	if(trackID > 1){
-		parentID = theTrack->GetParentID();
-		proc = theTrack->GetCreatorProcess()->GetProcessName();
-	}
+	if (trackID > 1){
+        parentID = theTrack->GetParentID();
+		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
+		else { proc = "primary"; }
+        
+    }
+	//if(trackID > 2){
+	//	parentID = theTrack->GetParentID();
+	//	proc = theTrack->GetCreatorProcess()->GetProcessName();
+	//}
 	else {
 		proc = "primary";
 		parentID = 0;

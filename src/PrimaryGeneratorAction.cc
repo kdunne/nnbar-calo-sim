@@ -23,84 +23,74 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file PrimaryGeneratorAction.cc
+/// \brief Implementation of the PrimaryGeneratorAction class
+//
 // 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PrimaryGeneratorAction.hh"
+#include "PrimaryGenerator.hh"
 #include "HistoManager.hh"
 
-#include "G4RunManager.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4LogicalVolume.hh"
-#include "G4Box.hh"
 #include "G4Event.hh"
-#include "G4GeneralParticleSource.hh"
-#include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4SystemOfUnits.hh"
-#include "Randomize.hh"
-
 #include "G4Threading.hh"
 #include "G4AutoLock.hh"
 
 namespace {G4Mutex PrimaryGeneratorMutex = G4MUTEX_INITIALIZER;}
-//.....
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(HistoManager *histo)
- : G4VUserPrimaryGeneratorAction(),fHistoManager(histo),
-   fParticleGun(nullptr)
-{
-    fParticleGun = new G4GeneralParticleSource();
-
-// G4int nofParticles = 1;
- // fParticleGun = new G4ParticleGun(nofParticles);
-
- // // default particle kinematic
- // // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
- // auto particleDefinition 
- //   = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
- // fParticleGun->SetParticleDefinition(particleDefinition);
-////  fParticleGun->SetParticlePosition(G4ThreeVector(15.,0.,0.));
-////  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1.,0.,0.));
- // fParticleGun->SetParticleEnergy(200*MeV);
+ : fHistoManager(histo)
+{ 
+	fPrimaryGenerator = new PrimaryGenerator();
 }
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
+{ 
+	delete fPrimaryGenerator;
 }
 
-//....
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-
-	auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 	G4AutoLock lock(&PrimaryGeneratorMutex);
-	// Set gun position
-	//fParticleGun->SetParticlePosition(G4ThreeVector(-20.*cm, 0.,0. ));
-
-	fParticleGun->GeneratePrimaryVertex(anEvent);
-
+	fPrimaryGenerator->GeneratePrimaryVertex(anEvent);
+	
 	// write particle properties to file
 	fHistoManager->ClearPVectors();
 	G4int evno = anEvent->GetEventID();
-	G4int pid = fParticleGun->GetParticleDefinition()->GetPDGEncoding();
-	G4double mass = fParticleGun->GetParticleDefinition()->GetPDGMass();
-	G4double charge = fParticleGun->GetParticleDefinition()->GetPDGCharge();
-	G4double ke = fParticleGun->GetParticleEnergy();
-	G4double x = fParticleGun->GetParticlePosition().getX();
-	G4double y = fParticleGun->GetParticlePosition().getY();
-	G4double z = fParticleGun->GetParticlePosition().getZ();
+	G4int pid = fPrimaryGenerator->GetParticleDefinition1()->GetPDGEncoding();
+	G4double mass = fPrimaryGenerator->GetParticleDefinition1()->GetPDGMass();
+	G4double charge = fPrimaryGenerator->GetParticleDefinition1()->GetPDGCharge();
+	G4double ke = fPrimaryGenerator->GetParticleEnergy1();
+	G4double x = fPrimaryGenerator->GetParticlePosition().getX();
+	G4double y = fPrimaryGenerator->GetParticlePosition().getY();
+	G4double z = fPrimaryGenerator->GetParticlePosition().getZ();
 	G4double t = 0.;
-	G4double px = fParticleGun->GetParticleMomentumDirection().getX();
-	G4double py = fParticleGun->GetParticleMomentumDirection().getY();
-	G4double pz = fParticleGun->GetParticleMomentumDirection().getZ();
+	G4double px = fPrimaryGenerator->GetParticleMomentumDirection1().getX();
+	G4double py = fPrimaryGenerator->GetParticleMomentumDirection1().getY();
+	G4double pz = fPrimaryGenerator->GetParticleMomentumDirection1().getZ();
+	fHistoManager->FillPVectors(evno,pid,mass,charge,ke,x,y,z,t,px,py,pz);
+		
+	pid = fPrimaryGenerator->GetParticleDefinition2()->GetPDGEncoding();
+	mass = fPrimaryGenerator->GetParticleDefinition2()->GetPDGMass();
+	charge = fPrimaryGenerator->GetParticleDefinition2()->GetPDGCharge();
+	ke = fPrimaryGenerator->GetParticleEnergy2();
+	x = fPrimaryGenerator->GetParticlePosition().getX();
+	y = fPrimaryGenerator->GetParticlePosition().getY();
+	z = fPrimaryGenerator->GetParticlePosition().getZ();
+	t = 0.;
+	px = fPrimaryGenerator->GetParticleMomentumDirection2().getX();
+	py = fPrimaryGenerator->GetParticleMomentumDirection2().getY();
+	pz = fPrimaryGenerator->GetParticleMomentumDirection2().getZ();
 	fHistoManager->FillPVectors(evno,pid,mass,charge,ke,x,y,z,t,px,py,pz);
 	
 }
 
-//....
-
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
