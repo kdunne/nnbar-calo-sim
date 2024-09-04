@@ -106,11 +106,15 @@ int main(int argc, char** argv)
   auto runManager = new G4RunManager;
 #endif
 
+  auto seed = time(nullptr);
+  CLHEP::HepRandom::setTheSeed(seed);
+  G4Random::setTheSeed(seed);
+
   // Set mandatory initialization classes
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
-   
+
   G4VModularPhysicsList* physicsList = new PhysicsList();
   //G4ProductionCutsTable::GetProductionCutsTable()->SetEnergyRange(30.0*eV, 10.0*TeV);
   runManager->SetUserInitialization(physicsList);
@@ -119,10 +123,10 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(actionInitialization);
   
   // Initialize visualization
- // auto visManager = new G4VisExecutive;
- // // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
- // // G4VisManager* visManager = new G4VisExecutive("Quiet");
- // visManager->Initialize();
+  auto visManager = new G4VisExecutive;
+  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
+  // G4VisManager* visManager = new G4VisExecutive("Quiet");
+  visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
@@ -131,20 +135,33 @@ int main(int argc, char** argv)
   if ( macro.size() ) {
     // batch mode
     G4String command = "/control/execute ";
+    UImanager->ApplyCommand("/control/macroPath ../macros/");
     UImanager->ApplyCommand(command+macro);
   }
-  else  {  
-    // interactive mode : define UI session
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
-    if (ui->IsGUI()) {
-      UImanager->ApplyCommand("/control/execute gui.mac");
-    }
-    ui->SessionStart();
-    delete ui;
+  else  {
+
+     ///*
+     // interactive mode : define UI session
+     UImanager->ApplyCommand("/control/execute init_vis.mac");
+     UImanager->ApplyCommand("/control/macroPath ../macros/");
+     // UImanager->ApplyCommand("/output/filename ../testout.root");
+     // UImanager->ApplyCommand("/control/execute nn1.mac");
+
+     if (ui->IsGUI()) {
+       UImanager->ApplyCommand("/control/execute gui.mac");
+     }
+     ui->SessionStart();
+     delete ui;
+
+     //*/
+
+    // Force to cmd execution
+    // UImanager->ApplyCommand("/control/macroPath ../macros/");
+    // UImanager->ApplyCommand("/control/execute nn1.mac");
   }
 
   // Job termination
-  //delete visManager;
+  delete visManager;
   delete runManager;
 }
 

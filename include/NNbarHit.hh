@@ -1,6 +1,8 @@
 #ifndef NNbarHit_h
 #define NNbarHit_h 1
 
+#include <G4Track.hh>
+
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
@@ -24,6 +26,7 @@ class NNbarHit : public G4VHit
 		//******************************MT
 
 	private:
+		G4Step* step;
 		G4double localTime;
 		G4int parentID;
 		G4String process;
@@ -38,10 +41,15 @@ class NNbarHit : public G4VHit
 		G4double energyDeposit; // Energy deposit associated with the hit
 		G4double vertex_KE;
 		G4double kinEnergy;
-		G4int photons;
+		G4int photons; // All photons
 		G4String detName;
+		G4String LVName; // Logic volume name ADDED
+		G4String solidName; // Solid name ADDED
+		G4String nextLVName; // Next logic volume name ADDED
+		G4String sdName; // Sensitive Detector name ADDED
 
 	public:
+		inline G4Step* GetStep(){return step;}
 		inline G4double GetLocalTime(){return localTime;}
 		inline G4int GetParentID(){return parentID;}
 		inline G4String GetProcess(){return process;}
@@ -58,7 +66,12 @@ class NNbarHit : public G4VHit
 		inline G4bool GetIsLast(){return isLast;}
 		inline G4int GetPhotons(){return photons;}
 		inline G4String GetDetName(){return detName;}
+		inline G4String GetLVName(){return LVName;}
+		inline G4String GetSolidName(){return solidName;}
+		inline G4String GetNextLVName(){return nextLVName;}
+		inline G4String GetSDName(){return sdName;}
 
+		inline void SetStep(G4Step* aStep){step = aStep;}
 		inline void SetLocalTime(G4double ltime){localTime = ltime;}
 		inline void SetParentID(G4int parent){parentID = parent;}
 		inline void SetProcess(G4String p){process = p;}
@@ -75,6 +88,11 @@ class NNbarHit : public G4VHit
 		inline void SetIsLast(G4bool last){isLast = last;}
 		inline void SetPhotons(G4int ph){photons = ph;}
 		inline void SetDetName(G4String dn){detName = dn;}
+		inline void SetLVName(G4String lv){LVName = lv;}
+		inline void SetSolidName(G4String solid){solidName = solid;}
+		inline void SetNextLVName(G4String nextlv){nextLVName = nextlv;}
+		inline void SetSDName(G4String sd){sdName = sd;}
+
 
 };
 

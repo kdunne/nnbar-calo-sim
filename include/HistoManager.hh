@@ -53,10 +53,14 @@ class HistoManager
 			G4double ke, G4double x, G4double y, G4double z,
 			G4double t, G4double px, G4double py, G4double pz);
 
+	void FillScintVectors(G4double x, G4double y, G4double z, G4double time);
+
 	void FillScintVectors(G4int evtno, G4int trackid, G4int pid, 
 			G4int parentid, G4int no, G4double t, G4double ke, G4double eDep,
 			G4int photons, G4double x, G4double y, G4double z,
 			G4double part_x, G4double part_y, G4double part_z);
+
+	void FillScintVectors(G4int scint, G4int scintphotons,G4int holeAphotons, G4int holeBphotons, G4int fiberAphotons, G4int fiberBphotons, G4double hitTime, std::vector<G4double> hitPos, std::vector<G4int> hitPDG);
 
 	void FillFiberVectors(G4int evtno, G4int trackid, G4int parentid, 
 			G4int procid, G4int no, G4double t, 
@@ -65,12 +69,19 @@ class HistoManager
 	
 	void FillSiPMVectors(G4int evtno, G4int trackid, G4int parentid, 
 			G4int no, G4double t, G4double ke,
-			G4double x, G4double y, G4double z);
-	
+			G4double x, G4double y, G4double z, const G4String& scintname, const G4String& sipmname, G4double time, G4int phot);
+
+	void FillSiPMVectors(const G4String& sipmname, G4double time, G4int phot);
+
+	void FillSiPMVectors(const G4int scint, G4int photA0, G4int photA1, G4int photB0, G4int photB1);
+	void FillSiPMVectors(const G4int scint, std::vector<G4double> tA0, std::vector<G4double> tA1, std::vector<G4double> tB0, std::vector<G4double> tB1);
+
+	void FillTargetVectors(const G4int proc);
+
 	void ClearPVectors();
     void ClearEventVectors();
 
-    void FillTree();
+    void FillTree() const;
     
   private:
 	void DefineCommands();
@@ -80,58 +91,79 @@ class HistoManager
 
 	G4bool fFactoryOn;
 
-	std::vector<G4int> p_evtno;
-	std::vector<G4int> p_parentid;
-	std::vector<G4double> p_m;
-	std::vector<G4double> p_q;
-	std::vector<G4double> p_ke;
-	std::vector<G4double> p_x;
-	std::vector<G4double> p_y;
-	std::vector<G4double> p_z;
-	std::vector<G4double> p_t;
-	std::vector<G4double> p_px;
-	std::vector<G4double> p_py;
-	std::vector<G4double> p_pz;
+// 	/*
+// 	*std::vector<G4int> p_evtno;
+// 	std::vector<G4int> p_parentid;
+// 	std::vector<G4double> p_m;
+// 	std::vector<G4double> p_q;
+// 	std::vector<G4double> p_ke;
+// 	std::vector<G4double> p_x;
+// 	std::vector<G4double> p_y;
+// 	std::vector<G4double> p_z;
+// 	std::vector<G4double> p_t;
+// 	std::vector<G4double> p_px;
+// 	std::vector<G4double> p_py;
+// 	std::vector<G4double> p_pz;
+//
+// 	std::vector<G4int> scint_evtno;
+// 	std::vector<G4int> scint_trackid;
+// 	std::vector<G4int> scint_pid;
+// 	std::vector<G4int> scint_parentid;
+// 	std::vector<G4int> scint_no;
+// 	std::vector<G4double> scint_ke;
+// 	std::vector<G4double> scint_eDep;
+// 	std::vector<G4double> scint_part_x;
+// 	std::vector<G4double> scint_part_y;
+// 	std::vector<G4double> scint_part_z;
+//
+// 	std::vector<G4int> fiber_evtno;
+// 	std::vector<G4int> fiber_trackid;
+// 	std::vector<G4int> fiber_parentid;
+// 	std::vector<G4int> fiber_procid;
+// 	std::vector<G4int> fiber_no;
+// 	std::vector<G4double> fiber_t;
+// 	std::vector<G4double> fiber_x;
+// 	std::vector<G4double> fiber_y;
+// 	std::vector<G4double> fiber_z;
+// 	std::vector<G4double> fiber_part_x;
+// 	std::vector<G4double> fiber_part_y;
+// 	std::vector<G4double> fiber_part_z;
+//
+// 	std::vector<G4int> sipm_evtno;
+// 	std::vector<G4int> sipm_trackid;
+// 	std::vector<G4int> sipm_parentid;
+// 	std::vector<G4int> sipm_no;
+// 	std::vector<G4double> sipm_t;
+// 	std::vector<G4double> sipm_ke;
+// 	std::vector<G4double> sipm_x;
+// 	std::vector<G4double> sipm_y;
+// 	std::vector<G4double> sipm_z;
+// 	*/
 
-	std::vector<G4int> scint_evtno;
-	std::vector<G4int> scint_trackid;
-	std::vector<G4int> scint_pid;
-	std::vector<G4int> scint_parentid;
-	std::vector<G4int> scint_no;
-	std::vector<G4double> scint_t;
-	std::vector<G4double> scint_ke;
-	std::vector<G4double> scint_eDep;
-	std::vector<G4int> scint_photons;
-	std::vector<G4double> scint_x;
-	std::vector<G4double> scint_y;
-	std::vector<G4double> scint_z;
-	std::vector<G4double> scint_part_x;
-	std::vector<G4double> scint_part_y;
-	std::vector<G4double> scint_part_z;
+	std::vector<std::vector<G4int>> scint_photons;
+	std::vector<std::vector<G4int>> holeA_photons;
+	std::vector<std::vector<G4int>> holeB_photons;
+	std::vector<std::vector<G4int>> fiberA_photons;
+	std::vector<std::vector<G4int>> fiberB_photons;
 
-	std::vector<G4int> fiber_evtno;
-	std::vector<G4int> fiber_trackid;
-	std::vector<G4int> fiber_parentid;
-	std::vector<G4int> fiber_procid;
-	std::vector<G4int> fiber_no;
-	std::vector<G4double> fiber_t;
-	std::vector<G4double> fiber_x;
-	std::vector<G4double> fiber_y;
-	std::vector<G4double> fiber_z;
-	std::vector<G4double> fiber_part_x;
-	std::vector<G4double> fiber_part_y;
-	std::vector<G4double> fiber_part_z;
- 
-	std::vector<G4int> sipm_evtno;
-	std::vector<G4int> sipm_trackid;
-	std::vector<G4int> sipm_parentid;
-	std::vector<G4int> sipm_no;
-	std::vector<G4double> sipm_t;
-	std::vector<G4double> sipm_ke;
-	std::vector<G4double> sipm_x;
-	std::vector<G4double> sipm_y;
-	std::vector<G4double> sipm_z;
-  
+	std::vector<std::vector<G4double>> scint_x;
+	std::vector<std::vector<G4double>> scint_y;
+	std::vector<std::vector<G4double>> scint_z;
+	std::vector<std::vector<G4double>> scint_t;
+	std::vector<std::vector<G4int>> scint_pdg;
+	// std::vector<std::vector<G4double>> scint_kEn;
+	// std::vector<std::vector<G4double>> scint_eDep;
+
+	std::vector<std::vector<G4double>> sipma0_t;
+	std::vector<std::vector<G4double>> sipma1_t;
+	std::vector<std::vector<G4double>> sipmb0_t;
+	std::vector<std::vector<G4double>> sipmb1_t;
+	std::vector<std::vector<G4int>> sipma0_phot;
+	std::vector<std::vector<G4int>> sipma1_phot;
+	std::vector<std::vector<G4int>> sipmb0_phot;
+	std::vector<std::vector<G4int>> sipmb1_phot;
+
+	std::vector<G4int> target_proc;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

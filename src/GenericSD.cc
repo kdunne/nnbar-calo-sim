@@ -1,6 +1,8 @@
 #include "GenericSD.hh"
 #include "NNbarHit.hh"
 
+#include "DetectorConstruction.hh"
+
 #include "G4Step.hh"
 #include "G4VTouchable.hh"
 #include "G4TouchableHistory.hh"
@@ -43,6 +45,19 @@ void GenericSD::Initialize(G4HCofThisEvent*)
 	HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
+
+// kp
+G4bool IsScintillatorName(const G4String& name,const std::vector<G4String>& names)
+{
+	for(const auto& scintName : names)
+		if(name=="Scintillator_"+scintName)
+			return true;
+
+	return false;
+}
+// kp
+
+
 //.....
 G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
@@ -67,7 +82,13 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	const G4VTouchable* touchable = PreStep->GetTouchable();
 	G4int k  = touchable->GetReplicaNumber(0);
 	G4String detname  = touchable->GetVolume()->GetName();
-
+//kp
+	G4String lvname = theTrack->GetVolume()->GetLogicalVolume()->GetName();
+	// G4String lvname = touchable->GetVolume()->GetLogicalVolume()->GetName();
+	G4String solidname = touchable->GetSolid()->GetName();
+	G4String nextlvname = theTrack->GetNextVolume()->GetLogicalVolume()->GetName();
+	auto sdname = PreStep -> GetPhysicalVolume()->GetLogicalVolume()->GetName();
+//kp
 	G4bool isLast = aStep->IsLastStepInVolume();
 	G4double time = theTrack->GetGlobalTime() / CLHEP::ns; // Get Global Time 
 	G4double localTime = theTrack->GetLocalTime() / CLHEP::ns; // Get Local Time
@@ -87,16 +108,10 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	G4int parentID = 0;
 	G4String proc = "";
 	// Getting Process on parentID of primary causes seg fault
-	if (trackID > 1){
-        parentID = theTrack->GetParentID();
-		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
-		else { proc = "primary"; }
-        
-    }
-	//if(trackID > 2){
-	//	parentID = theTrack->GetParentID();
-	//	proc = theTrack->GetCreatorProcess()->GetProcessName();
-	//}
+	if(trackID > 2){
+		parentID = theTrack->GetParentID();
+		proc = theTrack->GetCreatorProcess()->GetProcessName();
+	}
 	else {
 		proc = "primary";
 		parentID = 0;
@@ -105,7 +120,11 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	//G4cout << proc  << G4endl;
 	//G4cout << pos.getX() << " " << pos.getY() << " " << pos.getZ() << G4endl;
 	//G4cout << mom.getX() << " " << mom.getY() << " " << mom.getZ() << G4endl;
-	if(proc=="OpWLS"&&detname=="Scintillator") { // kill photons that escaped the fiber
+//	if(proc=="OpWLS"&&detname=="Scintillator") { // kill photons that escaped the fiber
+//kp
+	auto scints = DetectorConstruction::GetPointer()->GetScintillatorNames();
+    if(proc=="OpWLS" && IsScintillatorName(detname,scints)) { // kill photons that escaped the fiber.
+//kp
 		theTrack->SetTrackStatus(fKillTrackAndSecondaries);
 	}
 	
@@ -126,6 +145,12 @@ G4bool GenericSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 	detectorHit -> SetPos(pos);
 	detectorHit -> SetVert(vertex);
 	detectorHit -> SetDetName(detname);
+//kp
+	detectorHit -> SetLVName(lvname);
+	detectorHit -> SetNextLVName(nextlvname);
+	detectorHit -> SetSolidName(solidname);
+	detectorHit -> SetSDName(sdname);
+//kp
 
 	// Energy Info
 	detectorHit -> SetEDep(eDep);

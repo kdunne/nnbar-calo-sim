@@ -68,7 +68,6 @@ Scint_DetSD::~Scint_DetSD()
 //.....
 void Scint_DetSD::Initialize(G4HCofThisEvent*)
 {
-    
     HitsCollection = new NNbarHitsCollection(sensitiveDetectorName,collectionName[0]);
 }
 
@@ -76,6 +75,7 @@ void Scint_DetSD::Initialize(G4HCofThisEvent*)
 G4bool Scint_DetSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 {
     //if (aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> GetName() != "Scint_detectorPV") return false;
+    
     // Get Direction
     G4Track * theTrack = aStep  ->  GetTrack();
     G4ThreeVector stepDelta = aStep->GetDeltaPosition();
@@ -133,16 +133,18 @@ G4bool Scint_DetSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 		if (parentID!=0){ proc = theTrack->GetCreatorProcess()->GetProcessName(); }
 		else { proc = "primary"; }
         
-    } 
+    }
 	
 	else {
        proc = "primary";
 	   parentID = 0;
     }
 
+    auto sdname = aStep -> GetPreStepPoint() -> GetPhysicalVolume() ->GetLogicalVolume() -> GetName();
+
 	
     // kill all things entering
-    //G4cout << particleName << " ID: "<< trackID << " Killing particle " << name << G4endl;
+    // G4cout << particleName << " ID: "<< trackID << " Killing particle " << name << G4endl;
     theTrack->SetTrackStatus(fKillTrackAndSecondaries);
     
 	
@@ -171,6 +173,9 @@ G4bool Scint_DetSD::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     //detectorHit -> SetMod_ID(module_ID);
     detectorHit -> SetEDep(energyDeposit);
     detectorHit -> SetKinEn(eKinMean);
+    detectorHit -> SetSDName(sdname);
+
+
     HitsCollection -> insert(detectorHit);
 
     return true;

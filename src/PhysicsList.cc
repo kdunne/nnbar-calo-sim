@@ -49,10 +49,10 @@
 
 PhysicsList::PhysicsList(): G4VModularPhysicsList()
 {
-  defaultCutValue = 0.7*CLHEP::mm;  
+  // defaultCutValue = 0.7*CLHEP::mm;
   fConfig = G4LossTableManager::Instance()->EmConfigurator();
-  defaultCutValue = 1.0*mm;
-  SetVerboseLevel(1);
+  defaultCutValue = 0.1*mm;
+  SetVerboseLevel(2);
 
   ConstructParticle();
 
@@ -71,7 +71,8 @@ PhysicsList::PhysicsList(): G4VModularPhysicsList()
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   
   auto opticalParams = G4OpticalParameters::Instance();
-  opticalParams->SetProcessActivation("Cerenkov", false);
+//  opticalParams->SetProcessActivation("Cerenkov", false);
+  opticalParams->SetProcessActivation("Cerenkov", true);
   opticalParams->SetWLSTimeProfile("exponential");
   opticalParams->SetWLS2TimeProfile("exponential");
   //opticalParams->SetWLSTimeProfile("delta");

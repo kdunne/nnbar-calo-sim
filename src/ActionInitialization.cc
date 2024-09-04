@@ -64,7 +64,7 @@ void ActionInitialization::Build() const
 	EventAction* eventAction = new EventAction(histo);
 	SetUserAction(eventAction);
 
-	//SetUserAction(new SteppingAction());
+	SetUserAction(new SteppingAction());
 
 }  
 

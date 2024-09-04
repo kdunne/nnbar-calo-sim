@@ -46,27 +46,38 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     virtual G4VPhysicalVolume* Construct();
     virtual void ConstructSDandField();
 
+	static DetectorConstruction* GetPointer();
+
     void BuildScintBar(G4LogicalVolume* logicExtrusion, G4double xPos, G4double yPos, std::string name, G4double zPos, G4double scintThickness, G4double WorldSizeY, G4double WorldSizeZ);
     G4Material *FindMaterial(G4String);
+
+	inline std::vector<G4String> GetScintillatorNames() {return fScintBars;};
+	inline G4int GetHolesPlacement() const {return fHolesPlacement;};
 
   private:
     // methods
     void DefineMaterials();
     G4VPhysicalVolume* DefineVolumes();
-    WLSMaterials* fMaterials;
+    WLSMaterials* fMaterials{};
  	
 	void DefineCommands();
-	
+
+	static DetectorConstruction* fDConstruction;
+
 	G4double fLength;
 	G4double fWidth;
 	G4double fThickness;
-	G4double fYScale;
+	G4double fYScale{};
+	G4int fHolesPlacement; // 1 - centered double tubing, 2 - side double squares
+	G4int fFibersType; // 1 - tube, 2 - squares
+	std::vector<G4String> fScintBars = {"A"}; // Scintillator bars (default A)
 
 	G4GenericMessenger* fMessenger = nullptr;
  
     // data members
     G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps
 };
+
 
 //....
 

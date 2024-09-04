@@ -64,6 +64,29 @@ void WLSMaterials::CreateMaterials()
   std::vector<G4double> fractionMass;
   std::vector<G4String> elements;
 
+  G4String name;
+  G4String symbol;
+  G4double Zeff, Aeff;
+  G4int nAtoms, nComponents;
+
+
+
+//   //
+//   // define Elements
+//   //
+//
+// int z;
+// double a;
+//
+//   G4Element* H  = new G4Element("Hydrogen" ,"H" , z= 1., a=   1.01*g/mole);
+//   G4Element* C  = new G4Element("Hydrogen" ,"C" , z= 6., a=  12.00*g/mole);
+//   G4Element* N  = new G4Element("Nitrogen" ,"N" , z= 7., a=  14.01*g/mole);
+//   G4Element* O  = new G4Element("Oxygen"   ,"O" , z= 8., a=  16.00*g/mole);
+//   G4Element* Ge = new G4Element("Germanium","Ge", z=32., a=  72.59*g/mole);
+//   G4Element* Bi = new G4Element("Bismuth"  ,"Bi", z=83., a= 208.98*g/mole);
+//   G4Element* He = new G4Element("Helium"   , "He", z= 2., a= 4.0*g/mole);
+
+
   // Materials Definitions
   // =====================
 
@@ -194,6 +217,122 @@ void WLSMaterials::CreateMaterials()
   fCoating->AddMaterial(TiO2,         fractionmass = 15*perCent);
   fCoating->AddMaterial(fPolystyrene, fractionmass = 85*perCent);
 
+    //--------------------------------------------------
+    // CD2 target
+    //--------------------------------------------------
+
+   G4double a = 2.01*g/mole;
+   auto Deuterium = new G4Element(name="Deuterium", symbol="D",Zeff=1., Aeff=a);
+   a = 12.01*g/mole;
+   auto Carbon = new G4Element(name="Carbon", symbol="C", Zeff=6., Aeff=a);
+
+   //density = 0.23*100*g/cm3;
+   density = 1.01*g/cm3;
+
+   auto CD2 = new G4Material(name="CD2", density, nComponents=2);
+   CD2->AddElement(Carbon,nAtoms=1);
+   CD2->AddElement(Deuterium,nAtoms=2);
+
+  //--------------------------------------------------
+
+
+  //--------------------------------------------------
+  // liquid D
+  //--------------------------------------------------
+
+  fNistMan->FindOrBuildMaterial("G4_lH2");
+
+  // //--------------------------------------------------
+  // // liquid H2
+  // //--------------------------------------------------
+  //
+  // G4Material* H2l =
+  // new G4Material("H2liquid", density= 70.8*mg/cm3, ncomponents=1);
+  // H2l->AddElement(H, fractionmass=1.);
+/*
+  //--------------------------------------------------
+  // gas D
+  //--------------------------------------------------
+
+  G4Isotope* d = new G4Isotope("d", 1, 2, 0.0, 0);
+  G4Element* D = new G4Element("Heavy-Hydrogen" ,"D", ncomponents=1);
+
+  D->AddIsotope(d, 1.0);
+  G4Material* D2 =
+//    new G4Material("D2_gas", density= 0.036*mg/cm3, ncomponents=1);
+  new G4Material("D2_gas", density= 0.036*100*1000*mg/cm3, ncomponents=1);
+
+//  elements.push_back("D");      natoms.push_back(2);
+//  D2->AddElement(D, natoms=2);*/
+
+
+
+    //--------------------------------------------------
+    // CH2 coating
+    //--------------------------------------------------
+
+    elements.push_back("C");     natoms.push_back(1);
+    elements.push_back("H");      natoms.push_back(2);
+
+//    density     = 0.23*g/cm3;
+    density     = 1.01*g/cm3;
+
+    G4Material* CH2 = fNistMan->
+            ConstructNewMaterial("CH2", elements, natoms, density);
+
+    elements.clear();
+    natoms.clear();
+
+  //--------------------------------------------------
+  // Target Coating - 100% CD2.
+  //--------------------------------------------------
+
+  density = 1.006*g/cm3;
+
+  fTargetCoating = new G4Material("TargetCoating", density, ncomponents=1);
+
+  fTargetCoating->AddMaterial(CD2,         fractionmass = 100*perCent);
+
+    //--------------------------------------------------
+    // Copper
+    //--------------------------------------------------
+
+    elements.push_back("Cu");     natoms.push_back(1);
+
+    density     = 8.96*g/cm3;
+
+    G4Material* Cuprum = fNistMan->
+            ConstructNewMaterial("Cu", elements, natoms, density);
+
+    elements.clear();
+    natoms.clear();
+
+  //--------------------------------------------------
+  // B4C
+  //--------------------------------------------------
+
+  elements.push_back("B");     natoms.push_back(4);
+  elements.push_back("C");      natoms.push_back(1);
+
+  density     = 2.52*g/cm3;
+
+  G4Material* B4C = fNistMan->
+          ConstructNewMaterial("B4C", elements, natoms, density);
+
+  elements.clear();
+  natoms.clear();
+
+  //--------------------------------------------------
+  // BeamStop Coating - 10% TiO2 and 85% polystyrene by weight.
+  //--------------------------------------------------
+
+  density = 1.52*g/cm3;
+
+  fBeamStopCoating = new G4Material("BeamStopCoating", density, ncomponents=2);
+
+  fBeamStopCoating->AddMaterial(B4C,         fractionmass = 10*perCent);
+  fBeamStopCoating->AddMaterial(Cuprum, fractionmass = 90*perCent);
+
   //
   // ------------ Generate & Add Material Properties Table ------------
   //
@@ -322,16 +461,19 @@ void WLSMaterials::CreateMaterials()
   mptPolystyrene->AddProperty("SCINTILLATIONCOMPONENT2", ScintPhotonEnergy, scintilSlow,false,true);
   // 64% of Antracene: 17400
   double yield = 17400*0.64;
-  double yieldScale = 0.0025;
+  double yieldScale = 0.025*0.1;
   mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD", yield*yieldScale/MeV); //original 11136.
-  mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", sqrt(yieldScale));
+//  mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", sqrt(yieldScale));
+  mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", 0.);
   //mptPolystyrene->AddConstProperty("RESOLUTIONSCALE", 1.);
   mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 0.9*ns); // org: 0.9
   mptPolystyrene->AddConstProperty("SCINTILLATIONTIMECONSTANT2", 2.1*ns); // org: 2.1
   mptPolystyrene->AddConstProperty("SCINTILLATIONYIELD1", 1.);
+
   fPolystyrene->SetMaterialPropertiesTable(mptPolystyrene);
   
-  fPolystyrene->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
+//  fPolystyrene->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
+  fPolystyrene->GetIonisation()->SetBirksConstant(0.);
 
   G4cout << "Scintillator Properties -------" << G4endl;
   mptPolystyrene->DumpTable();
