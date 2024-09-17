@@ -36,8 +36,10 @@
 #include "G4OpticalPhoton.hh"
 #include "G4Event.hh"
 #include "G4RunManager.hh"
-
+#include "G4DynamicParticle.hh"
 //....
+extern G4double event_number;
+extern std::ofstream pi0_outFile;
 
 SteppingAction::SteppingAction()
 : G4UserSteppingAction()
@@ -57,29 +59,24 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
-  G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+ 
+  // G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 
-  if (eventNumber != fEventNumber) {
-     fEventNumber = eventNumber;
-     fScintillationCounter = 0;
-     fCerenkovCounter = 0;
-  }
+  
+  // G4Track* track = step->GetTrack();
+  // G4int parentID = track->GetParentID();
+  // G4int ID = track->GetTrackID();
 
-  G4Track* track = step->GetTrack();
-  G4int ID = track->GetTrackID();
-  G4int ltime = track->GetLocalTime();
-
-
+  // if (parentID == 0 & step->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()=="WorldPV" & step->IsFirstStepInVolume()) {
+    
+  //   const std::vector<const G4Track*>* secondary = step->GetSecondaryInCurrentStep();
+  //   if ((*secondary).size()>0){
+  //     for (int j = 0; j < (*secondary).size(); j++) {
+  //       G4double KE = (*secondary)[j]->GetKineticEnergy();
+  //       G4ThreeVector momentum = (*secondary)[j]->GetMomentumDirection();
+  //       //std::cout << event_number << " particle: " << j << " :: "<<momentum[0] << " " << momentum[1] << " " << momentum[2] << std::endl;
+  //       pi0_outFile << event_number << "," << KE << "," << momentum[0] << "," << momentum[1] << "," << momentum[2] <<G4endl;           
+  //     }
+  //   }  
+  // }
 } 
-  //const std::vector<const G4Track*>* secondaries = step->GetSecondaryInCurrentStep();
-
-//  if (secondaries->size()>0) {
-  //   for(unsigned int i=0; i<secondaries->size(); ++i) {
-    //      G4cout << "secondary particle: " << secondaries->at(i)->GetDynamicParticle()->GetParticleDefinition()->GetParticleName() << G4endl;
-      //    G4cout << "Creator process: " << secondaries->at(i)->GetCreatorProcess()->GetProcessName() << G4endl;
-     //}
-  //}
-
-//}
-
-//....

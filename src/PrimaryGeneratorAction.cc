@@ -1,32 +1,5 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-// 
-
 #include "PrimaryGeneratorAction.hh"
-
+#include <iomanip>
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -37,46 +10,68 @@
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
+#include "G4GenericMessenger.hh"
+#include "Analysis.hh"
 
-//.....
 
-PrimaryGeneratorAction::PrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(),
-   fParticleGun(nullptr)
+using namespace std;
+
+extern std::ofstream Particle_outFile;
+extern std::vector<std::vector<G4double>> particle_gun_record;
+extern G4double event_number;
+extern G4int run_number;
+
+PrimaryGeneratorAction::PrimaryGeneratorAction():fParticleGun(nullptr){fParticleGun = new G4ParticleGun();}
+
+
+PrimaryGeneratorAction::~PrimaryGeneratorAction(){}
+
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event * anEvent)
 {
-  G4int nofParticles = 1;
-  fParticleGun = new G4ParticleGun(nofParticles);
+	G4double x; G4double y; G4double z;
+	G4double t; G4double px; G4double py; G4double pz;
+	G4double KE;
 
-  // default particle kinematic
-  // Hardcoded here for mu+ 50 MeV must be changed for different particle/momentum
-  //auto particleDefinition 
-  //  = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
-  //fParticleGun->SetParticleDefinition(particleDefinition);
-  //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  //fParticleGun->SetParticleMomentum(50.*MeV);
-}
+	G4String particleName;
 
-//....
+	std::vector<G4double> particle_gun_record_row;
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
-}
+	x = 0.0* m;
+	y = 0.0*m;
+	z = 0.0* m; // (*vect)[j]->z() * m
+	KE = (50.0+ 50.0*std::floor(event_number/1000)) *MeV ; //250.0 * MeV;
+	px = G4UniformRand();
+	py = G4UniformRand();
+	pz = G4UniformRand();
+	t = 0.; 
 
-//....
+	fParticleGun->SetParticleDefinition(particleTable->FindParticle("pi+"));
+	//fParticleGun->SetParticleEnergy(KE);
+	
+	int n = event_number/100; // every energy, it has 50 entries
+	fParticleGun->SetParticleEnergy(KE);	
+	
+	fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px, py, pz)); //(*vect)[j]->w())
+	fParticleGun->SetParticleTime(0.0);
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{
+	Particle_outFile <<  event_number << ",";
+	Particle_outFile <<  event_number << ",";
+	Particle_outFile <<  211 << ","; //PID
+	Particle_outFile <<  particleTable -> FindParticle("pi+") -> GetPDGMass() << ","; //Mass
+	Particle_outFile <<  0 << ","; //PID
+	Particle_outFile <<  KE << ","; // 100+n*10 
+	Particle_outFile <<  x << ",";
+	Particle_outFile <<  y << ",";
+	Particle_outFile <<  z << ",";
+	Particle_outFile <<  t << ",";
+	Particle_outFile <<  px << ",";
+	Particle_outFile <<  py << ",";
+	Particle_outFile <<  pz << G4endl;
 
-  G4double worldZHalfLength = 57.*cm / 2.;
-  G4cout << "Gun at position " << -(worldZHalfLength)/CLHEP::cm << " cm" <<G4endl;
-  //G4double worldZHalfLength = 27.5*cm;
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
+	fParticleGun->GeneratePrimaryVertex(anEvent);
+	
 
-  // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength ));
-
-  fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
 //....
