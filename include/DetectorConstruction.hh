@@ -67,7 +67,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 	G4double fLength;
 	G4double fWidth;
 	G4double fThickness;
-	G4double fYScale{};
+	G4double fYScale;
+	G4double fAngle1;
+	G4double fAngle2;
 	G4int fHolesPlacement; // 1 - centered double tubing, 2 - side double squares
 	G4int fFibersType; // 1 - tube, 2 - squares
 	std::vector<G4String> fScintBars = {"A"}; // Scintillator bars (default A)

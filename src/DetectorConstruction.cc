@@ -49,6 +49,7 @@
 #include "G4OpticalSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 
+#include "G4RunManager.hh"
 #include "G4SDManager.hh"
 #include "G4SDChargedFilter.hh"
 #include "G4PSPopulation.hh"
@@ -74,6 +75,8 @@ DetectorConstruction::DetectorConstruction()
    fCheckOverlaps(true),fLength(50.*cm),
    fWidth(5.*cm),
    fThickness(2.*cm),
+   fAngle1(33.5*deg),
+   fAngle2(71.5*deg),
 	fFibersType(1), // 1 - tube, 2 - squares
 	fHolesPlacement(1), // 1 - centered double tubing, 2 - side double squares
 	fScintBars{"A","B","C","D","E","F","G","AA","BB","CC"}
@@ -176,7 +179,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 		const auto len = scint.length();
 		if(len>1) continue;
 
-		const auto ang = -33.5*deg;
+		const auto ang = -fAngle1;
 		G4double zPos = cos(ang)*m + (i*scintThickness)*cos(ang);
 		G4double yPos = 0.*m;
 		G4double xPos = -sin(ang)*m - (i*scintThickness)*sin(ang);
@@ -204,7 +207,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 		const auto len = scint.length();
 		if(len==1) continue;
 
-		const auto ang = 71.5*deg;
+		const auto ang = fAngle2;
 //		const auto ang = 51.5*deg;
 
 		G4double zPos = cos(ang)*m + (i*scintThickness)*cos(ang);
@@ -308,7 +311,7 @@ void DetectorConstruction::BuildScintBar(G4LogicalVolume* worldLV, G4double xPos
 
 	TiO2Surface -> SetMaterialPropertiesTable(TiO2SurfaceProperty);
 
-	auto ang = name.length()>1 ? 71.5*deg : -33.5*deg;
+	auto ang = name.length()>1 ? fAngle2 : -fAngle1;
 //	auto ang = name.length()>1 ? 51.5*deg : -33.5*deg;
 
 	auto* rot = new G4RotationMatrix();
@@ -525,6 +528,7 @@ G4Material* DetectorConstruction::FindMaterial(G4String name) {
 
 void DetectorConstruction::DefineCommands()
 {
+	G4RunManager* runManager = G4RunManager::GetRunManager();
 	// Define /B5/generator command directory using generic messenger class
 	fMessenger = new G4GenericMessenger(this, "/scint/", "Scintillator bar properties");
 
@@ -549,7 +553,7 @@ void DetectorConstruction::DefineCommands()
 	thicknessCmd.SetParameterName("thickness", true);
 	thicknessCmd.SetRange("thickness>=0.");
 	thicknessCmd.SetDefaultValue("2.");
-	
+		
 	auto& yScaleCmd = fMessenger->DeclareProperty("yScale", fYScale);
 	guidance = "Scaling factor for scintillator yield.\n";
 	yScaleCmd.SetGuidance(guidance);
@@ -557,4 +561,5 @@ void DetectorConstruction::DefineCommands()
 	yScaleCmd.SetRange("yScale>=0.");
 	yScaleCmd.SetDefaultValue("0.05");
 
+	runManager->GeometryHasBeenModified();
 }

@@ -47,6 +47,7 @@ set(SCRIPTS
   gui.mac
   init_vis.mac
   vis.mac
+  macros/nn1.mac
   )
 
 foreach(_script ${SCRIPTS})
